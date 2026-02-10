@@ -1,59 +1,63 @@
-# ProceduresGamsFe
+# Procedures GAMS Frontend
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.3.
+Frontend del sistema Procedures GAMS. Angular + TailwindCSS. Desarrollo bajo la rama `dev`.
 
-## Development server
+## Requisitos
+- Node.js (recomendado: 22.x)
+- npm
 
-To start a local development server, run:
-
+## Instalación
 ```bash
-ng serve
-```
+npm install
+Ejecución en desarrollo
+npm run start
+App: http://localhost:4200
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Build
+npm run build
+Estructura
+src/app/core: auth, interceptors, errors, policies, config
 
-## Code scaffolding
+src/app/api: acceso a APIs (único lugar con endpoints)
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+src/app/shared: UI reutilizable y utilidades sin negocio
 
-```bash
-ng generate component component-name
-```
+src/app/features: funcionalidades por dominio (feature-first)
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+docs/: documentación de arquitectura y branching
 
-```bash
-ng generate --help
-```
+Branching
+Rama de trabajo: dev
 
-## Building
+PRs apuntan a dev
 
-To build the project run:
+Releases a main
 
-```bash
-ng build
-```
+Ver: docs/branching.md
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Convención de commits
+feat: nueva funcionalidad
 
-## Running unit tests
+fix: bug
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+chore: tareas internas
 
-```bash
-ng test
-```
+refactor: refactor sin cambio funcional
 
-## Running end-to-end tests
+docs: documentación
 
-For end-to-end (e2e) testing, run:
+test: pruebas
 
-```bash
-ng e2e
-```
+style: formato
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+Backend
+Auth: JWT (Bearer)
 
-## Additional Resources
+Base URL API: configurada en src/environments/environment.ts (placeholder)
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Reglas rápidas
+No HTTP en páginas/components.
+
+No strings de endpoints fuera de src/app/api.
+
+Errores siempre como AppError (interceptor).
