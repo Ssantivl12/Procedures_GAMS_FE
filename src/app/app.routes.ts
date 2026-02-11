@@ -2,7 +2,12 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/auth/auth.guard';
 
 export const routes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+  { path: '', pathMatch: 'full', redirectTo: 'home' },
+
+  {
+    path: 'home',
+    loadComponent: () => import('./features/home/HomePage').then(m => m.HomePage),
+  },
 
   // Placeholder routes (devs implement later)
   {
