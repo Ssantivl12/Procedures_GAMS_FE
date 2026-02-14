@@ -11,10 +11,11 @@ export const routes: Routes = [
   },
 
   {
-    path: 'dashboard',
-    canActivate: [authGuard],
-    loadComponent: () => import('./features/dashboard/dashboard.page').then(m => m.DashboardPage),
-  },
+      path: 'dashboard',
+      //canActivate: [authGuard],
+      loadComponent: () => import('./features/dashboard/pages/dashboard-page/dashboard.page')
+        .then(m => m.DashboardPageComponent),
+    },
 
   {
     path: 'admin',

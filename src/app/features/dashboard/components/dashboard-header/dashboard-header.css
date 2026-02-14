@@ -1,0 +1,83 @@
+.header-container {
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  height: 64px;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-box {
+  background-color: #4caf4f; 
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-weight: bold;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #1f2937;
+}
+
+.subtitle {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.menu-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #374151;
+}
+
+.banner {
+  background-color: #4caf4f; 
+  color: white;
+  padding: 2rem 2rem;
+}
+
+.banner h1 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.banner-subtitle {
+  margin-top: 5px;
+  color: #d1fae5;
+  font-size: 0.9rem;
+}
+
+.user-badge {
+  margin-top: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.role-tag {
+  background-color: rgba(0,0,0,0.2);
+  padding: 4px 8px;
+  border-radius: 99px;
+  font-size: 0.75rem;
+  border: 1px solid rgba(255,255,255,0.3);
+}
