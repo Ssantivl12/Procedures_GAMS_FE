@@ -7,7 +7,7 @@
   --primary-soft: #57bd9e;
 
   /* Colores neutros */
-  --bg-surface: #f9fafb;
+  --bg-surface: #f5f7fa;
   --white: #ffffff;
   --gray-dark: #1f2937;
   --gray-medium: #4b5563;
@@ -26,8 +26,10 @@
   justify-content: space-between;
   padding: 1.5rem 2.5rem;
   background-color: var(--white);
-  border-bottom: 3px solid var(--primary-dark);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  /* Navbar un poco más sobrepuesto sobre el contenido */
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+  position: relative;
+  z-index: 10;
 }
 
 .home-header__logo-container {
@@ -51,7 +53,7 @@
 }
 
 .home-header__login-button {
-  background-color: var(--primary-dark);
+  background-color: #2e7d32;
   color: var(--white);
   padding: 12px 24px;
   border-radius: 8px;
@@ -68,7 +70,7 @@
 }
 
 .home-header__login-button:hover {
-  background-color: var(--primary-accent);
+  background-color: #2e7d32;
 }
 
 .home-header__login-button .arrow {
@@ -193,7 +195,8 @@
 /* Footer */
 .home-footer {
   margin-top: auto;
-  background-color: var(--white);
+  /* Mismo fondo que el body para que se vea un solo bloque */
+  background-color: var(--bg-surface);
   padding-top: 4rem;
   padding-bottom: 2rem;
 }
@@ -207,7 +210,7 @@
 .home-footer__credits {
   text-align: center;
   color: var(--gray-medium);
-  margin-bottom: 3rem;
+  margin-top: 2rem;
   font-size: 1rem;
   font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
 }

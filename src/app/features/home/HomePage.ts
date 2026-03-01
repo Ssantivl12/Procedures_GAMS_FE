@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { LoginButtonComponent } from '../../shared/ui/Login';
 
 @Component({
   standalone: true,
   selector: 'app-home-page',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, LoginButtonComponent],
   templateUrl: './HomePage.html',
   styleUrl: './HomePage.css',
 })
