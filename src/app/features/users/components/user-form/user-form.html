@@ -1,0 +1,48 @@
+<div class="modal-overlay" (click)="closeForm.emit()"></div>
+
+<div class="modal-box">
+  <div class="modal-header">
+    <div>
+      <h2>Crear Nuevo Usuario</h2>
+      <p>Complete los datos del nuevo usuario del sistema</p>
+    </div>
+    <button class="close-btn" (click)="closeForm.emit()">✕</button>
+  </div>
+
+  <div class="modal-body">
+    <div class="form-group">
+      <label>Nombres</label>
+      <input type="text" placeholder="Ej: María">
+    </div>
+
+    <div class="form-group">
+      <label>Apellidos</label>
+      <input type="text" placeholder="Ej: González">
+    </div>
+
+    <div class="form-group">
+      <label>CI</label>
+      <input type="text" placeholder="Ej: 12345678">
+    </div>
+
+    <div class="form-group">
+      <label>Correo</label>
+      <input type="email" placeholder="Ej: correo@gams.gob.bo">
+    </div>
+
+    <div class="form-group">
+      <label>Rol</label>
+      <select>
+        <option>Secretaría</option>
+        <option>Inspector</option>
+        <option>SuperAdmin</option>
+        <option>Encargado</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn-cancel" (click)="closeForm.emit()">Cancelar</button>
+    <button class="btn-save">Crear Usuario</button>
+  </div>
+</div>

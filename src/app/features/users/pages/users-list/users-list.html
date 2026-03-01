@@ -1,0 +1,70 @@
+<div class="page-wrapper">
+  <app-dashboard-header></app-dashboard-header>
+
+  <main class="main-content">
+    
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Gestión de Personal</h1>
+        <p class="page-subtitle">Administración de usuarios del sistema</p>
+      </div>
+      <button class="btn-create" (click)="isModalOpen = true">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
+        </svg>
+        Crear nuevo usuario
+      </button>
+    </div>
+
+    <div class="search-container">
+      <div class="search-box">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="search-icon">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+        </svg>
+        <input type="text" placeholder="Buscar por nombre, CI o correo...">
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombres</th>
+            <th>Apellidos</th>
+            <th>CI</th>
+            <th>Correo</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (user of users; track user.ci) {
+            <tr>
+              <td class="font-medium">{{ user.name }}</td>
+              <td>{{ user.lastName }}</td>
+              <td>{{ user.ci }}</td>
+              <td>{{ user.email }}</td>
+              <td>
+                <span class="role-badge" [ngClass]="user.role.toLowerCase()">{{ user.role }}</span>
+              </td>
+              <td>
+                <span class="status-badge" [class.active]="user.status === 'Activo'" [class.inactive]="user.status === 'Inactivo'">
+                  {{ user.status }}
+                </span>
+              </td>
+              <td class="actions-cell">
+                <button class="btn-action">⋮</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+
+  @if (isModalOpen) {
+    <app-user-form (closeForm)="isModalOpen = false"></app-user-form>
+  }
+</div>

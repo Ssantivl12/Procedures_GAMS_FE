@@ -13,11 +13,11 @@
       </div>
     </div>
 
-    <h2 class="section-title">¿Qué quieres hacer hoy?</h2>
+    <h2 class="section-title">Módulos de Gestión Administrativa</h2>
     
     <div class="actions-grid">
       @for (action of mainActions; track action.title) {
-        <button class="action-card">
+        <button class="action-card" [routerLink]="action.route">
           <div class="action-icon">
             @switch (action.iconKey) {
               @case ('building') {
@@ -50,7 +50,7 @@
       }
     </div>
 
-    <h2 class="section-title mt-large">Resumen General</h2>
+    <h2 class="section-title mt-large">Resumen General Operativo</h2>
 
     <div class="cards-grid">
       @for (stat of stats; track stat.title) {

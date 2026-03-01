@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DashboardHeaderComponent } from '../../components/dashboard-header/dashboard-header';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard-page',
   standalone: true,
-  imports: [CommonModule, DashboardHeaderComponent],
+  imports: [CommonModule, DashboardHeaderComponent, RouterModule],
   templateUrl: './dashboard.page.html',
   styleUrl: './dashboard.page.css'
 })

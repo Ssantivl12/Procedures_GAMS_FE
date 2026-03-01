@@ -16,7 +16,11 @@ export const routes: Routes = [
       loadComponent: () => import('./features/dashboard/pages/dashboard-page/dashboard.page')
         .then(m => m.DashboardPageComponent),
     },
-
+{
+      path: 'users',
+      loadComponent: () => import('./features/users/pages/users-list/users-list')
+        .then(m => m.UsersListComponent),
+    },
   {
     path: 'admin',
     canActivate: [authGuard],
