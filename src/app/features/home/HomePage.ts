@@ -7,7 +7,7 @@ import { RouterLink } from '@angular/router';
   selector: 'app-home-page',
   imports: [CommonModule, RouterLink],
   templateUrl: './HomePage.html',
-  styleUrl: './HomePage.scss',
+  styleUrl: './HomePage.css',
 })
 export class HomePage {}
 
