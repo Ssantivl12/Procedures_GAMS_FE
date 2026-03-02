@@ -40,7 +40,31 @@
   background: #fef2f2; 
 }
 .btn-save {
-  padding: 10px 20px; border: none; background:#4caf4f; border-radius: 8px;
+  padding: 10px 20px; border: none; background: #4caf4f; border-radius: 8px;
   font-weight: 600; cursor: pointer; color: white; transition: background 0.2s;
 }
-.btn-save:hover { background: #047857; }
+.btn-save:hover { background: #4caf4f; }
+
+.form-group input.is-invalid, 
+.form-group select.is-invalid {
+  border: 1px solid #ef4444; 
+  background-color: #fef2f2; 
+}
+.invalid-feedback {
+  color: #ef4444; 
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+.modal-box { max-width: 600px; } 
+
+.dire-input textarea {
+  padding: 10px 12px; border: 1px solid transparent; border-radius: 8px;
+  background-color: #f3f4f6; font-size: 0.95rem; outline: none; transition: border 0.2s;
+  resize: vertical; font-family: 'Segoe UI', sans-serif;
+}
+.dire-input textarea.is-invalid { border: 1px solid #ef4444; background-color: #fef2f2; }
+
+.form-row {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;
+}

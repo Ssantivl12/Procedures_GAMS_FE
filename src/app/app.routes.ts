@@ -16,11 +16,23 @@ export const routes: Routes = [
       loadComponent: () => import('./features/dashboard/pages/dashboard-page/dashboard.page')
         .then(m => m.DashboardPageComponent),
     },
-{
+  {
       path: 'users',
       loadComponent: () => import('./features/users/pages/users-list/users-list')
         .then(m => m.UsersListComponent),
     },
+  {
+      path: 'companies',
+      loadComponent: () => import('./features/companies/pages/companies-list/companies-list')
+        .then(m => m.CompaniesListComponent),
+    },
+
+  {
+      path: 'companies/:id', 
+      loadComponent: () => import('./features/companies/pages/company-detail/company-detail')
+        .then(m => m.CompanyDetailComponent),
+    },
+  
   {
     path: 'admin',
     canActivate: [authGuard],
