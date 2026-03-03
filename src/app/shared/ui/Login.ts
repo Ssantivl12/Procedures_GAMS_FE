@@ -14,7 +14,7 @@ import { RouterLink } from '@angular/router';
   styles: [
     `
       .login-button {
-        background-color: var(--primary-dark);
+        background-color: #2e7d32;
         color: var(--white);
         padding: 12px 24px;
         border-radius: 8px;
@@ -32,7 +32,7 @@ import { RouterLink } from '@angular/router';
       }
 
       .login-button:hover {
-        background-color: var(--primary-accent);
+        background-color: #2e7d32;
       }
 
       .login-button .arrow {

@@ -7,11 +7,12 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { GamsNavbarComponent } from '../../shared/ui/Navbar';
 
 @Component({
   standalone: true,
   selector: 'app-login-page',
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink, GamsNavbarComponent],
   styles: [`
     * {
       box-sizing: border-box;
@@ -32,37 +33,7 @@ import { RouterLink } from '@angular/router';
       flex-direction: column;
     }
 
-    .login-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 1.5rem 2.5rem; /* igual que .home-header */
-      background-color: #ffffff;
-      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08); /* igual intensidad que home */
-      position: relative;
-      z-index: 10;
-    }
-
-    .login-header__logo {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .login-header__logo-image {
-      height: 28px;
-      width: auto;
-      object-fit: contain;
-    }
-
-    .login-header__logo-text {
-      font-size: 18px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      color: #111827;
-    }
-
-    .login-header__back-button {
+    .login-back-button {
       background-color: #2e7d32;
       color: #ffffff;
       padding: 12px 24px;
@@ -80,11 +51,11 @@ import { RouterLink } from '@angular/router';
       transition: background-color 0.2s ease;
     }
 
-    .login-header__back-button:hover {
+    .login-back-button:hover {
       background-color: #2e7d32;
     }
 
-    .login-header__back-button .arrow {
+    .login-back-button .arrow {
       font-size: 1.125rem;
     }
 
@@ -255,20 +226,12 @@ import { RouterLink } from '@angular/router';
   `],
   template: `
     <div class="login-page">
-      <header class="login-header">
-        <div class="login-header__logo">
-          <img
-            src="assets/img/LogoGams.png"
-            alt="Logo GAMS"
-            class="login-header__logo-image"
-          />
-          <span class="login-header__logo-text">GAMS</span>
-        </div>
-        <a routerLink="/home" class="login-header__back-button">
+      <app-gams-navbar>
+        <a routerLink="/home" class="login-back-button">
           Volver al inicio
           <span class="arrow">→</span>
         </a>
-      </header>
+      </app-gams-navbar>
 
       <div class="login-container">
         <div class="login-box">

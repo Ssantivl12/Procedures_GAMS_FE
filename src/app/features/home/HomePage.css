@@ -19,63 +19,7 @@
   flex-direction: column;
 }
 
-/* Header Moderno */
-.home-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1.5rem 2.5rem;
-  background-color: var(--white);
-  /* Navbar un poco más sobrepuesto sobre el contenido */
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
-  position: relative;
-  z-index: 10;
-}
-
-.home-header__logo-container {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.home-header__logo-container .logo-image {
-  height: 55px;
-  width: auto;
-  object-fit: contain;
-}
-
-.home-header__logo-container .logo-text {
-  font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-  font-size: 1.875rem;
-  font-weight: 600;
-  color: var(--primary-dark);
-  letter-spacing: -0.025em;
-}
-
-.home-header__login-button {
-  background-color: #2e7d32;
-  color: var(--white);
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 1rem;
-  transition: background-color 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  text-decoration: none;
-  border: none;
-  cursor: pointer;
-  font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-}
-
-.home-header__login-button:hover {
-  background-color: #2e7d32;
-}
-
-.home-header__login-button .arrow {
-  font-size: 1.125rem;
-}
+/* Header: ahora es componente reutilizable `app-gams-navbar` (shared/ui/Navbar.ts) */
 
 /* Hero Section */
 .home-hero {
