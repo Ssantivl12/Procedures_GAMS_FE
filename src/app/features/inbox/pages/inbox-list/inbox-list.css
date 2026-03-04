@@ -4,12 +4,6 @@
 .page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
 .page-title { font-size: 1.8rem; font-weight: 700; color: #111827; margin: 0 0 8px 0; }
 .page-subtitle { color: #6b7280; margin: 0; font-size: 1rem; }
-.btn-create {
-  display: flex; align-items: center; gap: 8px; background-color: #60ad5e; color: white;
-  padding: 10px 20px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; transition: background 0.2s;
-}
-.btn-create:hover { background-color: #60ad5e; }
-.btn-create svg { width: 20px; height: 20px; }
 
 .search-container { margin-bottom: 24px; }
 .search-box {
@@ -28,15 +22,20 @@ td { padding: 16px 24px; border-bottom: 1px solid #f3f4f6; color: #4b5563; font-
 tr:last-child td { border-bottom: none; }
 .font-medium { font-weight: 600; color: #111827; }
 
-.role-badge { padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; }
-.role-badge.secretaría { border: 1px solid #e5e7eb; color: #374151; background: white; }
-.role-badge.inspector { background: #f3f4f6; color: #374151; }
-.role-badge.superadmin { background: #111827; color: white; }
+.cell-name { max-width: 300px; font-size: 0.85rem; line-height: 1.4; }
 
-.status-badge { padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 600; }
-.status-badge.active { background: #d1fae5; color: #4caf4f; }
-.status-badge.inactive { background: #f3f4f6; color: #6b7280; }
+.status-badge { padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; white-space: nowrap;}
+.status-badge.por-revisar-inspector { background: #eff6ff; color: #2563eb; } 
+.status-badge.subsanación-pendiente { background: #fff7ed; color: #ea580c; } 
+.status-badge.observado { background: #fee2e2; color: #dc2626; } 
+
+.days-badge { padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; background-color: #f3f4f6; color: #6b7280; }
+.days-badge.urgent { background-color: #fef2f2; color: #dc2626; } 
 
 .actions-cell { text-align: right; }
-.btn-action { background: none; border: none; font-size: 1.2rem; font-weight: bold; color: #9ca3af; cursor: pointer; }
-.btn-action:hover { color: #374151; }
+.btn-view {
+  padding: 8px 16px; background-color: #f3f4f6; color: #374151;
+  border: 1px solid #e5e7eb; border-radius: 6px; font-weight: 600;
+  cursor: pointer; font-size: 0.8rem; transition: background 0.2s;
+}
+.btn-view:hover { background-color: #e5e7eb; }

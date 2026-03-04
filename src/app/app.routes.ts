@@ -34,6 +34,17 @@ export const routes: Routes = [
     },
   
   {
+      path: 'inbox', 
+      loadComponent: () => import('./features/inbox/pages/inbox-list/inbox-list')
+        .then(m => m.InboxListComponent),
+    },
+  {
+      path: 'inbox/:id', 
+      loadComponent: () => import('./features/inbox/pages/inbox-detail/inbox-detail')
+        .then(m => m.InboxDetailComponent),
+    },
+
+  {
     path: 'admin',
     canActivate: [authGuard],
     loadChildren: () => import('./features/admin/admin.routes').then(m => m.ADMIN_ROUTES),

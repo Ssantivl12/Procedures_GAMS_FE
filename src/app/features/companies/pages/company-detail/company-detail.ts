@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule,Location } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router'; 
 import { DashboardHeaderComponent } from '../../../dashboard/components/dashboard-header/dashboard-header';
 
@@ -28,9 +28,13 @@ export class CompanyDetailComponent implements OnInit {
     { name: 'Carlos', lastName: 'Pérez', ci: '87654321', email: 'carlos.inspector@gams.gob.bo', role: 'Inspector', status: 'Activo' },
   ];
 
-  constructor(private route: ActivatedRoute) { }
+ constructor(private route: ActivatedRoute, private location: Location) { }
 
   ngOnInit(): void {
     this.companyId = this.route.snapshot.paramMap.get('id');
+  }
+  
+  goBack(): void {
+    this.location.back();
   }
 }

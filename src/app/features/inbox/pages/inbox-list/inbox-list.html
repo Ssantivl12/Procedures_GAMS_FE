@@ -1,0 +1,60 @@
+<div class="page-wrapper">
+  <app-dashboard-header></app-dashboard-header>
+
+  <main class="main-content">
+    
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Bandeja de Pendientes</h1>
+        <p class="page-subtitle">Ver y gestionar los trámites en curso que requieren atención</p>
+      </div>
+    </div>
+
+    <div class="search-container">
+      <div class="search-box">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="search-icon">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+        </svg>
+        <input type="text" placeholder="Buscar por código de trámite, empresa o estado...">
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Código Trámite</th>
+            <th>Empresa</th>
+            <th>Tipo de Trámite</th>
+            <th>Fecha Solicitud</th>
+            <th>Estado Actual</th>
+            <th>Días Pendientes</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of pendingItems; track item.id) {
+            <tr>
+              <td class="font-medium">{{ item.id }}</td>
+              <td class="cell-name">{{ item.empresa }}</td>
+              <td>{{ item.tramite }}</td>
+              <td>{{ item.fecha }}</td>
+              <td>
+                <span class="status-badge" [ngClass]="item.estado.toLowerCase().replace(' ', '-')">
+                  {{ item.estado }}
+                </span>
+              </td>
+              <td>
+                <span class="days-badge" [class.urgent]="item.dias > 5">{{ item.dias }} días</span>
+              </td>
+              <td class="actions-cell">
+                <button class="btn-view" [routerLink]="['/inbox', item.id]">Ver Detalle →</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>

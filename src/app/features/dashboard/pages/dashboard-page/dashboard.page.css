@@ -12,7 +12,7 @@
 }
 
 .banner-card {
-  background: linear-gradient(135deg, #4caf4f 0%, #4caf4f 100%);
+  background: linear-gradient(135deg, #4caf4f 0%, #005005 100%);
   color: white;
   border-radius: 16px;
   padding: 3rem;
@@ -48,7 +48,7 @@
 
 .role-tag {
   background-color: white;
-  color: #4caf4f;
+  color: #60AD5E;
   padding: 4px 10px;
   border-radius: 6px;
   font-size: 0.75rem;
@@ -101,7 +101,7 @@
 
 .action-icon {
   background-color: #f0fdf4;
-  color: #4caf4f;
+  color: #60AD5E;
   width: 70px;
   height: 70px;
   display: flex;
@@ -112,7 +112,7 @@
 }
 
 .action-card:hover .action-icon {
-  background-color: #17ba53;
+  background-color: #60AD5E;
   color: white; 
 }
 

@@ -1,0 +1,80 @@
+.page-wrapper { background-color: #f3f4f6; min-height: 100vh; font-family: 'Inter', sans-serif; }
+.main-content { width: 100%; max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+
+.btn-back {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: none; border: none; color: #6b7280;
+  font-weight: 600; font-size: 0.9rem; cursor: pointer;
+  padding: 0; margin-bottom: 20px; transition: color 0.2s;
+}
+.btn-back:hover { color: #111827; }
+.btn-back svg { width: 18px; height: 18px; }
+
+.page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+.header-pretitle { color: #9ca3af; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
+.page-title { font-size: 1.8rem; font-weight: 800; color: #111827; margin: 0 0 8px 0; max-width: 700px; line-height: 1.2; }
+.page-subtitle { color: #6b7280; margin: 0; font-size: 1rem; }
+.header-actions { display: flex; align-items: center; gap: 16px; }
+
+
+.status-badge { padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; white-space: nowrap;}
+.status-badge.por-revisar-inspector { background: #eff6ff; color: #2563eb; } 
+.status-badge.subsanación-pendiente { background: #fff7ed; color: #ea580c; } 
+.status-badge.observado { background: #fee2e2; color: #dc2626; } 
+
+.detail-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px;
+}
+.detail-card, .actions-card {
+  background: white; border-radius: 12px; padding: 30px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #f3f4f6;
+  margin-bottom: 24px;
+}
+.card-title { font-size: 1.1rem; color: #111827; font-weight: 600; margin: 0 0 20px 0; }
+
+.info-list { display: flex; flex-direction: column; gap: 16px; }
+.info-item { display: flex; justify-content: space-between; align-items: center; }
+.label { color: #6b7280; font-size: 0.9rem; }
+.value { font-weight: 600; color: #1f2937; text-align: right; }
+.dire-item { align-items: flex-start; }
+.dire-item .value { text-align: right; max-width: 250px; line-height: 1.4; }
+
+.cell-name { max-width: 300px; font-size: 0.9rem; line-height: 1.4; }
+.font-medium { font-weight: 500; }
+.font-bold { font-weight: 700; }
+.text-vigente { color: #0f0f0f; } 
+
+.actions-buttons {
+  display: flex; gap: 16px; flex-wrap: wrap;
+}
+
+.btn-action-light {
+  display: inline-flex;       
+  align-items: center;        
+  gap: 8px;                   
+  padding: 10px 20px; 
+  background-color: #ecfdf5; 
+  color: #059669; 
+  border: 1px solid transparent; 
+  border-radius: 8px; 
+  font-weight: 600;
+  cursor: pointer; 
+  font-size: 0.9rem; 
+  transition: background 0.2s;
+}
+
+.btn-action-light svg {
+  width: 20px;
+  height: 20px;
+}
+.btn-action-light:hover { background-color: #d1fae5; }
+
+.btn-action-light.warning {
+  background-color: #fffbeb; color: #d97706; 
+}
+.btn-action-light.warning:hover { background-color: #fef3c7; }
+
+.btn-action-light.urgent {
+  background-color: #fef2f2; color: #dc2626; 
+}
+.btn-action-light.urgent:hover { background-color: #fee2e2; }
