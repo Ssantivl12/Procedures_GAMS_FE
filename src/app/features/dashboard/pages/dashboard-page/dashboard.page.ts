@@ -25,6 +25,6 @@ export class DashboardPageComponent {
     { title: 'Gestión de Empresas', desc: 'Registrar y categorizar', iconKey: 'building', route: '/companies' },
     { title: 'Gestión de Personal', desc: 'Usuarios y permisos', iconKey: 'users', route: '/users' },
     { title: 'Bandeja de Pendientes', desc: 'Trámites en curso', iconKey: 'inbox', route: '/inbox' },
-    { title: 'Historial', desc: 'Consultar pasados', iconKey: 'history', route: '/history' }
+    { title: 'Estado de empresas', desc: 'Consultar situación actual y trámites', iconKey: 'status', route: '/status-companies' }
   ];
 }

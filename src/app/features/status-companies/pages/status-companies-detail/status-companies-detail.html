@@ -1,0 +1,77 @@
+<div class="page-wrapper">
+  <app-dashboard-header></app-dashboard-header>
+
+  <main class="main-content">
+    
+    <button class="btn-back" (click)="goBack()">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+      </svg>
+      Volver atrás
+    </button>
+
+    <div class="company-header-card">
+      <h1 class="company-name">{{ company.name }}</h1>
+      <div class="company-meta">
+        <span class="cat-badge">{{ company.category }}</span>
+        <span class="inspector-info">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+          </svg>
+          {{ company.inspector }}
+        </span>
+      </div>
+
+      <div class="vigencias-grid">
+        <div class="vigencia-box">
+          <span class="v-label">Vigencia RAI</span>
+          <span class="v-badge" [ngClass]="company.vigenciaRaiColor">{{ company.vigenciaRai }}</span>
+        </div>
+        <div class="vigencia-box">
+          <span class="v-label">Vigencia MAI/PMA</span>
+          <span class="v-badge" [ngClass]="company.vigenciaMaiColor">{{ company.vigenciaMai }}</span>
+        </div>
+        <div class="vigencia-box">
+          <span class="v-label">Estado IAA</span>
+          <span class="v-badge" [ngClass]="company.estadoIaaColor">{{ company.estadoIaa }}</span>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-title">Trámites</h2>
+
+    <div class="tramites-list">
+      @for (tramite of tramites; track tramite.tipo) {
+        <div class="tramite-card">
+          
+          <div class="tramite-header">
+            <h3>{{ tramite.tipo }}</h3>
+            <span class="t-badge" [ngClass]="tramite.estadoColor">{{ tramite.estado }}</span>
+          </div>
+
+          @if (tramite.recibido !== '-') {
+            <div class="tramite-details">
+              <div class="detail-col">
+                <span class="d-label">Recibido</span>
+                <span class="d-value">{{ tramite.recibido }}</span>
+              </div>
+              <div class="detail-col">
+                <span class="d-label">Inicio cómputo</span>
+                <span class="d-value">{{ tramite.inicioComputo }}</span>
+              </div>
+              <div class="detail-col">
+                <span class="d-label">N° Certificado</span>
+                <span class="d-value">{{ tramite.nroCertificado }}</span>
+              </div>
+              <div class="detail-col">
+                <span class="d-label">Cerrado</span>
+                <span class="d-value">{{ tramite.cerrado }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+  </main>
+</div>

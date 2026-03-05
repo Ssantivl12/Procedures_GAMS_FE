@@ -1,0 +1,74 @@
+<div class="page-wrapper">
+  <app-dashboard-header></app-dashboard-header>
+
+  <main class="main-content">
+    
+    <button class="btn-back" routerLink="/dashboard">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+      </svg>
+      Volver al inicio
+    </button>
+
+    <div class="page-header">
+      <h1 class="page-title">Estado de Empresas</h1>
+      <p class="page-subtitle">Seguimiento de trámites por categoría</p>
+    </div>
+
+    <div class="tabs-pill-container">
+      <button class="tab-pill" [class.active]="activeTab === 'proceso'" (click)="activeTab = 'proceso'">Proceso</button>
+      <button class="tab-pill" [class.active]="activeTab === 'rai'" (click)="activeTab = 'rai'">RAI</button>
+      <button class="tab-pill" [class.active]="activeTab === 'mai'" (click)="activeTab = 'mai'">MAI/PMA</button>
+    </div>
+
+    <div class="cards-grid">
+      @for (item of currentCompanies; track item.id) {
+        <div class="status-card">
+          
+          <h3 class="card-company-name">{{ item.name }}</h3>
+          <span class="cat-badge">{{ item.category }}</span>
+
+          @if (activeTab === 'rai') {
+            <div class="status-section">
+              <span class="section-label">N° RAI</span>
+              <span class="text-bold">{{ item.nro }}</span>
+            </div>
+          } @else if (activeTab === 'mai') {
+            <div class="status-section">
+              <span class="section-label">N° MAI</span>
+              <span class="text-bold">{{ item.nro }}</span>
+            </div>
+          }
+
+          <div class="status-section">
+            <span class="section-label">Estado actual</span>
+            <span class="badge-status">{{ item.status }}</span>
+          </div>
+
+          @if (activeTab === 'proceso' && item.expiry) {
+            <div class="status-section">
+              <span class="section-label">Vencimiento</span>
+              <span class="badge-expiry">{{ item.expiry }}</span>
+            </div>
+          } @else if (activeTab !== 'proceso') {
+            <div class="status-section">
+              <span class="section-label">Vigencia</span>
+              <span class="badge-vigencia" [ngClass]="item.vigenciaColor">{{ item.vigencia }}</span>
+            </div>
+          }
+
+          <div class="card-footer">
+            <button class="btn-ver-detalle" [routerLink]="['/status-companies', item.id]">
+              Ver detalle
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            </button>
+          </div>
+
+        </div>
+      }
+    </div>
+
+  </main>
+</div>

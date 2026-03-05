@@ -43,7 +43,16 @@ export const routes: Routes = [
       loadComponent: () => import('./features/inbox/pages/inbox-detail/inbox-detail')
         .then(m => m.InboxDetailComponent),
     },
-
+  {
+      path: 'status-companies',
+      loadComponent: () => import('./features/status-companies/pages/status-companies-list/status-companies-list')
+        .then(m => m.StatusCompaniesListComponent),
+    },
+  {
+      path: 'status-companies/:id',
+      loadComponent: () => import('./features/status-companies/pages/status-companies-detail/status-companies-detail')
+        .then(m => m.StatusCompaniesDetailComponent),
+    },
   {
     path: 'admin',
     canActivate: [authGuard],
