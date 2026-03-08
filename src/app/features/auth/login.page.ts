@@ -6,8 +6,14 @@ import {
   Validators,
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { GamsNavbarComponent } from '../../shared/ui/Navbar';
+import { AuthService } from '../../core/auth/auth.service';
+import { environment } from '../../../environments/environment';
+
+interface LoginResponse {
+  accessToken: string;
+}
 
 @Component({
   standalone: true,
@@ -223,6 +229,19 @@ import { GamsNavbarComponent } from '../../shared/ui/Navbar';
       font-size: 12px;
       color: #999;
     }
+
+    .error-message {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #d32f2f;
+      text-align: center;
+    }
+
+    .field-error {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #d32f2f;
+    }
   `],
   template: `
     <div class="login-page">
@@ -249,13 +268,16 @@ import { GamsNavbarComponent } from '../../shared/ui/Navbar';
 
           <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
             <div class="form-group">
-              <label>Usuario / Correo</label>
+              <label>Correo electrónico</label>
               <input
-                type="text"
+                type="email"
                 class="form-control"
-                placeholder="Ingrese su usuario o correo electrónico"
+                placeholder="Ingrese su correo electrónico"
                 formControlName="usuario"
               />
+              <div *ngIf="loginForm.get('usuario')?.invalid && loginForm.get('usuario')?.touched" class="field-error">
+                {{ loginForm.get('usuario')?.errors?.['email'] ? 'Correo electrónico inválido.' : 'El correo es obligatorio.' }}
+              </div>
             </div>
 
             <div class="form-group">
@@ -277,9 +299,13 @@ import { GamsNavbarComponent } from '../../shared/ui/Navbar';
               </div>
             </div>
 
-            <button type="submit" class="btn-ingresar">
-              INGRESAR
+            <button type="submit" class="btn-ingresar" [disabled]="loading">
+              {{ loading ? 'INGRESANDO...' : 'INGRESAR' }}
             </button>
+
+            <div *ngIf="loginError" class="error-message">
+              {{ loginError }}
+            </div>
           </form>
 
           <div class="forgot-password">
@@ -300,10 +326,16 @@ import { GamsNavbarComponent } from '../../shared/ui/Navbar';
 export class LoginPage {
   loginForm: FormGroup;
   showPassword = false;
+  loading = false;
+  loginError: string | null = null;
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private auth: AuthService,
+    private router: Router,
+  ) {
     this.loginForm = this.fb.group({
-      usuario: ['', Validators.required],
+      usuario: ['', [Validators.required, Validators.email]],
       contrasena: ['', Validators.required],
     });
   }
@@ -316,5 +348,51 @@ export class LoginPage {
     window.history.back();
   }
 
-  onSubmit() {}
+  async onSubmit() {
+    if (this.loading) return;
+
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      return;
+    }
+
+    this.loading = true;
+    this.loginError = null;
+
+    const { usuario, contrasena } = this.loginForm.value;
+    const url = environment.apiBaseUrl + '/auth/login';
+
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: usuario, password: contrasena }),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      const data = (await res.json().catch(() => ({}))) as LoginResponse;
+
+      if (res.ok && data?.accessToken) {
+        this.auth.setAccessToken(data.accessToken);
+        this.router.navigate(['/dashboard']);
+      } else {
+        this.loginError = res.ok
+          ? 'Respuesta del servidor inválida.'
+          : 'Usuario o contraseña incorrectos.';
+      }
+    } catch (err) {
+      if ((err as Error).name === 'AbortError') {
+        this.loginError = 'El servidor no respondió a tiempo. Intenta de nuevo.';
+      } else {
+        this.loginError = 'No se pudo conectar con el servidor. Verifica que el backend esté en ejecución.';
+      }
+    } finally {
+      this.loading = false;
+    }
+  }
 }

@@ -60,12 +60,16 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "proxyConfig": "src/proxy.conf.cjs"
+          },
           "configurations": {
             "production": {
               "buildTarget": "procedures-gams-fe:build:production"
             },
             "development": {
-              "buildTarget": "procedures-gams-fe:build:development"
+              "buildTarget": "procedures-gams-fe:build:development",
+              "proxyConfig": "src/proxy.conf.cjs"
             }
           },
           "defaultConfiguration": "development"
