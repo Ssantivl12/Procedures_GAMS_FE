@@ -12,18 +12,24 @@
   height: 64px;
 }
 
-.logo-section {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
 .logo-box {
   background-color: #4caf4f; 
   color: white;
   padding: 8px 12px;
   border-radius: 6px;
   font-weight: bold;
+}
+
+.logo-image {
+  height: 55px;
+  width: auto;
+  object-fit: contain;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
 }
 
 .logo-text {
