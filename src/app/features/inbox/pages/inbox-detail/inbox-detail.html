@@ -1,0 +1,80 @@
+<div class="page-wrapper">
+  <app-dashboard-header></app-dashboard-header>
+
+  <main class="main-content">
+    
+    <button class="btn-back" routerLink="/inbox">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+      </svg>
+      Volver a pendientes
+    </button>
+
+    <div class="page-header">
+      <div>
+        <div class="header-pretitle">Detalle del Trámite #{{ tramite.id }}</div>
+        <h1 class="page-title">{{ tramite.tipo }}</h1>
+        <p class="page-subtitle">{{ tramite.empresa }} | NIT: {{ tramite.nit }}</p>
+      </div>
+      <div class="header-actions">
+        <span class="status-badge" [ngClass]="tramite.estado.toLowerCase().replace(' ', '-')">
+          {{ tramite.estado }}
+        </span>
+      </div>
+    </div>
+
+    <div class="detail-grid">
+      <div class="detail-card">
+        <h3 class="card-title">Información del Trámite</h3>
+        <div class="info-list">
+          <div class="info-item"><span class="label">Código Trámite:</span><span class="value font-medium">{{ tramite.id }}</span></div>
+          <div class="info-item"><span class="label">Tipo Trámite:</span><span class="value">{{ tramite.tipo }}</span></div>
+          <div class="info-item"><span class="label">Fecha Solicitud:</span><span class="value font-medium">{{ tramite.fecha }}</span></div>
+          <div class="info-item dire-item"><span class="label">Empresa Solicitante:</span><span class="value cell-name">{{ tramite.empresa }}</span></div>
+          <div class="info-item"><span class="label">NIT Empresa:</span><span class="value">{{ tramite.nit }}</span></div>
+        </div>
+      </div>
+
+      <div class="detail-card">
+        <h3 class="card-title">Estado y Asignación</h3>
+        <div class="info-list">
+          <div class="info-item"><span class="label">Estado Actual:</span><span class="value font-bold text-vigente">{{ tramite.estado }}</span></div>
+          <div class="info-item"><span class="label">Inspector Asignado:</span><span class="value font-medium">{{ tramite.inspector }}</span></div>
+          <div class="info-item"><span class="label">Certificado Actual:</span><span class="value">{{ tramite.certificado_actual }}</span></div>
+          <div class="info-item"><span class="label">Ciudad/Municipio:</span><span class="value">{{ tramite.ciudad }}</span></div>
+          <div class="info-item"><span class="label">Fecha Registro Empresa:</span><span class="value">{{ tramite.fecha_registro }}</span></div>
+          <div class="info-item dire-item"><span class="label">Dirección Empresa:</span><span class="value cell-name">{{ tramite.direccion }}</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions-card">
+      <h3 class="card-title">Acciones del Trámite</h3>
+      <div class="actions-buttons">
+        
+        <button class="btn-action-light">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+          </svg>
+          Aprobar Revisión
+        </button>
+
+        <button class="btn-action-light warning">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          Entregar Observaciones
+        </button>
+
+        <button class="btn-action-light urgent">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+          Rechazar Trámite
+        </button>
+
+      </div>
+    </div>
+
+  </main>
+</div>

@@ -1,0 +1,75 @@
+<div class="page-wrapper">
+  <app-dashboard-header></app-dashboard-header>
+
+  <main class="main-content">
+
+    <button class="btn-back" routerLink="/dashboard">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+      </svg>
+      Volver al inicio
+    </button>
+    
+    <div class="page-header">
+      <div>
+        <h1 class="page-title">Gestión de Empresas</h1>
+        <p class="page-subtitle">Administración y categorización de empresas registradas</p>
+      </div>
+      <button class="btn-create" (click)="isModalOpen = true">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+        </svg>
+        Registrar Empresa
+      </button>
+    </div>
+
+    <div class="search-container">
+      <div class="search-box">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="search-icon">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+        </svg>
+        <input type="text" placeholder="Buscar por nombre, NIT o categoría...">
+      </div>
+    </div>
+
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre Empresa</th>
+            <th>NIT</th>
+            <th>Categoría</th>
+            <th>Estado</th>
+            <th>Subsanaciones</th>
+            <th>Vigencia</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (company of companies; track company.id) {
+            <tr>
+              <td class="font-medium cell-name">{{ company.name }}</td>
+              <td>{{ company.nit }}</td>
+              <td>{{ company.cate }}</td>
+              <td>
+                <span class="status-badge" [ngClass]="company.estado.toLowerCase()">
+                  {{ company.estado }}
+                </span>
+              </td>
+              <td>{{ company.sub }}</td>
+              <td>{{ company.vigencia }}</td>
+              <td class="actions-cell">
+                <button class="btn-detail" [routerLink]="['/companies', company.id]">Ver Detalle →</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+
+  @if (isModalOpen) {
+    <app-company-form (closeForm)="isModalOpen = false"></app-company-form>
+  }
+</div>

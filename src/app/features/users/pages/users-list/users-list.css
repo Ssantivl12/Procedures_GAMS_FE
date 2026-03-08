@@ -1,0 +1,42 @@
+.page-wrapper { background-color: #f3f4f6; min-height: 100vh; font-family: 'Inter', sans-serif; }
+.main-content { width: 100%; max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
+
+.page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+.page-title { font-size: 1.8rem; font-weight: 700; color: #111827; margin: 0 0 8px 0; }
+.page-subtitle { color: #6b7280; margin: 0; font-size: 1rem; }
+.btn-create {
+  display: flex; align-items: center; gap: 8px; background-color: #60ad5e; color: white;
+  padding: 10px 20px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; transition: background 0.2s;
+}
+.btn-create:hover { background-color: #60ad5e; }
+.btn-create svg { width: 20px; height: 20px; }
+
+.search-container { margin-bottom: 24px; }
+.search-box {
+  background: white; border-radius: 12px; padding: 12px 20px; display: flex; align-items: center;
+  gap: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); border: 1px solid #f3f4f6;
+}
+.search-icon { width: 20px; height: 20px; color: #9ca3af; }
+.search-box input {
+  border: none; outline: none; width: 100%; font-size: 0.95rem; color: #374151;
+}
+
+.table-container { background: white; border-radius: 12px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); overflow: hidden; }
+table { width: 100%; border-collapse: collapse; text-align: left; }
+th { padding: 16px 24px; background-color: #ffffff; border-bottom: 1px solid #f3f4f6; color: #111827; font-weight: 600; font-size: 0.9rem; }
+td { padding: 16px 24px; border-bottom: 1px solid #f3f4f6; color: #4b5563; font-size: 0.9rem; }
+tr:last-child td { border-bottom: none; }
+.font-medium { font-weight: 600; color: #111827; }
+
+.role-badge { padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 700; }
+.role-badge.secretaría { border: 1px solid #e5e7eb; color: #374151; background: white; }
+.role-badge.inspector { background: #f3f4f6; color: #374151; }
+.role-badge.superadmin { background: #111827; color: white; }
+
+.status-badge { padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 600; }
+.status-badge.active { background: #d1fae5; color: #4caf4f; }
+.status-badge.inactive { background: #f3f4f6; color: #6b7280; }
+
+.actions-cell { text-align: right; }
+.btn-action { background: none; border: none; font-size: 1.2rem; font-weight: bold; color: #9ca3af; cursor: pointer; }
+.btn-action:hover { color: #374151; }

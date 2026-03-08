@@ -1,0 +1,88 @@
+<div class="page-wrapper">
+  <app-dashboard-header></app-dashboard-header>
+
+  <main class="main-content">
+    
+    <button class="btn-back" (click)="goBack()">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+      </svg>
+      Volver a empresas
+    </button>
+    
+    <div class="page-header">
+      <div>
+        <div class="header-pretitle">Detalle de Empresa</div>
+        <h1 class="page-title">{{ company.name }}</h1>
+        <p class="page-subtitle">NIT: {{ company.nit }} | Categoría: {{ company.cate }}</p>
+      </div>
+      <div class="header-actions">
+        <span class="status-badge" [ngClass]="company.estado.toLowerCase()">
+          {{ company.estado }}
+        </span>
+      </div>
+    </div>
+
+    <div class="tabs-container">
+      <button class="tab-item" [class.active]="activeTab === 'general'" (click)="activeTab = 'general'">
+        Información General
+      </button>
+      <button class="tab-item" [class.active]="activeTab === 'personal'" (click)="activeTab = 'personal'">
+        Personal Asignado
+      </button>
+      <button class="tab-item" [class.active]="activeTab === 'licencias'" (click)="activeTab = 'licencias'">
+        Licencias y Permisos
+      </button>
+    </div>
+
+    @if (activeTab === 'general') {
+      <div class="detail-grid">
+        <div class="detail-card">
+          <h3 class="card-title">Identificación y Ubicación</h3>
+          <div class="info-list">
+            <div class="info-item"><span class="label">Licencia GAMS:</span><span class="value">{{ company.lic }}</span></div>
+            <div class="info-item"><span class="label">Categoría:</span><span class="value">{{ company.cate }}</span></div>
+            <div class="info-item"><span class="label">Subcategoría:</span><span class="value">{{ company.subCate }}</span></div>
+            <div class="info-item"><span class="label">Vigencia:</span><span class="value font-bold text-vigente">{{ company.vigencia }}</span></div>
+            <div class="info-item"><span class="label">Fecha Registro:</span><span class="value">{{ company.fec }}</span></div>
+            <div class="info-item"><span class="label">Ciudad/Municipio:</span><span class="value">{{ company.ciud }}</span></div>
+            <div class="info-item dire-item"><span class="label">Dirección:</span><span class="value">{{ company.dire }}</span></div>
+          </div>
+        </div>
+
+        <div class="detail-card">
+          <h3 class="card-title">Contacto y Representación Legal</h3>
+          <div class="info-list">
+            <div class="info-item"><span class="label">NIT:</span><span class="value font-medium">{{ company.nit }}</span></div>
+            <div class="info-item"><span class="label">Teléfono/Cel:</span><span class="value">{{ company.tel }}</span></div>
+            <div class="info-item"><span class="label">Representante Legal:</span><span class="value">{{ company.rep }}</span></div>
+          </div>
+        </div>
+      </div>
+    }
+
+    @if (activeTab === 'personal') {
+      <div class="personal-list">
+        <h3 class="card-title">Personal Asignado (Inspectores)</h3>
+        <div class="table-container">
+          <table>
+            <thead><tr><th>Nombres</th><th>CI</th><th>Correo</th><th>Acciones</th></tr></thead>
+            <tbody>
+              @for (p of personal; track p.ci) {
+                <tr>
+                  <td class="font-medium cell-name">{{ p.name }} {{ p.lastName }}</td>
+                  <td>{{ p.ci }}</td>
+                  <td>{{ p.email }}</td>
+                  <td class="actions-cell">
+                    <button class="btn-action-light">Quitar Asignación</button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+
+  </main>
+</div>

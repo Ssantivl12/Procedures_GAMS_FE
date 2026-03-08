@@ -1,0 +1,95 @@
+<div class="modal-overlay" (click)="closeForm.emit()"></div>
+
+<div class="modal-box">
+  
+  @if (!showSuccessModal) {
+    <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+      <div class="modal-header">
+        <div>
+          <h2>Crear Nuevo Usuario</h2>
+          <p>Complete los datos del nuevo usuario del sistema</p>
+        </div>
+        <button type="button" class="close-btn" (click)="closeForm.emit()">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="nombres">Nombres</label>
+          <input type="text" id="nombres" formControlName="nombres" placeholder="Ej: María"
+                 (keypress)="allowOnlyLetters($event)"
+                 [class.is-invalid]="submitted && f['nombres'].errors">
+          @if (submitted && f['nombres'].errors) {
+            <div class="invalid-feedback"><span>El nombre es obligatorio</span></div>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="apellidos">Apellidos</label>
+          <input type="text" id="apellidos" formControlName="apellidos" placeholder="Ej: González"
+                 (keypress)="allowOnlyLetters($event)"
+                 [class.is-invalid]="submitted && f['apellidos'].errors">
+          @if (submitted && f['apellidos'].errors) {
+            <div class="invalid-feedback"><span>Los apellidos son obligatorios</span></div>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="ci">CI</label>
+          <input type="text" id="ci" formControlName="ci" placeholder="Ej: 12345678"
+                 (keypress)="allowOnlyNumbers($event)"
+                 [class.is-invalid]="submitted && f['ci'].errors">
+          @if (submitted && f['ci'].errors) {
+            <div class="invalid-feedback">
+              @if (f['ci'].errors['required']) { <span>El CI es obligatorio</span> }
+              @if (f['ci'].errors['minlength']) { <span>Mínimo 7 dígitos</span> }
+              @if (f['ci'].errors['maxlength']) { <span>Máximo 10 dígitos</span> }
+            </div>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="correo">Correo</label>
+          <input type="email" id="correo" formControlName="correo" placeholder="Ej: maria@gams.gob.bo"
+                 [class.is-invalid]="submitted && f['correo'].errors">
+          @if (submitted && f['correo'].errors) {
+            <div class="invalid-feedback">
+              @if (f['correo'].errors['required']) { <span>El correo es obligatorio</span> }
+              @if (f['correo'].errors['email']) { <span>Formato inválido</span> }
+            </div>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="rol">Rol</label>
+          <select id="rol" formControlName="rol" [class.is-invalid]="submitted && f['rol'].errors">
+            <option value="">Seleccione un Rol...</option>
+            <option value="Secretaría">Secretaría</option>
+            <option value="Inspector">Inspector</option>
+            <option value="SuperAdmin">SuperAdmin</option>
+          </select>
+          @if (submitted && f['rol'].errors) {
+            <div class="invalid-feedback"><span>El rol es obligatorio</span></div>
+          }
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" (click)="closeForm.emit()">Cancelar</button>
+        <button type="submit" class="btn-save">Crear Usuario</button>
+      </div>
+    </form>
+  }
+
+  @if (showSuccessModal) {
+    <div class="success-view">
+      <div class="success-icon">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+        </svg>
+      </div>
+      <h2>¡Usuario Registrado!</h2>
+      <p>El usuario ha sido creado correctamente en el sistema y ya puede iniciar sesión.</p>
+      <button class="btn-save btn-full" (click)="finishAndClose()">Aceptar y Cerrar</button>
+    </div>
+  }
+</div>
