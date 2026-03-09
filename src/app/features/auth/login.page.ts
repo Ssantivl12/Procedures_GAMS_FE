@@ -360,37 +360,22 @@ export class LoginPage {
     this.loginError = null;
 
     const { usuario, contrasena } = this.loginForm.value;
-    const url = environment.apiBaseUrl + '/auth/login';
 
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000);
+      // Usamos el servicio de auth que ya utiliza ApiClient e interceptores
+      const data = await this.auth.login(usuario, contrasena);
 
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: usuario, password: contrasena }),
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      const data = (await res.json().catch(() => ({}))) as LoginResponse;
-
-      if (res.ok && data?.accessToken) {
+      if (data?.accessToken) {
         this.auth.setAccessToken(data.accessToken);
         this.router.navigate(['/dashboard']);
       } else {
-        this.loginError = res.ok
-          ? 'Respuesta del servidor inválida.'
-          : 'Usuario o contraseña incorrectos.';
+        this.loginError = 'Respuesta del servidor inválida.';
       }
-    } catch (err) {
-      if ((err as Error).name === 'AbortError') {
-        this.loginError = 'El servidor no respondió a tiempo. Intenta de nuevo.';
-      } else {
-        this.loginError = 'No se pudo conectar con el servidor. Verifica que el backend esté en ejecución.';
-      }
+    } catch (err: any) {
+      // Los errores ya vienen formateados como AppError por el errorInterceptor
+      // o son errores de conexión (status 0)
+      this.loginError = err.message || 'No se pudo conectar con el servidor.';
+      console.error('Login error:', err);
     } finally {
       this.loading = false;
     }

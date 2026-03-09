@@ -1,9 +1,10 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { AppError } from '../errors/app-error';
 
 function toAppError(err: HttpErrorResponse): AppError {
-  // Network / CORS / offline typically have status 0
+  // ... (toAppError implementation remains same)
   if (err.status === 0) {
     return {
       kind: 'NETWORK',
@@ -24,7 +25,6 @@ function toAppError(err: HttpErrorResponse): AppError {
     };
   }
 
-  // Try to read a common backend error shape if exists
   const backendMessage =
     (err.error && (err.error.message || err.error.error || err.error.detail)) ?? null;
 
@@ -39,19 +39,17 @@ function toAppError(err: HttpErrorResponse): AppError {
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (source: any) =>
-      source.catchError((err: unknown) => {
-        if (err instanceof HttpErrorResponse) {
-          return throwError(() => toAppError(err));
-        }
-        const fallback: AppError = {
-          kind: 'UNKNOWN',
-          message: 'Ocurrió un error inesperado.',
-          details: err,
-          timestamp: new Date().toISOString(),
-        };
-        return throwError(() => fallback);
-      })
+    catchError((err: unknown) => {
+      if (err instanceof HttpErrorResponse) {
+        return throwError(() => toAppError(err));
+      }
+      const fallback: AppError = {
+        kind: 'UNKNOWN',
+        message: 'Ocurrió un error inesperado.',
+        details: err,
+        timestamp: new Date().toISOString(),
+      };
+      return throwError(() => fallback);
+    })
   );
 };

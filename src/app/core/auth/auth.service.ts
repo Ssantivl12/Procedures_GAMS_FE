@@ -1,9 +1,17 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
+import { ApiClient } from '../../api/api-client';
+import { firstValueFrom } from 'rxjs';
 
 const ACCESS_TOKEN_KEY = 'gams_access_token';
 
+export interface LoginResponse {
+  accessToken: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private readonly api = inject(ApiClient);
+
   getAccessToken(): string | null {
     return localStorage.getItem(ACCESS_TOKEN_KEY);
   }
@@ -24,8 +32,11 @@ export class AuthService {
     this.clearSession();
   }
 
-  // Placeholder: endpoint real lo definirá BE
-  async loginPlaceholder(_username: string, _password: string): Promise<void> {
-    throw new Error('Login no implementado: pendiente contrato de BE.');
+  /**
+   * Realiza el login usando el ApiClient para asegurar que se usen
+   * los interceptores y la configuración global.
+   */
+  async login(email: string, password: string): Promise<LoginResponse> {
+    return firstValueFrom(this.api.post<LoginResponse>('/auth/login', { email, password }));
   }
 }
