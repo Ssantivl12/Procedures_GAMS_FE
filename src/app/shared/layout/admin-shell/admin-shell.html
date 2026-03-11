@@ -1,0 +1,11 @@
+<div class="admin-shell">
+  <app-dashboard-sidebar
+    [isOpen]="isSidebarOpen"
+    (close)="isSidebarOpen = false"
+  ></app-dashboard-sidebar>
+
+  <div class="admin-content" (click)="isSidebarOpen = false">
+    <router-outlet />
+  </div>
+</div>
+

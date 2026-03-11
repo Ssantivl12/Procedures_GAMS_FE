@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/auth/auth.guard';
+import { AdminShellComponent } from './shared/layout/admin-shell/admin-shell';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'home' },
@@ -16,48 +17,68 @@ export const routes: Routes = [
   },
 
   {
-      path: 'dashboard',
-      //canActivate: [authGuard],
-      loadComponent: () => import('./features/dashboard/pages/dashboard-page/dashboard.page')
-        .then(m => m.DashboardPageComponent),
-    },
-  {
-      path: 'users',
-      loadComponent: () => import('./features/users/pages/users-list/users-list')
-        .then(m => m.UsersListComponent),
-    },
-  {
-      path: 'companies',
-      loadComponent: () => import('./features/companies/pages/companies-list/companies-list')
-        .then(m => m.CompaniesListComponent),
-    },
-
-  {
-      path: 'companies/:id', 
-      loadComponent: () => import('./features/companies/pages/company-detail/company-detail')
-        .then(m => m.CompanyDetailComponent),
-    },
-  
-  {
-      path: 'inbox', 
-      loadComponent: () => import('./features/inbox/pages/inbox-list/inbox-list')
-        .then(m => m.InboxListComponent),
-    },
-  {
-      path: 'inbox/:id', 
-      loadComponent: () => import('./features/inbox/pages/inbox-detail/inbox-detail')
-        .then(m => m.InboxDetailComponent),
-    },
-  {
-      path: 'status-companies',
-      loadComponent: () => import('./features/status-companies/pages/status-companies-list/status-companies-list')
-        .then(m => m.StatusCompaniesListComponent),
-    },
-  {
-      path: 'status-companies/:id',
-      loadComponent: () => import('./features/status-companies/pages/status-companies-detail/status-companies-detail')
-        .then(m => m.StatusCompaniesDetailComponent),
-    },
+    path: '',
+    // canActivate: [authGuard],
+    component: AdminShellComponent,
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./features/dashboard/pages/dashboard-page/dashboard.page').then(
+            (m) => m.DashboardPageComponent
+          ),
+      },
+      {
+        path: 'users',
+        loadComponent: () =>
+          import('./features/users/pages/users-list/users-list').then(
+            (m) => m.UsersListComponent
+          ),
+      },
+      {
+        path: 'companies',
+        loadComponent: () =>
+          import('./features/companies/pages/companies-list/companies-list').then(
+            (m) => m.CompaniesListComponent
+          ),
+      },
+      {
+        path: 'companies/:id',
+        loadComponent: () =>
+          import('./features/companies/pages/company-detail/company-detail').then(
+            (m) => m.CompanyDetailComponent
+          ),
+      },
+      {
+        path: 'inbox',
+        loadComponent: () =>
+          import('./features/inbox/pages/inbox-list/inbox-list').then(
+            (m) => m.InboxListComponent
+          ),
+      },
+      {
+        path: 'inbox/:id',
+        loadComponent: () =>
+          import('./features/inbox/pages/inbox-detail/inbox-detail').then(
+            (m) => m.InboxDetailComponent
+          ),
+      },
+      {
+        path: 'status-companies',
+        loadComponent: () =>
+          import(
+            './features/status-companies/pages/status-companies-list/status-companies-list'
+          ).then((m) => m.StatusCompaniesListComponent),
+      },
+      {
+        path: 'status-companies/:id',
+        loadComponent: () =>
+          import(
+            './features/status-companies/pages/status-companies-detail/status-companies-detail'
+          ).then((m) => m.StatusCompaniesDetailComponent),
+      },
+    ],
+  },
   {
     path: 'admin',
     canActivate: [authGuard],

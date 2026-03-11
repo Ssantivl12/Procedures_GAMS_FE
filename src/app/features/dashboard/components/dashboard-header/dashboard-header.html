@@ -1,5 +1,8 @@
 <header class="header-container">
   <div class="top-bar">
+    <button class="menu-btn" type="button" (click)="toggleMenu.emit()" aria-label="Abrir menú">
+      ☰
+    </button>
     <div class="logo-section">
       <img src="assets/img/LogoGams.png" alt="Logo GAMS" class="logo-image" />
       
@@ -8,6 +11,7 @@
         <span class="subtitle">Departamento Ambiental</span>
       </div>
     </div>
-    
-    </div>
+
+    <app-user-toolbar></app-user-toolbar>
+  </div>
 </header>

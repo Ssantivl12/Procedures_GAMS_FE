@@ -11,8 +11,6 @@ import { RouterModule } from '@angular/router';
   styleUrl: './dashboard.page.css'
 })
 export class DashboardPageComponent {
-  isSidebarOpen = false;
-
   stats = [
     { title: 'Empresas en Revisión', count: 1, iconKey: 'doc', colorClass: 'blue' },
     { title: 'Observaciones Pendientes', count: 1, iconKey: 'alert', colorClass: 'amber' },

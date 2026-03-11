@@ -202,3 +202,9 @@
 .icon-box.red { background-color: #fef2f2; color: #dc2626; }
 
 .mt-large { margin-top: 60px; }
+
+@media (max-width: 1024px) {
+  .main-content {
+    padding: 18px 18px;
+  }
+}

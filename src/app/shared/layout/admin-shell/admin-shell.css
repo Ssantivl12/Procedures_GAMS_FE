@@ -1,0 +1,26 @@
+.admin-shell {
+  display: flex;
+  height: 100vh;
+  min-height: 100vh;
+  background: #0f5c3a;
+  overflow: hidden;
+}
+
+.admin-content {
+  flex: 1;
+  min-width: 0;
+  overflow: auto;
+  background: #f3f4f6;
+  margin-left: 260px; /* mismo ancho que el sidebar fijo */
+}
+
+@media (max-width: 1024px) {
+  .admin-shell {
+    display: block;
+  }
+
+  .admin-content {
+    height: 100vh;
+  }
+}
+
