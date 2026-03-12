@@ -53,9 +53,16 @@
                   {{ user.status }}
                 </span>
               </td>
+              
               <td class="actions-cell">
-                <button class="btn-action">⋮</button>
+                <button class="btn-icon btn-edit" title="Editar">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                </button>
+                <button class="btn-icon btn-delete" title="Eliminar" (click)="openDeleteModal(user)">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
               </td>
+
             </tr>
           }
         </tbody>
@@ -66,5 +73,17 @@
 
   @if (isModalOpen) {
     <app-user-form (closeForm)="isModalOpen = false"></app-user-form>
+  }
+
+  @if (isDeleteModalOpen) {
+    <div class="modal-overlay" (click)="closeDeleteModal()"></div>
+    <div class="delete-modal-box">
+      <h3>¿Eliminar Personal?</h3>
+      <p>Está a punto de eliminar a <strong>{{ userToDelete?.name }} {{ userToDelete?.lastName }}</strong>. Esta acción no se puede deshacer.</p>
+      <div class="delete-modal-footer">
+        <button class="btn-cancel" (click)="closeDeleteModal()">Cancelar</button>
+        <button class="btn-delete-confirm" (click)="confirmDelete()">Eliminar</button>
+      </div>
+    </div>
   }
 </div>

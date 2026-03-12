@@ -12,6 +12,10 @@ import { UserFormComponent } from '../../components/user-form/user-form';
 })
 export class UsersListComponent {
   isModalOpen = false;
+  
+  isDeleteModalOpen = false; 
+  userToDelete: any = null; 
+
   users = [
     { name: 'María', lastName: 'González', ci: '12345678', email: 'maria.gonzalez@gams.gob.bo', role: 'Secretaría', status: 'Activo' },
     { name: 'Carlos', lastName: 'Pérez', ci: '87654321', email: 'carlos.inspector@gams.gob.bo', role: 'Inspector', status: 'Activo' },
@@ -19,4 +23,21 @@ export class UsersListComponent {
     { name: 'Juan', lastName: 'Mamani', ci: '55667788', email: 'juan.inspector@gams.gob.bo', role: 'Inspector', status: 'Activo' },
     { name: 'Rosa', lastName: 'Quispe', ci: '99887766', email: 'rosa.secretaria@gams.gob.bo', role: 'Secretaría', status: 'Inactivo' },
   ];
+
+  openDeleteModal(user: any) {
+    this.userToDelete = user;
+    this.isDeleteModalOpen = true;
+  }
+
+  closeDeleteModal() {
+    this.isDeleteModalOpen = false;
+    this.userToDelete = null;
+  }
+
+  confirmDelete() {
+    if (this.userToDelete) {
+      this.users = this.users.filter(u => u.ci !== this.userToDelete.ci);
+      this.closeDeleteModal();
+    }
+  }
 }
