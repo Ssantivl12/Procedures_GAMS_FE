@@ -28,7 +28,19 @@
         <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="search-icon">
           <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
         </svg>
-        <input type="text" placeholder="Buscar por nombre, NIT o categoría...">
+        
+        <input type="text" placeholder="Buscar por nombre, NIT o categoría..." 
+               [(ngModel)]="searchTerm" (input)="onSearchChange()">
+        
+        <button class="btn-sort" (click)="toggleSort()" title="Ordenar alfabéticamente">
+          {{ sortAscending ? 'A-Z ↓' : 'Z-A ↑' }}
+        </button>
+
+        <select class="select-pagination" [(ngModel)]="itemsPerPage" (change)="onSearchChange()">
+          <option [ngValue]="5">5 por página</option>
+          <option [ngValue]="10">10 por página</option>
+          <option [ngValue]="20">20 por página</option>
+        </select>
       </div>
     </div>
 
@@ -46,13 +58,13 @@
           </tr>
         </thead>
         <tbody>
-          @for (company of companies; track company.id) {
+          @for (company of displayedCompanies; track company.id) {
             <tr>
               <td class="font-medium cell-name">{{ company.name }}</td>
               <td>{{ company.nit }}</td>
               <td>{{ company.cate }}</td>
               <td>
-                <span class="status-badge" [ngClass]="company.estado.toLowerCase()">
+                <span class="status-badge" [ngClass]="company.estado.toLowerCase().replace(' ', '')">
                   {{ company.estado }}
                 </span>
               </td>
@@ -63,8 +75,22 @@
               </td>
             </tr>
           }
+
+          @if (displayedCompanies.length === 0) {
+            <tr>
+              <td colspan="7" style="text-align: center; padding: 24px; color: #6b7280;">
+                No se encontraron empresas con esa búsqueda.
+              </td>
+            </tr>
+          }
         </tbody>
       </table>
+
+      <div class="pagination-ui">
+        <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">Anterior</button>
+        <span class="page-info">Página {{ currentPage }} de {{ totalPages }}</span>
+        <button (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages">Siguiente</button>
+      </div>
     </div>
 
   </main>

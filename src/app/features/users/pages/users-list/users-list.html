@@ -21,7 +21,19 @@
         <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="search-icon">
           <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
         </svg>
-        <input type="text" placeholder="Buscar por nombre, CI o correo...">
+        
+        <input type="text" placeholder="Buscar por nombre, CI o correo..." 
+               [(ngModel)]="searchTerm" (input)="onSearchChange()">
+        
+        <button class="btn-sort" (click)="toggleSort()" title="Ordenar alfabéticamente">
+          {{ sortAscending ? 'A-Z ↓' : 'Z-A ↑' }}
+        </button>
+
+        <select class="select-pagination" [(ngModel)]="itemsPerPage" (change)="onSearchChange()">
+          <option [ngValue]="5">5 por página</option>
+          <option [ngValue]="10">10 por página</option>
+          <option [ngValue]="20">20 por página</option>
+        </select>
       </div>
     </div>
 
@@ -39,7 +51,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (user of users; track user.ci) {
+          @for (user of displayedUsers; track user.ci) {
             <tr>
               <td class="font-medium">{{ user.name }}</td>
               <td>{{ user.lastName }}</td>
@@ -62,11 +74,24 @@
                   <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                 </button>
               </td>
+            </tr>
+          }
 
+          @if (displayedUsers.length === 0) {
+            <tr>
+              <td colspan="7" style="text-align: center; padding: 24px; color: #6b7280;">
+                No se encontraron usuarios con esa búsqueda.
+              </td>
             </tr>
           }
         </tbody>
       </table>
+
+      <div class="pagination-ui">
+        <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">Anterior</button>
+        <span class="page-info">Página {{ currentPage }} de {{ totalPages }}</span>
+        <button (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages">Siguiente</button>
+      </div>
     </div>
 
   </main>

@@ -1,5 +1,5 @@
 .page-wrapper { background-color: #f8fafc; min-height: 100vh; font-family: 'Inter', sans-serif; }
-.main-content { width: 100%; max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+.main-content { box-sizing: border-box; width: 100%; max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
 
 
 .btn-back { display: inline-flex; align-items: center; gap: 8px; background: none; border: none; color: #0f172a; font-weight: 600; font-size: 0.95rem; cursor: pointer; padding: 0; margin-bottom: 24px; transition: opacity 0.2s; }
