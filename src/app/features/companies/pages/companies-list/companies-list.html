@@ -58,28 +58,28 @@
           </tr>
         </thead>
         <tbody>
-          @for (company of displayedCompanies; track company.id) {
+          @for (company of companies; track company.id) {
             <tr>
-              <td class="font-medium cell-name">{{ company.name }}</td>
-              <td>{{ company.nit }}</td>
-              <td>{{ company.cate }}</td>
+              <td class="font-medium cell-name">{{ company.legalName }}</td>
+              <td>{{ company.nit || 'Sin NIT' }}</td>
+              <td>{{ company.category }}</td>
               <td>
-                <span class="status-badge" [ngClass]="company.estado.toLowerCase().replace(' ', '')">
-                  {{ company.estado }}
+                <span class="status-badge" [ngClass]="company.isActive ? 'vigente' : 'ensubs'">
+                  {{ company.isActive ? 'Vigente' : 'Inactiva' }}
                 </span>
               </td>
-              <td>{{ company.sub }}</td>
-              <td>{{ company.vigencia }}</td>
+              <td>Sacaba</td>
+              <td>{{ company.createdAt | date:'dd/MM/yyyy' }}</td>
               <td class="actions-cell">
                 <button class="btn-detail" [routerLink]="['/companies', company.id]">Ver Detalle →</button>
               </td>
             </tr>
           }
 
-          @if (displayedCompanies.length === 0) {
+          @if (companies.length === 0) {
             <tr>
               <td colspan="7" style="text-align: center; padding: 24px; color: #6b7280;">
-                No se encontraron empresas con esa búsqueda.
+                No se encontraron empresas.
               </td>
             </tr>
           }

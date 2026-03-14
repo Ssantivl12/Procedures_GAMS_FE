@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router'; 
 import { FormsModule } from '@angular/forms'; 
 import { DashboardHeaderComponent } from '../../../dashboard/components/dashboard-header/dashboard-header';
 import { CompanyFormComponent } from '../../components/company-form/company-form';
+import { CompanyService, Company } from '../../services/company.service';
 
 @Component({
   selector: 'app-companies-list',
@@ -12,57 +13,65 @@ import { CompanyFormComponent } from '../../components/company-form/company-form
   templateUrl: './companies-list.html', 
   styleUrl: './companies-list.css'    
 })
-export class CompaniesListComponent {
+export class CompaniesListComponent implements OnInit {
+  private companyService = inject(CompanyService);
+
   isModalOpen = false; 
-  companies = [
-    { id: '1', name: 'INDUSTRIAS ALIMENTICIAS CORONILLA S.A.', nit: '1016839028', cate: '3', estado: 'Vigente', sub: '9 de 10', vigencia: '23/04/2026' },
-    { id: '2', name: 'EMPRESA CONSTRUCTORA Y DE SERVICIOS', nit: '2023456789', cate: '4', estado: 'Observado', sub: '2 de 5', vigencia: '15/10/2025' },
-    { id: '3', name: 'COOPERATIVA DE TRANSPORTE Y TURISMO S.R.L.', nit: '3034567891', cate: '4', estado: 'Vigente', sub: '8 de 8', vigencia: '01/01/2027' },
-    { id: '4', name: 'PHARMACOSMÉDICA ANDINA S.A.', nit: '4045678912', cate: '3', estado: 'Vigente', sub: '12 de 12', vigencia: '10/06/2026' },
-    { id: '5', name: 'GESTIÓN INTEGRAL DE RESIDUOS Y RECICLAJE', nit: '5056789123', cate: '3', estado: 'En Subsanación', sub: '1 de 6', vigencia: '30/08/2025' },
-  ];
+  companies: Company[] = []; 
 
   searchTerm: string = '';
   sortAscending: boolean = true;
   itemsPerPage: number = 5;
   currentPage: number = 1;
+  totalPages: number = 1;
 
-  get filteredCompanies() {
-    let filtered = this.companies.filter(c => 
-      c.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-      c.nit.includes(this.searchTerm) ||
-      c.cate.toLowerCase().includes(this.searchTerm.toLowerCase())
-    );
+  ngOnInit() {
+    this.loadCompanies(); 
+  }
 
-    filtered.sort((a, b) => {
-      let res = a.name.localeCompare(b.name);
-      return this.sortAscending ? res : -res;
+  loadCompanies() {
+    const params: any = {
+      page: this.currentPage,
+      limit: this.itemsPerPage,
+      sortBy: 'legalName',
+      sortOrder: this.sortAscending ? 'asc' : 'desc'
+    };
+
+    if (this.searchTerm) {
+      params.search = this.searchTerm;
+    }
+
+    this.companyService.getCompanies(params).subscribe({
+      next: (response) => {
+        this.companies = response.data; 
+        this.totalPages = response.meta.totalPages; 
+      },
+      error: (err) => {
+        console.error('Error al cargar las empresas:', err);
+      }
     });
-
-    return filtered;
-  }
-
-  get displayedCompanies() {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    return this.filteredCompanies.slice(startIndex, startIndex + this.itemsPerPage);
-  }
-
-  get totalPages() {
-    return Math.ceil(this.filteredCompanies.length / this.itemsPerPage) || 1;
   }
 
   onSearchChange() {
     this.currentPage = 1; 
+    this.loadCompanies(); 
   }
 
   toggleSort() {
     this.sortAscending = !this.sortAscending;
     this.currentPage = 1;
+    this.loadCompanies(); 
   }
 
   changePage(page: number) {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
+      this.loadCompanies(); 
     }
+  }
+
+  onCompanyRegistered() {
+    this.isModalOpen = false;
+    this.loadCompanies(); 
   }
 }

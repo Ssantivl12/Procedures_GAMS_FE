@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms'; 
+import { CompanyService } from '../../services/company.service'; 
 
 @Component({
   selector: 'app-company-form',
@@ -13,16 +14,18 @@ export class CompanyFormComponent {
   @Output() closeForm = new EventEmitter<void>();
   @Output() companyRegistered = new EventEmitter<void>(); 
 
+  private companyService = inject(CompanyService);
   companyForm: FormGroup; 
   submitted = false; 
+  isLoading = false; 
 
   constructor(private fb: FormBuilder) {
     this.companyForm = this.fb.group({
-      nombres: ['', [Validators.required, Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/)]],
-      nit: ['', [Validators.required, Validators.pattern(/^[0-9]*$/), Validators.minLength(10), Validators.maxLength(12)]],
+      nombres: ['', [Validators.required, Validators.pattern(/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s.,-]*$/)]],
+      nit: ['', [Validators.required, Validators.pattern(/^[0-9]*$/), Validators.minLength(7), Validators.maxLength(13)]],
       dire: ['', [Validators.required]],
       ciud: ['SACABA', [Validators.required]],
-      tel: ['', [Validators.pattern(/^[0-9]*$/)]], 
+      tel: ['', [Validators.pattern(/^\+?[0-9\s]*$/)]], 
       rep: ['', [Validators.required, Validators.pattern(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]*$/)]],
       cate: ['', [Validators.required]],
     });
@@ -32,14 +35,52 @@ export class CompanyFormComponent {
 
   onSubmit() {
     this.submitted = true;
+
     if (this.companyForm.invalid) {
+      console.log('EL FORMULARIO ES INVÁLIDO.');
+      Object.keys(this.companyForm.controls).forEach(key => {
+        const controlErrors = this.companyForm.get(key)?.errors;
+        if (controlErrors) console.log(`- Error en el campo [${key}]:`, controlErrors);
+      });
+      alert('Revisa los datos. Algunos campos están vacíos o tienen caracteres no permitidos.');
       return;
     }
 
-    console.log('¡Empresa válida!', this.companyForm.value);
+    if (this.isLoading) return;
+    this.isLoading = true;
 
-    alert('¡Empresa registrada correctamente!');
-    this.companyRegistered.emit(); 
-    this.closeForm.emit(); 
+    const formValue = this.companyForm.value;
+    const categoryMapped = formValue.cate === 'CATEGORIA 3' ? 'C3' : 'C4';
+
+    let phoneFormatted = formValue.tel;
+    if (phoneFormatted && !phoneFormatted.startsWith('+591')) {
+      phoneFormatted = '+591' + phoneFormatted.replace(/\s/g, '');
+    }
+
+    const newCompany = {
+      legalName: formValue.nombres,
+      nit: formValue.nit,
+      address: formValue.dire,
+      municipality: formValue.ciud,
+      phone: phoneFormatted,
+      legalRepName: formValue.rep,
+      category: categoryMapped as 'C3' | 'C4'
+    };
+
+    console.log('Enviando estos datos reales al Backend:', newCompany);
+
+    this.companyService.createCompany(newCompany).subscribe({
+      next: (response) => {
+        console.log('🎉 Respuesta exitosa del backend:', response);
+        alert('¡Empresa registrada exitosamente en la base de datos!');
+        this.companyRegistered.emit(); 
+        this.closeForm.emit(); 
+      },
+      error: (err: any) => {
+        console.error(' ERROR DEL BACKEND:', err);
+        alert('El servidor rechazó los datos. Revisa la consola para más detalles.');
+        this.isLoading = false;
+      }
+    });
   }
 }
