@@ -58,6 +58,7 @@ export class CompanyFormComponent {
       address: formValue.dire,
       municipality: formValue.ciud,
       phone: phoneFormatted || undefined, 
+      legalRepName: formValue.rep,
       category: categoryMapped as 'C3' | 'C4',
       email: 'sin_correo@empresa.com',
       legalRepCi: '0000000',

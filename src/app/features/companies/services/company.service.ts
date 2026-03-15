@@ -9,6 +9,8 @@ export interface Company {
   isActive: boolean;
   createdAt: string;
   municipality?: string;
+  legalRepName?: string; 
+  phone?: string;
 }
 
 export interface PaginatedResponse<T> {

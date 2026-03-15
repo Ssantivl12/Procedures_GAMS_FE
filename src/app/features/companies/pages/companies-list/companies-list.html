@@ -52,8 +52,8 @@
             <th>NIT</th>
             <th>Categoría</th>
             <th>Estado</th>
-            <th>Subsanaciones</th>
-            <th>Vigencia</th>
+            <th>Contacto</th>
+            <th>Teléfono</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -68,8 +68,9 @@
                   {{ company.isActive ? 'Vigente' : 'Inactiva' }}
                 </span>
               </td>
-              <td>Sacaba</td>
-              <td>{{ company.createdAt | date:'dd/MM/yyyy' }}</td>
+              <td>{{ company.legalRepName || 'No registrado' }}</td>
+              <td>{{ company.phone || 'Sin teléfono' }}</td>
+              
               <td class="actions-cell">
                 <button class="btn-detail" [routerLink]="['/companies', company.id]">Ver Detalle →</button>
               </td>
