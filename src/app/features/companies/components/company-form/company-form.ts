@@ -37,12 +37,7 @@ export class CompanyFormComponent {
     this.submitted = true;
 
     if (this.companyForm.invalid) {
-      console.log('EL FORMULARIO ES INVÁLIDO.');
-      Object.keys(this.companyForm.controls).forEach(key => {
-        const controlErrors = this.companyForm.get(key)?.errors;
-        if (controlErrors) console.log(`- Error en el campo [${key}]:`, controlErrors);
-      });
-      alert('Revisa los datos. Algunos campos están vacíos o tienen caracteres no permitidos.');
+      alert('No se puede registrar. Hay campos vacíos o con datos incorrectos. Revisa los mensajes en rojo.');
       return;
     }
 
@@ -50,9 +45,9 @@ export class CompanyFormComponent {
     this.isLoading = true;
 
     const formValue = this.companyForm.value;
-    const categoryMapped = formValue.cate === 'CATEGORIA 3' ? 'C3' : 'C4';
+    const categoryMapped = formValue.cate === 'CATEGORIA 3' ? 'C3' : (formValue.cate === 'CATEGORIA 4' ? 'C4' : null);
 
-    let phoneFormatted = formValue.tel;
+    let phoneFormatted = formValue.tel ? formValue.tel.trim() : '';
     if (phoneFormatted && !phoneFormatted.startsWith('+591')) {
       phoneFormatted = '+591' + phoneFormatted.replace(/\s/g, '');
     }
@@ -62,22 +57,22 @@ export class CompanyFormComponent {
       nit: formValue.nit,
       address: formValue.dire,
       municipality: formValue.ciud,
-      phone: phoneFormatted,
-      legalRepName: formValue.rep,
-      category: categoryMapped as 'C3' | 'C4'
+      phone: phoneFormatted || undefined, 
+      category: categoryMapped as 'C3' | 'C4',
+      email: 'sin_correo@empresa.com',
+      legalRepCi: '0000000',
+      economicActivity: 'Actividad no especificada'
     };
 
-    console.log('Enviando estos datos reales al Backend:', newCompany);
-
     this.companyService.createCompany(newCompany).subscribe({
-      next: (response) => {
-        console.log('🎉 Respuesta exitosa del backend:', response);
+      next: () => {
+        this.isLoading = false; 
         alert('¡Empresa registrada exitosamente en la base de datos!');
         this.companyRegistered.emit(); 
         this.closeForm.emit(); 
       },
       error: (err: any) => {
-        console.error(' ERROR DEL BACKEND:', err);
+        console.error('ERROR DEL BACKEND:', err);
         alert('El servidor rechazó los datos. Revisa la consola para más detalles.');
         this.isLoading = false;
       }

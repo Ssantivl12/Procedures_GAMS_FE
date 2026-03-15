@@ -1,107 +1,97 @@
-<div class="modal-overlay" (click)="closeForm.emit()"></div>
-
-<div class="modal-box">
-  <form [formGroup]="companyForm" (ngSubmit)="onSubmit()">
+<div class="modal-overlay" (click)="closeForm.emit()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+    
     <div class="modal-header">
       <div>
-        <h2>Registrar Nueva Empresa</h2>
-        <p>Complete los datos de la empresa para su registro en el sistema</p>
+        <h2 class="modal-title">Registrar Nueva Empresa</h2>
+        <p class="modal-subtitle">Complete los datos de la empresa para su registro en el sistema</p>
       </div>
-      <button type="button" class="close-btn" (click)="closeForm.emit()">✕</button>
+      <button type="button" class="close-btn" (click)="closeForm.emit()">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
     </div>
 
-    <div class="modal-body">
+    <form [formGroup]="companyForm" class="modal-body">
+      
       <div class="form-group">
-        <label for="nombres">Nombres de la Empresa</label>
-        <input type="text" id="nombres" formControlName="nombres" placeholder="Ej: INDUSTRIAS ALIMENTICIAS CORONILLA S.A."
-               [class.is-invalid]="submitted && f['nombres'].errors">
-        
-        @if (submitted && f['nombres'].errors) {
-          <div class="invalid-feedback">
-            @if (f['nombres'].errors['required']) { <span>El nombre es obligatorio</span> }
-            @if (f['nombres'].errors['pattern']) { <span>Solo se permiten letras y espacios</span> }
-          </div>
+        <label>Nombres de la Empresa *</label>
+        <input type="text" formControlName="nombres" 
+               [placeholder]="(submitted || f['nombres'].touched) && f['nombres'].errors?.['required'] ? '(Campo obligatorio)' : 'Ej: INDUSTRIAS DEL VALLE'"
+               [class.is-invalid]="(submitted || f['nombres'].touched) && f['nombres'].invalid">
+        @if ((submitted || f['nombres'].touched) && f['nombres'].invalid && !f['nombres'].errors?.['required']) {
+          <span class="invalid-feedback">
+            (Solo letras y números)
+          </span>
         }
       </div>
 
       <div class="form-group">
-        <label for="nit">NIT</label>
-        <input type="text" id="nit" formControlName="nit" placeholder="Ej: 1016839028"
-               [class.is-invalid]="submitted && f['nit'].errors">
-        
-        @if (submitted && f['nit'].errors) {
-          <div class="invalid-feedback">
-            @if (f['nit'].errors['required']) { <span>El NIT es obligatorio</span> }
-            @if (f['nit'].errors['pattern']) { <span>Solo se permiten números</span> }
-            @if (f['nit'].errors['minlength']) { <span>Mínimo 10 dígitos</span> }
-            @if (f['nit'].errors['maxlength']) { <span>Máximo 12 dígitos</span> }
-          </div>
+        <label>NIT *</label>
+        <input type="text" formControlName="nit" 
+               [placeholder]="(submitted || f['nit'].touched) && f['nit'].errors?.['required'] ? '(Campo obligatorio)' : 'Ej: 1234567891'"
+               [class.is-invalid]="(submitted || f['nit'].touched) && f['nit'].invalid">
+        @if ((submitted || f['nit'].touched) && f['nit'].invalid && !f['nit'].errors?.['required']) {
+          <span class="invalid-feedback">
+            (Debe tener entre 7 y 13 números)
+          </span>
         }
       </div>
 
       <div class="form-group dire-input">
-        <label for="dire">Dirección Completa</label>
-        <textarea id="dire" formControlName="dire" placeholder="Ej: Zona Industrial Quintanilla, Km 6.5 Av. Villazón"
-               [class.is-invalid]="submitted && f['dire'].errors" rows="3"></textarea>
-        
-        @if (submitted && f['dire'].errors) {
-          <div class="invalid-feedback">
-            @if (f['dire'].errors['required']) { <span>La dirección es obligatoria</span> }
-          </div>
-        }
+        <label>Dirección Completa *</label>
+        <textarea formControlName="dire" 
+                  [placeholder]="(submitted || f['dire'].touched) && f['dire'].errors?.['required'] ? '(Campo obligatorio)' : 'Av. Ecologica #1256'"
+                  [class.is-invalid]="(submitted || f['dire'].touched) && f['dire'].invalid" rows="3"></textarea>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label for="ciud">Ciudad/Municipio</label>
-          <input type="text" id="ciud" formControlName="ciud" placeholder="Ej: SACABA"
-                 [class.is-invalid]="submitted && f['ciud'].errors">
-          @if (submitted && f['ciud'].errors) {
-            <div class="invalid-feedback"><span>La ciudad es obligatoria</span></div>
-          }
+          <label>Ciudad/Municipio *</label>
+          <input type="text" formControlName="ciud"
+                 [class.is-invalid]="(submitted || f['ciud'].touched) && f['ciud'].invalid">
         </div>
         <div class="form-group">
-          <label for="tel">Teléfono/Cel</label>
-          <input type="text" id="tel" formControlName="tel" placeholder="Ej: 4712345"
-                 [class.is-invalid]="submitted && f['tel'].errors">
-          @if (submitted && f['tel'].errors) {
-            <div class="invalid-feedback"><span>Solo se permiten números</span></div>
+          <label>Teléfono/Cel</label>
+          <input type="text" formControlName="tel" placeholder="Ej: 4235678"
+                 [class.is-invalid]="(submitted || f['tel'].touched) && f['tel'].invalid">
+          @if ((submitted || f['tel'].touched) && f['tel'].invalid) {
+            <span class="invalid-feedback">
+              (Formato inválido)
+            </span>
           }
         </div>
       </div>
 
       <div class="form-group">
-        <label for="rep">Representante Legal (Nombre Completo)</label>
-        <input type="text" id="rep" formControlName="rep" placeholder="Ej: Juan Pérez García"
-               [class.is-invalid]="submitted && f['rep'].errors">
-        
-        @if (submitted && f['rep'].errors) {
-          <div class="invalid-feedback">
-            @if (f['rep'].errors['required']) { <span>El representante es obligatorio</span> }
-            @if (f['rep'].errors['pattern']) { <span>Solo se permiten letras</span> }
-          </div>
-        }
+        <label>Representante Legal (Nombre Completo) *</label>
+        <input type="text" formControlName="rep" 
+               [placeholder]="(submitted || f['rep'].touched) && f['rep'].errors?.['required'] ? '(Campo obligatorio)' : 'Ej: Mario Perez Ruiz'"
+               [class.is-invalid]="(submitted || f['rep'].touched) && f['rep'].invalid">
       </div>
 
       <div class="form-group">
-        <label for="cate">Categoría de la Empresa</label>
-        <select id="cate" formControlName="cate" [class.is-invalid]="submitted && f['cate'].errors">
+        <label>Categoría de la Empresa *</label>
+        <select formControlName="cate" [class.is-invalid]="(submitted || f['cate'].touched) && f['cate'].invalid">
           <option value="">Seleccione Categoría...</option>
           <option value="CATEGORIA 3">Categoría 3</option>
           <option value="CATEGORIA 4">Categoría 4</option>
         </select>
-        
-        @if (submitted && f['cate'].errors) {
-          <div class="invalid-feedback">
-            @if (f['cate'].errors['required']) { <span>La categoría es obligatoria</span> }
-          </div>
+        @if ((submitted || f['cate'].touched) && f['cate'].errors?.['required']) {
+          <span class="invalid-feedback">
+            (Debe seleccionar una categoría)
+          </span>
         }
       </div>
-    </div>
 
-    <div class="modal-footer">
-      <button type="button" class="btn-cancel" (click)="closeForm.emit()">Cancelar</button>
-      <button type="submit" class="btn-save">Registrar Empresa</button>
-    </div>
-  </form>
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" (click)="closeForm.emit()">Cancelar</button>
+        <button type="button" class="btn-save" (click)="onSubmit()" [disabled]="isLoading">
+          {{ isLoading ? 'Registrando...' : 'Registrar Empresa' }}
+        </button>
+      </div>
+
+    </form>
+  </div>
 </div>

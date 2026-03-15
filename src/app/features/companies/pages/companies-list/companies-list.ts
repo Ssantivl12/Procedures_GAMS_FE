@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router'; 
 import { FormsModule } from '@angular/forms'; 
@@ -15,6 +15,7 @@ import { CompanyService, Company } from '../../services/company.service';
 })
 export class CompaniesListComponent implements OnInit {
   private companyService = inject(CompanyService);
+  private cdr = inject(ChangeDetectorRef);
 
   isModalOpen = false; 
   companies: Company[] = []; 
@@ -45,6 +46,7 @@ export class CompaniesListComponent implements OnInit {
       next: (response) => {
         this.companies = response.data; 
         this.totalPages = response.meta.totalPages; 
+        this.cdr.detectChanges(); 
       },
       error: (err) => {
         console.error('Error al cargar las empresas:', err);
@@ -71,7 +73,7 @@ export class CompaniesListComponent implements OnInit {
   }
 
   onCompanyRegistered() {
-    this.isModalOpen = false;
-    this.loadCompanies(); 
+    this.isModalOpen = false; 
+    this.loadCompanies();     
   }
 }

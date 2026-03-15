@@ -95,7 +95,10 @@
 
   </main>
 
-  @if (isModalOpen) {
-    <app-company-form (closeForm)="isModalOpen = false"></app-company-form>
+ @if (isModalOpen) {
+    <app-company-form 
+      (closeForm)="isModalOpen = false"
+      (companyRegistered)="onCompanyRegistered()">
+    </app-company-form>
   }
 </div>
