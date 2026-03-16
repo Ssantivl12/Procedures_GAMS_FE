@@ -3,8 +3,8 @@
     
     <div class="modal-header">
       <div>
-        <h2 class="modal-title">Registrar Nueva Empresa</h2>
-        <p class="modal-subtitle">Complete los datos de la empresa para su registro en el sistema</p>
+        <h2 class="modal-title">{{ companyToEdit ? 'Editar Empresa' : 'Registrar Nueva Empresa' }}</h2>
+        <p class="modal-subtitle">{{ companyToEdit ? 'Modifique los datos de la empresa seleccionada' : 'Complete los datos de la empresa para su registro en el sistema' }}</p>
       </div>
       <button type="button" class="close-btn" (click)="closeForm.emit()">
         <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24">
@@ -88,7 +88,7 @@
       <div class="modal-footer">
         <button type="button" class="btn-cancel" (click)="closeForm.emit()">Cancelar</button>
         <button type="button" class="btn-save" (click)="onSubmit()" [disabled]="isLoading">
-          {{ isLoading ? 'Registrando...' : 'Registrar Empresa' }}
+          {{ isLoading ? 'Guardando...' : (companyToEdit ? 'Actualizar Empresa' : 'Registrar Empresa') }}
         </button>
       </div>
 

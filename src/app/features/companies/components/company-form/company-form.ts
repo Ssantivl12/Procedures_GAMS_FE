@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Output, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms'; 
 import { CompanyService } from '../../services/company.service'; 
@@ -10,9 +10,10 @@ import { CompanyService } from '../../services/company.service';
   templateUrl: './company-form.html', 
   styleUrl: './company-form.css'    
 })
-export class CompanyFormComponent {
+export class CompanyFormComponent implements OnInit {
   @Output() closeForm = new EventEmitter<void>();
   @Output() companyRegistered = new EventEmitter<void>(); 
+  @Input() companyToEdit: any = null; 
 
   private companyService = inject(CompanyService);
   companyForm: FormGroup; 
@@ -33,11 +34,27 @@ export class CompanyFormComponent {
 
   get f() { return this.companyForm.controls; }
 
+  ngOnInit() {
+    if (this.companyToEdit) {
+      const cateMappedBack = this.companyToEdit.category === 'C3' ? 'CATEGORIA 3' : 'CATEGORIA 4';
+      
+      this.companyForm.patchValue({
+        nombres: this.companyToEdit.legalName,
+        nit: this.companyToEdit.nit,
+        dire: this.companyToEdit.address || '', 
+        ciud: this.companyToEdit.municipality || 'SACABA',
+        tel: this.companyToEdit.phone || '',
+        rep: this.companyToEdit.legalRepName || '',
+        cate: cateMappedBack
+      });
+    }
+  }
+
   onSubmit() {
     this.submitted = true;
 
     if (this.companyForm.invalid) {
-      alert('No se puede registrar. Hay campos vacíos o con datos incorrectos. Revisa los mensajes en rojo.');
+      alert('No se puede guardar. Hay campos vacíos o con datos incorrectos.');
       return;
     }
 
@@ -52,31 +69,42 @@ export class CompanyFormComponent {
       phoneFormatted = '+591' + phoneFormatted.replace(/\s/g, '');
     }
 
-    const newCompany = {
+    const payload = {
       legalName: formValue.nombres,
       nit: formValue.nit,
       address: formValue.dire,
       municipality: formValue.ciud,
       phone: phoneFormatted || undefined, 
-      legalRepName: formValue.rep,
+      legalRepName: formValue.rep, 
       category: categoryMapped as 'C3' | 'C4',
-      email: 'sin_correo@empresa.com',
-      legalRepCi: '0000000',
-      economicActivity: 'Actividad no especificada'
+      email: this.companyToEdit?.email || 'sin_correo@empresa.com',
+      legalRepCi: this.companyToEdit?.legalRepCi || '0000000',
+      economicActivity: this.companyToEdit?.economicActivity || 'Actividad no especificada'
     };
 
-    this.companyService.createCompany(newCompany).subscribe({
-      next: () => {
-        this.isLoading = false; 
-        alert('¡Empresa registrada exitosamente en la base de datos!');
-        this.companyRegistered.emit(); 
-        this.closeForm.emit(); 
-      },
-      error: (err: any) => {
-        console.error('ERROR DEL BACKEND:', err);
-        alert('El servidor rechazó los datos. Revisa la consola para más detalles.');
-        this.isLoading = false;
-      }
-    });
+    if (this.companyToEdit) {
+      this.companyService.updateCompany(this.companyToEdit.id, payload).subscribe({
+        next: () => this.handleSuccess('¡Empresa actualizada correctamente!'),
+        error: (err: any) => this.handleError(err)
+      });
+    } else {
+      this.companyService.createCompany(payload).subscribe({
+        next: () => this.handleSuccess('¡Empresa registrada exitosamente!'),
+        error: (err) => this.handleError(err)
+      });
+    }
+  }
+
+  private handleSuccess(mensaje: string) {
+    this.isLoading = false; 
+    alert(mensaje);
+    this.companyRegistered.emit(); 
+    this.closeForm.emit(); 
+  }
+
+  private handleError(err: any) {
+    console.error('ERROR DEL BACKEND:', err);
+    alert('El servidor rechazó los datos. Revisa la consola para más detalles.');
+    this.isLoading = false;
   }
 }

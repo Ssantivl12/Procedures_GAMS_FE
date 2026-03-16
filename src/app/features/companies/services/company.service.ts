@@ -32,7 +32,6 @@ export class CompanyService {
   private readonly api = inject(ApiClient);
   private readonly basePath = '/companies'; 
 
- 
   getCompanies(params?: any) {
     return this.api.get<PaginatedResponse<Company>>(this.basePath, params);
   }
@@ -41,8 +40,15 @@ export class CompanyService {
     return this.api.get<Company>(`${this.basePath}/${id}`);
   }
 
-
   createCompany(data: Partial<Company>) {
     return this.api.post<Company>(this.basePath, data);
+  }
+
+  updateCompany(id: string, data: Partial<Company>) {
+    return this.api.patch<Company>(`${this.basePath}/${id}`, data);
+  }
+
+  deleteCompany(id: string) {
+    return this.api.delete<void>(`${this.basePath}/${id}`);
   }
 }

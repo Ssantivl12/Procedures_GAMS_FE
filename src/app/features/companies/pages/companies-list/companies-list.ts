@@ -19,6 +19,8 @@ export class CompaniesListComponent implements OnInit {
 
   isModalOpen = false; 
   companies: Company[] = []; 
+  
+  selectedCompany: Company | null = null; 
 
   searchTerm: string = '';
   sortAscending: boolean = true;
@@ -26,21 +28,14 @@ export class CompaniesListComponent implements OnInit {
   currentPage: number = 1;
   totalPages: number = 1;
 
-  ngOnInit() {
-    this.loadCompanies(); 
-  }
+  ngOnInit() { this.loadCompanies(); }
 
   loadCompanies() {
     const params: any = {
-      page: this.currentPage,
-      limit: this.itemsPerPage,
-      sortBy: 'legalName',
-      sortOrder: this.sortAscending ? 'asc' : 'desc'
+      page: this.currentPage, limit: this.itemsPerPage,
+      sortBy: 'legalName', sortOrder: this.sortAscending ? 'asc' : 'desc'
     };
-
-    if (this.searchTerm) {
-      params.search = this.searchTerm;
-    }
+    if (this.searchTerm) params.search = this.searchTerm;
 
     this.companyService.getCompanies(params).subscribe({
       next: (response) => {
@@ -48,32 +43,48 @@ export class CompaniesListComponent implements OnInit {
         this.totalPages = response.meta.totalPages; 
         this.cdr.detectChanges(); 
       },
-      error: (err) => {
-        console.error('Error al cargar las empresas:', err);
-      }
+      error: (err) => console.error(err)
     });
   }
 
-  onSearchChange() {
-    this.currentPage = 1; 
-    this.loadCompanies(); 
-  }
-
-  toggleSort() {
-    this.sortAscending = !this.sortAscending;
-    this.currentPage = 1;
-    this.loadCompanies(); 
-  }
-
+  onSearchChange() { this.currentPage = 1; this.loadCompanies(); }
+  toggleSort() { this.sortAscending = !this.sortAscending; this.currentPage = 1; this.loadCompanies(); }
+  
   changePage(page: number) {
     if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-      this.loadCompanies(); 
+      this.currentPage = page; this.loadCompanies(); 
+    }
+  }
+  
+  openCreateModal() {
+    this.selectedCompany = null; 
+    this.isModalOpen = true;
+  }
+
+  openEditModal(company: Company) {
+    this.selectedCompany = company; 
+    this.isModalOpen = true;
+  }
+
+  deleteCompany(company: Company) {
+    const confirmacion = window.confirm(`¿Estás seguro de que deseas eliminar la empresa: ${company.legalName}?`);
+    
+    if (confirmacion) {
+      this.companyService.deleteCompany(company.id).subscribe({
+        next: () => {
+          alert('Empresa eliminada exitosamente.');
+          this.loadCompanies(); 
+        },
+        error: (err: any) => {
+          console.error(err);
+          alert('Hubo un error al intentar eliminar la empresa.');
+        }
+      });
     }
   }
 
   onCompanyRegistered() {
     this.isModalOpen = false; 
-    this.loadCompanies();     
+    this.loadCompanies(); 
   }
 }
