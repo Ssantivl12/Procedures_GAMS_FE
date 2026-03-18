@@ -11,18 +11,13 @@ import { RouterModule } from '@angular/router';
   styleUrl: './dashboard.page.css'
 })
 export class DashboardPageComponent {
-  stats = [
-    { title: 'Empresas en Revisión', count: 1, iconKey: 'doc', colorClass: 'blue' },
-    { title: 'Observaciones Pendientes', count: 1, iconKey: 'alert', colorClass: 'amber' },
-    { title: 'Subsanaciones Pendientes', count: 1, iconKey: 'sync', colorClass: 'orange' },
-    { title: 'Certificados por Vencer', count: 0, iconKey: 'calendar', colorClass: 'purple' },
-    { title: 'IAA Atrasados', count: 1, iconKey: 'clock', colorClass: 'red' },
-  ];
+  isLoading = false;
+  pendingItems: any[] = []; // Se poblará más adelante con la integración del backend
+  
+  // Mock para visualización (se puede comentar o remover luego)
+  // pendingItems = [
+  //   { id: '1', title: 'Revisión de Informe Ambiental', type: 'TRÁMITE', status: 'PENDING', date: new Date() }
+  // ];
 
-  mainActions = [
-    { title: 'Gestión de Empresas', desc: 'Registrar y categorizar', iconKey: 'building', route: '/companies' },
-    { title: 'Gestión de Personal', desc: 'Usuarios y permisos', iconKey: 'users', route: '/users' },
-    { title: 'Bandeja de Pendientes', desc: 'Trámites en curso', iconKey: 'inbox', route: '/inbox' },
-    { title: 'Estado de empresas', desc: 'Consultar situación actual y trámites', iconKey: 'status', route: '/status-companies' }
-  ];
+  constructor() {}
 }

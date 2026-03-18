@@ -14,29 +14,36 @@ import { RouterLink } from '@angular/router';
   styles: [
     `
       .login-button {
-        background-color: #2e7d32;
-        color: var(--white);
-        padding: 12px 24px;
-        border-radius: 8px;
-        font-weight: 600;
-        font-size: 1rem;
-        transition: background-color 0.2s;
+        background-color: var(--color-primary);
+        color: var(--color-primary-foreground);
+        padding: 10px 20px;
+        border-radius: var(--radius-lg);
+        font-weight: 700;
+        font-size: 0.9rem;
+        transition: all 0.2s;
         display: flex;
         align-items: center;
         gap: 0.5rem;
         text-decoration: none;
         border: none;
         cursor: pointer;
-        font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont,
-          sans-serif;
+        font-family: var(--font-sans);
+        box-shadow: var(--shadow-sm);
       }
 
       .login-button:hover {
-        background-color: #2e7d32;
+        background-color: var(--color-sidebar-primary);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
       }
 
       .login-button .arrow {
         font-size: 1.125rem;
+        transition: transform 0.2s;
+      }
+      
+      .login-button:hover .arrow {
+        transform: translateX(4px);
       }
     `,
   ],

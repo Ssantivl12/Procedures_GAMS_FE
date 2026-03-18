@@ -1,114 +1,35 @@
-<div class="page-wrapper">
-  <app-dashboard-header></app-dashboard-header>
+<div class="dashboard-wrapper">
+    <app-dashboard-header></app-dashboard-header>
 
-  <main class="main-content">
-    
-    <div class="page-header">
-      <div>
-        <h1 class="page-title">Gestión de Personal</h1>
-        <p class="page-subtitle">Administración de usuarios del sistema</p>
-      </div>
-      <button class="btn-create" (click)="isModalOpen = true">
-        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
-        </svg>
-        Crear nuevo usuario
-      </button>
-    </div>
+    <main class="main-content">
+        <div class="flex flex-col gap-6 pb-12 animate-fade-in-up">
+            <!-- Header -->
+            <app-user-header (addUser)="openUserModal()"></app-user-header>
 
-    <div class="search-container">
-      <div class="search-box">
-        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="search-icon">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-        </svg>
-        
-        <input type="text" placeholder="Buscar por nombre, CI o correo..." 
-               [(ngModel)]="searchTerm" (input)="onSearchChange()">
-        
-        <button class="btn-sort" (click)="toggleSort()" title="Ordenar alfabéticamente">
-          {{ sortAscending ? 'A-Z ↓' : 'Z-A ↑' }}
-        </button>
+            <!-- Filters -->
+            <app-user-filters 
+                [searchQuery]="searchQuery"
+                [sortBy]="sortBy"
+                [pageSize]="pageSize"
+                (search)="onSearch($event)"
+                (sortChange)="onSortChange($event)"
+                (pageSizeChange)="onPageSizeChange($event)"
+                (refresh)="onRefresh()">
+            </app-user-filters>
 
-        <select class="select-pagination" [(ngModel)]="itemsPerPage" (change)="onSearchChange()">
-          <option [ngValue]="5">5 por página</option>
-          <option [ngValue]="10">10 por página</option>
-          <option [ngValue]="20">20 por página</option>
-        </select>
-      </div>
-    </div>
+            <!-- Table -->
+            <app-users-table
+                (edit)="openUserModal($event)"
+                (delete)="onDeleteUser($event)">
+            </app-users-table>
+        </div>
+    </main>
 
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Nombres</th>
-            <th>Apellidos</th>
-            <th>CI</th>
-            <th>Correo</th>
-            <th>Rol</th>
-            <th>Estado</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (user of displayedUsers; track user.ci) {
-            <tr>
-              <td class="font-medium">{{ user.name }}</td>
-              <td>{{ user.lastName }}</td>
-              <td>{{ user.ci }}</td>
-              <td>{{ user.email }}</td>
-              <td>
-                <span class="role-badge" [ngClass]="user.role.toLowerCase()">{{ user.role }}</span>
-              </td>
-              <td>
-                <span class="status-badge" [class.active]="user.status === 'Activo'" [class.inactive]="user.status === 'Inactivo'">
-                  {{ user.status }}
-                </span>
-              </td>
-              
-              <td class="actions-cell">
-                <button class="btn-icon btn-edit" title="Editar">
-                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
-                </button>
-                <button class="btn-icon btn-delete" title="Eliminar" (click)="openDeleteModal(user)">
-                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                </button>
-              </td>
-            </tr>
-          }
-
-          @if (displayedUsers.length === 0) {
-            <tr>
-              <td colspan="7" style="text-align: center; padding: 24px; color: #6b7280;">
-                No se encontraron usuarios con esa búsqueda.
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
-
-      <div class="pagination-ui">
-        <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">Anterior</button>
-        <span class="page-info">Página {{ currentPage }} de {{ totalPages }}</span>
-        <button (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages">Siguiente</button>
-      </div>
-    </div>
-
-  </main>
-
-  @if (isModalOpen) {
-    <app-user-form (closeForm)="isModalOpen = false"></app-user-form>
-  }
-
-  @if (isDeleteModalOpen) {
-    <div class="modal-overlay" (click)="closeDeleteModal()"></div>
-    <div class="delete-modal-box">
-      <h3>¿Eliminar Personal?</h3>
-      <p>Está a punto de eliminar a <strong>{{ userToDelete?.name }} {{ userToDelete?.lastName }}</strong>. Esta acción no se puede deshacer.</p>
-      <div class="delete-modal-footer">
-        <button class="btn-cancel" (click)="closeDeleteModal()">Cancelar</button>
-        <button class="btn-delete-confirm" (click)="confirmDelete()">Eliminar</button>
-      </div>
-    </div>
-  }
+    <!-- Modal Form -->
+    <app-user-form 
+        *ngIf="isModalOpen" 
+        [userToEdit]="selectedUser"
+        (closeForm)="closeUserModal()"
+        (userSaved)="onUserSaved()"
+    ></app-user-form>
 </div>

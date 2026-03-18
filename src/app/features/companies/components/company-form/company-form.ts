@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output, Input, OnInit, inject } from '@angular/core';
+import { Component, EventEmitter, Output, Input, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms'; 
 import { CompanyService } from '../../services/company.service'; 
@@ -16,9 +16,11 @@ export class CompanyFormComponent implements OnInit {
   @Input() companyToEdit: any = null; 
 
   private companyService = inject(CompanyService);
+  private cdr = inject(ChangeDetectorRef);
   companyForm: FormGroup; 
   submitted = false; 
   isLoading = false; 
+  showSuccessModal = false;
 
   constructor(private fb: FormBuilder) {
     this.companyForm = this.fb.group({
@@ -54,7 +56,7 @@ export class CompanyFormComponent implements OnInit {
     this.submitted = true;
 
     if (this.companyForm.invalid) {
-      alert('No se puede guardar. Hay campos vacíos o con datos incorrectos.');
+      console.warn('Formulario de empresa inválido');
       return;
     }
 
@@ -65,6 +67,7 @@ export class CompanyFormComponent implements OnInit {
     const categoryMapped = formValue.cate === 'CATEGORIA 3' ? 'C3' : (formValue.cate === 'CATEGORIA 4' ? 'C4' : null);
 
     let phoneFormatted = formValue.tel ? formValue.tel.trim() : '';
+    // GAMS Backend seems to expect +591 or specific formats, keeping existing logic
     if (phoneFormatted && !phoneFormatted.startsWith('+591')) {
       phoneFormatted = '+591' + phoneFormatted.replace(/\s/g, '');
     }
@@ -82,29 +85,27 @@ export class CompanyFormComponent implements OnInit {
       economicActivity: this.companyToEdit?.economicActivity || 'Actividad no especificada'
     };
 
-    if (this.companyToEdit) {
-      this.companyService.updateCompany(this.companyToEdit.id, payload).subscribe({
-        next: () => this.handleSuccess('¡Empresa actualizada correctamente!'),
-        error: (err: any) => this.handleError(err)
-      });
-    } else {
-      this.companyService.createCompany(payload).subscribe({
-        next: () => this.handleSuccess('¡Empresa registrada exitosamente!'),
-        error: (err) => this.handleError(err)
-      });
-    }
+    const request = this.companyToEdit 
+      ? this.companyService.updateCompany(this.companyToEdit.id, payload)
+      : this.companyService.createCompany(payload);
+
+    request.subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.showSuccessModal = true;
+        this.cdr.detectChanges();
+      },
+      error: (err: any) => {
+        this.isLoading = false;
+        console.error('ERROR GUARDANDO EMPRESA:', err);
+        alert('Hubo un error al guardar la empresa. Revisa los datos.');
+        this.cdr.detectChanges();
+      }
+    });
   }
 
-  private handleSuccess(mensaje: string) {
-    this.isLoading = false; 
-    alert(mensaje);
+  onFinish() {
     this.companyRegistered.emit(); 
-    this.closeForm.emit(); 
-  }
-
-  private handleError(err: any) {
-    console.error('ERROR DEL BACKEND:', err);
-    alert('El servidor rechazó los datos. Revisa la consola para más detalles.');
-    this.isLoading = false;
+    this.closeForm.emit();
   }
 }

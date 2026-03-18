@@ -12,5 +12,6 @@ import { DashboardSidebarComponent } from '../../../features/dashboard/component
 })
 export class AdminShellComponent {
   isSidebarOpen = false;
+  isSidebarCollapsed = false; // New: Manage collapsible state
 }
 

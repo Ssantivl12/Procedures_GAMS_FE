@@ -59,8 +59,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
         display: flex;
         align-items: center;
         gap: 1.5rem;
-        font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont,
-          'Segoe UI', sans-serif;
+        font-family: var(--font-sans);
       }
 
       .user-toolbar__date-time {
@@ -68,45 +67,51 @@ import { Component, EventEmitter, Output } from '@angular/core';
         align-items: baseline;
         gap: 0.4rem;
         font-size: 0.85rem;
-        color: #4b5563;
+        color: var(--color-muted-foreground);
       }
 
       .user-toolbar__label {
         font-weight: 500;
-        color: #6b7280;
+        color: var(--color-muted-foreground);
       }
 
       .user-toolbar__date {
         font-weight: 600;
-        color: #111827;
+        color: var(--color-foreground);
       }
 
       .user-toolbar__time {
         padding-left: 0.5rem;
         margin-left: 0.5rem;
-        border-left: 1px solid #e5e7eb;
+        border-left: 1px solid var(--color-border);
         font-weight: 500;
-        color: #374151;
+        color: var(--color-foreground);
       }
 
       .user-toolbar__icon-btn {
         position: relative;
         width: 38px;
         height: 38px;
-        border-radius: 999px;
-        border: 1px solid #e5e7eb;
-        background-color: #ffffff;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--color-border);
+        background-color: var(--color-background);
         display: inline-flex;
         align-items: center;
         justify-content: center;
         cursor: pointer;
         padding: 0;
+        transition: all 0.2s;
+      }
+      
+      .user-toolbar__icon-btn:hover {
+        background-color: var(--color-accent);
+        border-color: var(--color-primary);
       }
 
       .user-toolbar__icon-btn svg {
         width: 20px;
         height: 20px;
-        stroke: #4b5563;
+        stroke: var(--color-muted-foreground);
         fill: none;
       }
 
@@ -117,7 +122,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
         width: 8px;
         height: 8px;
         border-radius: 999px;
-        background-color: #f97316;
+        background-color: var(--color-destructive);
       }
 
       .user-toolbar__profile {
@@ -137,13 +142,13 @@ import { Component, EventEmitter, Output } from '@angular/core';
       .user-toolbar__name {
         font-size: 0.9rem;
         font-weight: 600;
-        color: #111827;
+        color: var(--color-foreground);
       }
 
       .user-toolbar__role {
         font-size: 0.75rem;
         font-weight: 500;
-        color: #059669;
+        color: var(--color-primary);
       }
 
       .user-toolbar__avatar-btn {
@@ -156,14 +161,15 @@ import { Component, EventEmitter, Output } from '@angular/core';
       .user-toolbar__avatar {
         width: 36px;
         height: 36px;
-        border-radius: 999px;
-        background: linear-gradient(135deg, #22c55e, #16a34a);
-        color: #ffffff;
+        border-radius: var(--radius-lg);
+        background: linear-gradient(135deg, var(--color-primary), var(--color-sidebar-primary));
+        color: var(--primary-foreground);
         display: inline-flex;
         align-items: center;
         justify-content: center;
         font-size: 0.9rem;
         font-weight: 600;
+        box-shadow: var(--shadow-sm);
       }
 
       .user-toolbar__menu {
@@ -171,36 +177,41 @@ import { Component, EventEmitter, Output } from '@angular/core';
         right: 0;
         top: 110%;
         min-width: 180px;
-        background-color: #ffffff;
-        border-radius: 0.75rem;
-        box-shadow: 0 18px 45px rgba(15, 23, 42, 0.15);
+        background-color: var(--color-card);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-lg);
         padding: 0.35rem;
         display: flex;
         flex-direction: column;
         z-index: 20;
+        animation: fade-in-up 0.3s ease-out;
       }
 
       .user-toolbar__menu-item {
         border: none;
         background-color: transparent;
         padding: 0.6rem 0.75rem;
-        border-radius: 0.6rem;
+        border-radius: var(--radius-md);
         text-align: left;
         font-size: 0.85rem;
-        color: #111827;
+        color: var(--color-foreground);
         cursor: pointer;
+        transition: background-color 0.2s;
       }
 
       .user-toolbar__menu-item:hover {
-        background-color: #f3f4f6;
+        background-color: var(--color-accent);
+        color: var(--color-accent-foreground);
       }
 
       .user-toolbar__menu-item--danger {
-        color: #b91c1c;
+        color: var(--color-destructive);
       }
 
       .user-toolbar__menu-item--danger:hover {
-        background-color: #fef2f2;
+        background-color: var(--color-destructive);
+        color: var(--color-destructive-foreground);
       }
 
       @media (max-width: 768px) {

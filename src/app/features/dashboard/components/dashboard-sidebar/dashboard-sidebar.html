@@ -1,74 +1,101 @@
-<div class="sidebar-shell" [class.is-open]="isOpen">
-  <div class="sidebar-backdrop" (click)="close.emit()"></div>
+<aside
+  [ngClass]="{ 'w-64': !isCollapsed, 'w-20': isCollapsed, 'translate-x-0': isOpen, '-translate-x-full lg:translate-x-0': !isOpen }"
+  class="fixed inset-y-0 left-0 z-50 lg:relative h-screen bg-sidebar text-sidebar-foreground flex flex-col transition-all duration-300 shadow-xl lg:shadow-none flex-shrink-0"
+>
+  <!-- Logo Area -->
+  <div class="h-16 flex items-center justify-between px-4 border-b border-sidebar-border shrink-0">
+    <div
+      *ngIf="!isCollapsed"
+      class="flex-shrink-0 flex items-center overflow-hidden whitespace-nowrap animate-fade-in truncate"
+    >
+      <div class="w-8 h-8 min-w-8 bg-primary/20 rounded-lg flex items-center justify-center overflow-hidden">
+        <img src="assets/img/LogoGams.png" alt="GAMS Logo" class="w-6 h-6 object-contain" />
+      </div>
+      <span class="ml-3 font-bold text-lg tracking-tight text-sidebar-foreground truncate">GAMS Ambiental</span>
+    </div>
 
-  <aside class="sidebar" aria-label="Navegación principal">
-    <div class="brand">
-      <div class="brand-row">
-        <div class="brand-mark" aria-hidden="true">
-          <img src="assets/img/LogoGams.png" alt="" class="brand-logo" />
-        </div>
-        <div class="brand-text">
-          <div class="brand-title">GAMS Ambiental</div>
-        </div>
+    <div *ngIf="isCollapsed" class="w-full flex justify-center items-center">
+      <div class="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center overflow-hidden">
+        <img src="assets/img/LogoGams.png" alt="GAMS Logo" class="w-7 h-7 object-contain" />
       </div>
     </div>
+  </div>
 
-    <nav class="nav">
-      @for (link of links; track link.route) {
-        <a
-          class="nav-item"
-          [routerLink]="link.route"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: link.route === '/dashboard' }"
-          (click)="onNavigate()"
-        >
-          <span class="nav-icon" aria-hidden="true">
-            @switch (link.icon) {
-              @case ('home') {
-                <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75V19.875c0 .621.504 1.125 1.125 1.125H9.75V15a.75.75 0 01.75-.75h3a.75.75 0 01.75.75v6h4.125c.621 0 1.125-.504 1.125-1.125V9.75" />
-                </svg>
-              }
-              @case ('users') {
-                <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
-                </svg>
-              }
-              @case ('building') {
-                <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
-                </svg>
-              }
-              @case ('inbox') {
-                <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 13.5h3.86a2.25 2.25 0 012.012 1.244l.256.512a2.25 2.25 0 002.013 1.244h3.218a2.25 2.25 0 002.013-1.244l.256-.512a2.25 2.25 0 012.013-1.244h3.859m-19.5.338V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 00-2.15-1.588H6.911a2.25 2.25 0 00-2.15 1.588L2.35 13.177a2.25 2.25 0 00-.1.661z" />
-                </svg>
-              }
-              @case ('status') {
-                <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 3v18h18M7 14l3-3 4 4 7-7" />
-                </svg>
-              }
-            }
-          </span>
-          <span class="nav-label">{{ link.label }}</span>
-          @if (link.badgeCount) {
-            <span class="nav-badge" aria-label="Pendientes">{{ link.badgeCount }}</span>
-          }
-        </a>
-      }
-    </nav>
+  <!-- Toggle Button (Horus Desktop Style) -->
+  <button
+    (click)="onToggleCollapse()"
+    class="hidden lg:flex absolute -right-3 top-20 bg-primary hover:bg-primary/90 text-primary-foreground p-1 rounded-full shadow-lg transform transition-transform z-10 focus:outline-none"
+    [ngClass]="{ 'rotate-180': isCollapsed }"
+  >
+    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+    </svg>
+  </button>
 
-    <div class="sidebar-footer">
-      <button class="logout" type="button" (click)="onLogout()">
-        <span class="logout-icon" aria-hidden="true">
-          <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-7.5A2.25 2.25 0 003.75 5.25v13.5A2.25 2.25 0 006 21h7.5a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+  <!-- Mobile Close Backdrop Toggle is handled in AdminShell, but we can add a mobile close button if needed -->
+
+  <!-- Navigation Links -->
+  <div class="flex-1 overflow-y-auto overflow-x-hidden py-4 px-3 flex flex-col gap-1 custom-scrollbar">
+    @for (link of links; track link.route) {
+      <a
+        [routerLink]="link.route"
+        routerLinkActive="bg-primary text-primary-foreground shadow-md"
+        [routerLinkActiveOptions]="{ exact: link.route === '/dashboard' }"
+        [title]="isCollapsed ? link.label : ''"
+        (click)="onNavigate()"
+        class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground transition-all duration-200 group relative"
+      >
+        <div class="w-5 h-5 shrink-0 flex items-center justify-center" [ngClass]="{ 'mx-auto': isCollapsed, 'mr-3': !isCollapsed }">
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path [attr.d]="link.icon"></path>
           </svg>
+        </div>
+
+        <span
+          *ngIf="!isCollapsed"
+          class="font-medium whitespace-nowrap animate-fade-in truncate flex-1"
+        >
+          {{ link.label }}
         </span>
-        Cerrar sesión
-      </button>
-    </div>
-  </aside>
-</div>
+
+        @if (link.badgeCount && !isCollapsed) {
+          <span class="ml-auto bg-primary-foreground text-primary text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+            {{ link.badgeCount }}
+          </span>
+        }
+      </a>
+    }
+  </div>
+
+  <!-- Logout Footer -->
+  <div class="p-4 border-t border-sidebar-border mt-auto">
+    <a
+      (click)="onLogout()"
+      [title]="isCollapsed ? 'Cerrar Sesión' : ''"
+      class="flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-destructive/90 hover:bg-destructive/10 hover:text-destructive transition-all duration-200 group relative cursor-pointer"
+    >
+      <div class="w-5 h-5 shrink-0 flex items-center justify-center" [ngClass]="{ 'mx-auto': isCollapsed, 'mr-3': !isCollapsed }">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+        </svg>
+      </div>
+      <span *ngIf="!isCollapsed" class="font-medium whitespace-nowrap animate-fade-in">Cerrar Sesión</span>
+    </a>
+  </div>
+</aside>
+
+<!-- Mobile Backdrop -->
+<div
+  *ngIf="isOpen"
+  (click)="close.emit()"
+  class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden transition-opacity"
+></div>
 

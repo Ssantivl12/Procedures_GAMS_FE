@@ -1,97 +1,118 @@
-<div class="modal-overlay" (click)="closeForm.emit()">
-  <div class="modal-box" (click)="$event.stopPropagation()">
-    
-    <div class="modal-header">
-      <div>
-        <h2 class="modal-title">{{ companyToEdit ? 'Editar Empresa' : 'Registrar Nueva Empresa' }}</h2>
-        <p class="modal-subtitle">{{ companyToEdit ? 'Modifique los datos de la empresa seleccionada' : 'Complete los datos de la empresa para su registro en el sistema' }}</p>
-      </div>
-      <button type="button" class="close-btn" (click)="closeForm.emit()">
-        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
+<div class="modal-overlay" (click)="!isLoading && !showSuccessModal && closeForm.emit()">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+        
+        <!-- Standard Form Header -->
+        <div class="modal-header" *ngIf="!showSuccessModal">
+            <div>
+                <h2 class="text-2xl font-extrabold text-foreground tracking-tight">
+                    {{ companyToEdit ? 'Editar Empresa' : 'Registrar Empresa' }}
+                </h2>
+                <p class="text-muted-foreground text-sm font-medium mt-1">
+                    {{ companyToEdit ? 'Modifique los datos de la institución' : 'Complete el registro para la nueva empresa' }}
+                </p>
+            </div>
+            <button type="button" class="close-btn" (click)="closeForm.emit()" [disabled]="isLoading">
+                <svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" width="20" height="20">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="modal-body py-4" *ngIf="!showSuccessModal">
+            <form [formGroup]="companyForm" class="flex flex-col gap-5">
+                
+                <!-- Razon Social -->
+                <div class="form-group">
+                    <label>Razón Social / Nombre Comercial *</label>
+                    <input type="text" formControlName="nombres" 
+                           placeholder="Ej: INDUSTRIAS DEL VALLE S.A."
+                           [class.is-invalid]="submitted && f['nombres'].invalid">
+                    <div *ngIf="submitted && f['nombres'].errors?.['required']" class="invalid-feedback mt-1">
+                        La razón social es obligatoria
+                    </div>
+                </div>
+
+                <!-- NIT y Categoria -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label>NIT *</label>
+                        <input type="text" formControlName="nit" 
+                               placeholder="Ej: 12345678"
+                               [class.is-invalid]="submitted && f['nit'].invalid">
+                        <div *ngIf="submitted && f['nit'].errors?.['required']" class="invalid-feedback mt-1">
+                            El NIT es obligatorio
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Categoría GAMS *</label>
+                        <select formControlName="cate" [class.is-invalid]="submitted && f['cate'].invalid">
+                            <option value="">Seleccione...</option>
+                            <option value="CATEGORIA 3">Categoría 3 (C3)</option>
+                            <option value="CATEGORIA 4">Categoría 4 (C4)</option>
+                        </select>
+                        <div *ngIf="submitted && f['cate'].errors?.['required']" class="invalid-feedback mt-1">
+                            Seleccione categoría
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Direccion -->
+                <div class="form-group">
+                    <label>Dirección del Establecimiento *</label>
+                    <input type="text" formControlName="dire" 
+                           placeholder="Av./Calle, # de puerta, Zona"
+                           [class.is-invalid]="submitted && f['dire'].invalid">
+                </div>
+
+                <!-- Municipio y Telefono -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label>Municipio *</label>
+                        <input type="text" formControlName="ciud" readonly class="bg-accent/30 cursor-not-allowed">
+                    </div>
+                    <div class="form-group">
+                        <label>Teléfono de Contacto</label>
+                        <input type="text" formControlName="tel" placeholder="Ej: 4321567">
+                    </div>
+                </div>
+
+                <!-- Representante -->
+                <div class="form-group">
+                    <label>Representante Legal *</label>
+                    <input type="text" formControlName="rep" 
+                           placeholder="Nombre completo del titular"
+                           [class.is-invalid]="submitted && f['rep'].invalid">
+                </div>
+            </form>
+        </div>
+
+        <!-- Footer for Form -->
+        <div class="modal-footer px-6 py-5 bg-accent/30 flex justify-end gap-3 mt-4" *ngIf="!showSuccessModal">
+            <button type="button" class="btn-secondary px-6 py-2.5 rounded-xl font-bold text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-all" (click)="closeForm.emit()" [disabled]="isLoading">
+                Cancelar
+            </button>
+            <button type="button" class="btn-primary px-8 py-2.5 rounded-xl font-bold text-sm bg-primary text-white shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all flex items-center gap-2" 
+                (click)="onSubmit()" [disabled]="isLoading">
+                <div *ngIf="isLoading" class="spinner-sm"></div>
+                {{ companyToEdit ? 'Actualizar Empresa' : 'Registrar Empresa' }}
+            </button>
+        </div>
+
+        <!-- Success View -->
+        <div *ngIf="showSuccessModal" class="p-8 text-center animate-fade-in">
+            <div class="success-icon-container mb-4 mx-auto w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
+            <h2 class="text-xl font-extrabold text-foreground mb-1">¡Operación Exitosa!</h2>
+            <p class="text-muted-foreground text-sm font-medium mb-6 px-4">
+                La empresa ha sido {{ companyToEdit ? 'actualizada' : 'registrada' }} correctamente.
+            </p>
+            <button (click)="onFinish()" class="btn-primary w-full py-3 rounded-xl font-bold bg-primary text-white hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/20">
+                Aceptar y Continuar
+            </button>
+        </div>
+
     </div>
-
-    <form [formGroup]="companyForm" class="modal-body">
-      
-      <div class="form-group">
-        <label>Nombres de la Empresa *</label>
-        <input type="text" formControlName="nombres" 
-               [placeholder]="(submitted || f['nombres'].touched) && f['nombres'].errors?.['required'] ? '(Campo obligatorio)' : 'Ej: INDUSTRIAS DEL VALLE'"
-               [class.is-invalid]="(submitted || f['nombres'].touched) && f['nombres'].invalid">
-        @if ((submitted || f['nombres'].touched) && f['nombres'].invalid && !f['nombres'].errors?.['required']) {
-          <span class="invalid-feedback">
-            (Solo letras y números)
-          </span>
-        }
-      </div>
-
-      <div class="form-group">
-        <label>NIT *</label>
-        <input type="text" formControlName="nit" 
-               [placeholder]="(submitted || f['nit'].touched) && f['nit'].errors?.['required'] ? '(Campo obligatorio)' : 'Ej: 1234567891'"
-               [class.is-invalid]="(submitted || f['nit'].touched) && f['nit'].invalid">
-        @if ((submitted || f['nit'].touched) && f['nit'].invalid && !f['nit'].errors?.['required']) {
-          <span class="invalid-feedback">
-            (Debe tener entre 7 y 13 números)
-          </span>
-        }
-      </div>
-
-      <div class="form-group dire-input">
-        <label>Dirección Completa *</label>
-        <textarea formControlName="dire" 
-                  [placeholder]="(submitted || f['dire'].touched) && f['dire'].errors?.['required'] ? '(Campo obligatorio)' : 'Av. Ecologica #1256'"
-                  [class.is-invalid]="(submitted || f['dire'].touched) && f['dire'].invalid" rows="3"></textarea>
-      </div>
-
-      <div class="form-row">
-        <div class="form-group">
-          <label>Ciudad/Municipio *</label>
-          <input type="text" formControlName="ciud"
-                 [class.is-invalid]="(submitted || f['ciud'].touched) && f['ciud'].invalid">
-        </div>
-        <div class="form-group">
-          <label>Teléfono/Cel</label>
-          <input type="text" formControlName="tel" placeholder="Ej: 4235678"
-                 [class.is-invalid]="(submitted || f['tel'].touched) && f['tel'].invalid">
-          @if ((submitted || f['tel'].touched) && f['tel'].invalid) {
-            <span class="invalid-feedback">
-              (Formato inválido)
-            </span>
-          }
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label>Representante Legal (Nombre Completo) *</label>
-        <input type="text" formControlName="rep" 
-               [placeholder]="(submitted || f['rep'].touched) && f['rep'].errors?.['required'] ? '(Campo obligatorio)' : 'Ej: Mario Perez Ruiz'"
-               [class.is-invalid]="(submitted || f['rep'].touched) && f['rep'].invalid">
-      </div>
-
-      <div class="form-group">
-        <label>Categoría de la Empresa *</label>
-        <select formControlName="cate" [class.is-invalid]="(submitted || f['cate'].touched) && f['cate'].invalid">
-          <option value="">Seleccione Categoría...</option>
-          <option value="CATEGORIA 3">Categoría 3</option>
-          <option value="CATEGORIA 4">Categoría 4</option>
-        </select>
-        @if ((submitted || f['cate'].touched) && f['cate'].errors?.['required']) {
-          <span class="invalid-feedback">
-            (Debe seleccionar una categoría)
-          </span>
-        }
-      </div>
-
-      <div class="modal-footer">
-        <button type="button" class="btn-cancel" (click)="closeForm.emit()">Cancelar</button>
-        <button type="button" class="btn-save" (click)="onSubmit()" [disabled]="isLoading">
-          {{ isLoading ? 'Guardando...' : (companyToEdit ? 'Actualizar Empresa' : 'Registrar Empresa') }}
-        </button>
-      </div>
-
-    </form>
-  </div>
 </div>

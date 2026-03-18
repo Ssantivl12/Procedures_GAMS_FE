@@ -1,94 +1,86 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms'; 
 import { DashboardHeaderComponent } from '../../../dashboard/components/dashboard-header/dashboard-header';
+import { UserHeaderComponent } from '../../components/user-header/user-header';
+import { UserFiltersComponent } from '../../components/user-filters/user-filters';
+import { UsersTableComponent } from '../../components/users-table/users-table';
 import { UserFormComponent } from '../../components/user-form/user-form';
+import { UserService, User } from '../../services/user.service';
 
 @Component({
   selector: 'app-users-list',
   standalone: true,
-  imports: [CommonModule, DashboardHeaderComponent, UserFormComponent, FormsModule],
+  imports: [
+    CommonModule, 
+    DashboardHeaderComponent, 
+    UserHeaderComponent, 
+    UserFiltersComponent, 
+    UsersTableComponent, 
+    UserFormComponent
+  ],
   templateUrl: './users-list.html',
   styleUrl: './users-list.css'
 })
 export class UsersListComponent {
+  private userService = inject(UserService);
+  @ViewChild(UsersTableComponent) usersTable!: UsersTableComponent;
+
   isModalOpen = false;
+  selectedUser: User | null = null;
   
-  isDeleteModalOpen = false; 
-  userToDelete: any = null; 
+  searchQuery = '';
+  sortBy = 'lastName-asc';
+  pageSize = 10;
 
-  users = [
-    { name: 'María', lastName: 'González', ci: '12345678', email: 'maria.gonzalez@gams.gob.bo', role: 'Secretaría', status: 'Activo' },
-    { name: 'Carlos', lastName: 'Pérez', ci: '87654321', email: 'carlos.inspector@gams.gob.bo', role: 'Inspector', status: 'Activo' },
-    { name: 'Ana', lastName: 'Rodríguez', ci: '11223344', email: 'ana.super@gams.gob.bo', role: 'SuperAdmin', status: 'Activo' },
-    { name: 'Juan', lastName: 'Mamani', ci: '55667788', email: 'juan.inspector@gams.gob.bo', role: 'Inspector', status: 'Activo' },
-    { name: 'Rosa', lastName: 'Quispe', ci: '99887766', email: 'rosa.secretaria@gams.gob.bo', role: 'Secretaría', status: 'Inactivo' },
-  ];
-
-  searchTerm: string = '';
-  sortAscending: boolean = true;
-  itemsPerPage: number = 5;
-  currentPage: number = 1;
-
-  get filteredUsers() {
-    let filtered = this.users.filter(u => 
-      u.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-      u.lastName.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-      u.ci.includes(this.searchTerm) ||
-      u.email.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
-      u.role.toLowerCase().includes(this.searchTerm.toLowerCase())
-    );
-
-    filtered.sort((a, b) => {
-      let res = a.name.localeCompare(b.name);
-      return this.sortAscending ? res : -res;
-    });
-
-    return filtered;
+  onSearch(query: string) {
+    this.searchQuery = query;
+    this.usersTable.searchQuery = query;
+    this.usersTable.refresh();
   }
 
-  get displayedUsers() {
-    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
-    return this.filteredUsers.slice(startIndex, startIndex + this.itemsPerPage);
+  onSortChange(sortBy: string) {
+    this.sortBy = sortBy;
+    this.usersTable.sortBy = sortBy;
+    this.usersTable.refresh();
   }
 
-  get totalPages() {
-    return Math.ceil(this.filteredUsers.length / this.itemsPerPage) || 1;
+  onPageSizeChange(size: number) {
+    this.pageSize = size;
+    this.usersTable.pageSize = size;
+    this.usersTable.refresh();
   }
 
-  onSearchChange() {
-    this.currentPage = 1; 
+  onRefresh() {
+    this.usersTable.refresh();
   }
 
-  toggleSort() {
-    this.sortAscending = !this.sortAscending;
-    this.currentPage = 1;
+  openUserModal(user: User | null = null) {
+    this.selectedUser = user;
+    this.isModalOpen = true;
   }
 
-  changePage(page: number) {
-    if (page >= 1 && page <= this.totalPages) {
-      this.currentPage = page;
-    }
+  closeUserModal() {
+    this.isModalOpen = false;
+    this.selectedUser = null;
   }
 
-  openDeleteModal(user: any) {
-    this.userToDelete = user;
-    this.isDeleteModalOpen = true;
+  onUserSaved() {
+    this.onRefresh();
+    this.closeUserModal();
   }
 
-  closeDeleteModal() {
-    this.isDeleteModalOpen = false;
-    this.userToDelete = null;
-  }
-
-  confirmDelete() {
-    if (this.userToDelete) {
-      this.users = this.users.filter(u => u.ci !== this.userToDelete.ci);
-      this.closeDeleteModal();
-      
-      if (this.currentPage > this.totalPages) {
-        this.currentPage = this.totalPages || 1;
-      }
+  onDeleteUser(user: User) {
+    // TODO: Implementar un modal de confirmación premium como el de Horus en el futuro
+    if (confirm(`¿Estás seguro de eliminar a ${user.nombres} ${user.apellidos}? Esta acción no se puede deshacer.`)) {
+      this.userService.deleteUser(user.id!).subscribe({
+        next: () => {
+          this.onRefresh();
+        },
+        error: (err) => {
+          console.error('Error deleting user:', err);
+          alert('No se pudo eliminar al usuario. Intente de nuevo.');
+        }
+      });
     }
   }
 }

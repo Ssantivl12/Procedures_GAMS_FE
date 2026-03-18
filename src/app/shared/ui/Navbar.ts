@@ -25,9 +25,10 @@ import { Component } from '@angular/core';
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 1.5rem 2.5rem;
-        background-color: #ffffff;
-        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+        padding: 1.25rem 2.5rem;
+        background-color: var(--color-background);
+        border-bottom: 1px solid var(--color-border);
+        box-shadow: var(--shadow-sm);
         position: relative;
         z-index: 10;
       }
@@ -35,21 +36,20 @@ import { Component } from '@angular/core';
       .gams-navbar__logo-container {
         display: flex;
         align-items: center;
-        gap: 1rem;
+        gap: 0.75rem;
       }
 
       .gams-navbar__logo-image {
-        height: 55px;
+        height: 48px;
         width: auto;
         object-fit: contain;
       }
 
       .gams-navbar__logo-text {
-        font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont,
-          sans-serif;
-        font-size: 1.875rem;
-        font-weight: 600;
-        color: #008259;
+        font-family: var(--font-sans);
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--color-primary);
         letter-spacing: -0.025em;
       }
 

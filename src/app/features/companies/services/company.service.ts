@@ -5,12 +5,17 @@ export interface Company {
   id: string;
   legalName: string;
   nit?: string;
+  raiNumber?: string;
   category: 'C3' | 'C4';
   isActive: boolean;
   createdAt: string;
   municipality?: string;
+  address?: string;
   legalRepName?: string; 
+  legalRepCi?: string;
   phone?: string;
+  email?: string;
+  economicActivity?: string;
 }
 
 export interface PaginatedResponse<T> {

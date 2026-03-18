@@ -2,94 +2,79 @@
   <app-dashboard-header></app-dashboard-header>
 
   <main class="main-content">
-    
-    <div class="banner-card">
-      <h1>Bienvenido al Sistema GAMS</h1>
-      <p class="banner-subtitle">Departamento Ambiental - Gobierno Autónomo Municipal de Sacaba</p>
-      
-      <div class="user-badge">
-        <span class="role-tag">SuperAdmin</span>
+    <!-- Welcome Header -->
+    <div class="welcome-section animate-fade-in-up">
+      <div class="welcome-text">
+        <h1 class="welcome-title">Bienvenido al Portal GAMS</h1>
+        <p class="welcome-subtitle">Gestión Ambiental y Recursos Naturales - Sacaba</p>
+      </div>
+      <div class="welcome-actions">
+        <button class="btn-secondary" routerLink="/inbox">
+          Ver Bandeja completa
+        </button>
       </div>
     </div>
 
-    <h2 class="section-title">Módulos de Gestión Administrativa</h2>
-    
-    <div class="actions-grid">
-      @for (action of mainActions; track action.title) {
-        <button class="action-card" [routerLink]="action.route">
-          <div class="action-icon">
-            @switch (action.iconKey) {
-              @case ('building') {
-                <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
-                </svg>
-              }
-              @case ('users') {
-                <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
-                </svg>
-              }
-              @case ('inbox') {
-                <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 13.5h3.86a2.25 2.25 0 012.012 1.244l.256.512a2.25 2.25 0 002.013 1.244h3.218a2.25 2.25 0 002.013-1.244l.256-.512a2.25 2.25 0 012.013-1.244h3.859m-19.5.338V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 00-2.15-1.588H6.911a2.25 2.25 0 00-2.15 1.588L2.35 13.177a2.25 2.25 0 00-.1.661z" />
-                </svg>
-              }
-              @case ('status') {
-                <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .415.139.797.373 1.103a2.25 2.25 0 000 3.225 2.25 2.25 0 00-3.231 0 2.25 2.25 0 000-3.225c.234-.306.373-.688.373-1.103 0-.23-.035-.455-.1-.664m-1.802 0a48.323 48.323 0 00-1.123.08C4.545 4.01 3.7 4.973 3.7 6.108V19.5a2.25 2.25 0 002.25 2.25h13.5m-3-11.25h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008v-.008zm0 2.25h.008v.008h-.008v-.008z" />
-                </svg>
-              }
-            }
-          </div>
-          <div class="action-text">
-            <h3>{{ action.title }}</h3>
-            <p>{{ action.desc }}</p>
-          </div>
-        </button>
-      }
-    </div>
-
-    <h2 class="section-title mt-large">Resumen General Operativo</h2>
-
-    <div class="cards-grid">
-      @for (stat of stats; track stat.title) {
-        <div class="stat-card">
+    <!-- Main Grid -->
+    <div class="dashboard-grid">
+      <!-- Daily Pendings Column -->
+      <div class="pendings-column lg:col-span-2">
+        <div class="card premium-card">
           <div class="card-header">
-            <span class="card-title">{{ stat.title }}</span>
-            <div class="icon-box" [ngClass]="stat.colorClass">
-              @switch (stat.iconKey) {
-                @case ('doc') {
-                  <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                  </svg>
-                }
-                @case ('alert') {
-                  <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-                  </svg>
-                }
-                @case ('sync') {
-                  <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-                  </svg>
-                }
-                @case ('calendar') {
-                  <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
-                  </svg>
-                }
-                @case ('clock') {
-                  <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                }
-              }
+            <div class="header-left">
+              <div class="icon-circle primary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+              </div>
+              <h2 class="card-title">Pendientes del Día</h2>
+            </div>
+            <a routerLink="/inbox" class="see-all-link">Ver Todo</a>
+          </div>
+
+          <div class="card-body">
+            <!-- Loading State -->
+            <div *ngIf="isLoading" class="state-container">
+              <div class="spinner border-primary"></div>
+              <p>Cargando pendientes...</p>
+            </div>
+
+            <!-- Empty State -->
+            <div *ngIf="!isLoading && pendingItems.length === 0" class="state-container empty">
+              <div class="empty-illustration">
+                <div class="circle-bg"></div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="text-primary/40"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+              </div>
+              <h3 class="state-title">¡Todo al día!</h3>
+              <p class="state-desc">No tienes actividades o trámites pendientes para hoy.</p>
+            </div>
+
+            <!-- List of Items (Placeholder for future) -->
+            <ul *ngIf="!isLoading && pendingItems.length > 0" class="pendings-list">
+              <li *ngFor="let item of pendingItems" class="pending-item">
+                <!-- Estructura para items cuando haya datos -->
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Stats / Info Sidebar (Optional but recommended for visual balance) -->
+      <div class="info-sidebar">
+        <div class="card info-card">
+          <div class="card-header mini">
+            <h3 class="card-title mini text-primary">Resumen Rápido</h3>
+          </div>
+          <div class="card-body mini">
+            <div class="quick-stat">
+              <span class="stat-label">Trámites en curso</span>
+              <span class="stat-value">0</span>
+            </div>
+            <div class="quick-stat">
+              <span class="stat-label">Alertas activas</span>
+              <span class="stat-value text-destructive">0</span>
             </div>
           </div>
-          <p class="card-count">{{ stat.count }}</p>
         </div>
-      }
+      </div>
     </div>
-
   </main>
 </div>
