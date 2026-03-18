@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/auth/auth.guard';
 import { AdminShellComponent } from './shared/layout/admin-shell/admin-shell';
+import { UserRole } from './core/auth/auth.service';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'home' },
@@ -18,7 +19,7 @@ export const routes: Routes = [
 
   {
     path: '',
-    // canActivate: [authGuard],
+    canActivate: [authGuard],
     component: AdminShellComponent,
     children: [
       {
@@ -30,6 +31,8 @@ export const routes: Routes = [
       },
       {
         path: 'users',
+        canActivate: [authGuard],
+        data: { roles: [UserRole.SUPERADMIN] },
         loadComponent: () =>
           import('./features/users/pages/users-list/users-list').then(
             (m) => m.UsersListComponent

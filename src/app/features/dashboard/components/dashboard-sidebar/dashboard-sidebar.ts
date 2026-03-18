@@ -1,13 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { AuthService } from '../../../../core/auth/auth.service';
+import { AuthService, UserRole } from '../../../../core/auth/auth.service';
 
 type SidebarLink = {
   label: string;
   route: string;
   icon: string; 
   badgeCount?: number;
+  roles?: UserRole[];
 };
 
 @Component({
@@ -35,7 +36,8 @@ export class DashboardSidebarComponent {
     { 
       label: 'Gestión de Personal', 
       route: '/users', 
-      icon: 'M12 14c4.97 0 9 2.24 9 5v1H3v-1c0-2.76 4.03-5 9-5zm0-2a4 4 0 100-8 4 4 0 000 8z'
+      icon: 'M12 14c4.97 0 9 2.24 9 5v1H3v-1c0-2.76 4.03-5 9-5zm0-2a4 4 0 100-8 4 4 0 000 8z',
+      roles: [UserRole.SUPERADMIN]
     },
     { 
       label: 'Gestión de Empresas', 
@@ -54,6 +56,10 @@ export class DashboardSidebarComponent {
       icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' 
     },
   ];
+
+  get availableLinks(): SidebarLink[] {
+    return this.links.filter(link => !link.roles || this.auth.hasRole(link.roles));
+  }
 
   onNavigate(): void {
     if (window.innerWidth < 1024) {

@@ -38,7 +38,7 @@ interface LoginResponse {
         hsl(165, 60%, 5%) 100%
       );
       color: #ffffff;
-      padding: 48px 20px;
+      padding: 28px 20px;
       box-sizing: border-box;
     }
 
@@ -47,8 +47,8 @@ interface LoginResponse {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 32px;
+      gap: 8px;
+      margin-bottom: 24px;
     }
 
     .lp-shield-icon {
@@ -300,11 +300,11 @@ interface LoginResponse {
     <div class="login-page">
       <!-- Header Section -->
       <div class="lp-header">
-        <div class="lp-shield-icon">
+        <!--<div class="lp-shield-icon">
           <img src="assets/img/LogoGams.png" alt="GAMS Logo" class="lp-shield-logo" />
-        </div>
+        </div> -->
         <h1 class="lp-title">GAMS</h1>
-        <p class="lp-subtitle">Gestión Ambiental Sacaba</p>
+        <p class="lp-subtitle">Gobierno Autónomo Municipal de Sacaba</p>
       </div>
 
       <!-- Card Section -->
