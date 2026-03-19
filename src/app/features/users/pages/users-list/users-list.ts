@@ -1,4 +1,4 @@
-import { Component, ViewChild, inject } from '@angular/core';
+import { Component, ViewChild, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DashboardHeaderComponent } from '../../../dashboard/components/dashboard-header/dashboard-header';
 import { UserHeaderComponent } from '../../components/user-header/user-header';
@@ -23,25 +23,28 @@ import { UserService, User } from '../../services/user.service';
 })
 export class UsersListComponent {
   private userService = inject(UserService);
+  private cdr = inject(ChangeDetectorRef);
   @ViewChild(UsersTableComponent) usersTable!: UsersTableComponent;
 
   isModalOpen = false;
   selectedUser: User | null = null;
   
+  userToDelete: User | null = null;
+  isDeleting = false;
+
+  userToReactivate: User | null = null;
+  isReactivating = false;
+
   searchQuery = '';
   sortBy = 'lastName-asc';
   pageSize = 10;
 
   onSearch(query: string) {
     this.searchQuery = query;
-    this.usersTable.searchQuery = query;
-    this.usersTable.refresh();
   }
 
   onSortChange(sortBy: string) {
     this.sortBy = sortBy;
-    this.usersTable.sortBy = sortBy;
-    this.usersTable.refresh();
   }
 
   onPageSizeChange(size: number) {
@@ -70,17 +73,66 @@ export class UsersListComponent {
   }
 
   onDeleteUser(user: User) {
-    // TODO: Implementar un modal de confirmación premium como el de Horus en el futuro
-    if (confirm(`¿Estás seguro de eliminar a ${user.nombres} ${user.apellidos}? Esta acción no se puede deshacer.`)) {
-      this.userService.deleteUser(user.id!).subscribe({
-        next: () => {
-          this.onRefresh();
-        },
-        error: (err) => {
-          console.error('Error deleting user:', err);
-          alert('No se pudo eliminar al usuario. Intente de nuevo.');
-        }
-      });
-    }
+    this.userToDelete = user;
+    this.cdr.detectChanges();
+  }
+
+  cancelDelete() {
+    this.userToDelete = null;
+    this.isDeleting = false;
+    this.cdr.detectChanges();
+  }
+
+  confirmDelete() {
+    if (!this.userToDelete) return;
+    this.isDeleting = true;
+    this.cdr.detectChanges();
+    
+    this.userService.updateUser(this.userToDelete.id!, { isActive: false }).subscribe({
+      next: () => {
+        this.isDeleting = false;
+        this.userToDelete = null;
+        this.onRefresh();
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.isDeleting = false;
+        console.error('Error soft-deleting user:', err);
+        this.userToDelete = null;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  onReactivateUser(user: User) {
+    this.userToReactivate = user;
+    this.cdr.detectChanges();
+  }
+
+  cancelReactivate() {
+    this.userToReactivate = null;
+    this.isReactivating = false;
+    this.cdr.detectChanges();
+  }
+
+  confirmReactivate() {
+    if (!this.userToReactivate) return;
+    this.isReactivating = true;
+    this.cdr.detectChanges();
+    
+    this.userService.updateUser(this.userToReactivate.id!, { isActive: true }).subscribe({
+      next: () => {
+        this.isReactivating = false;
+        this.userToReactivate = null;
+        this.onRefresh();
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.isReactivating = false;
+        console.error('Error reactivating user:', err);
+        this.userToReactivate = null;
+        this.cdr.detectChanges();
+      }
+    });
   }
 }

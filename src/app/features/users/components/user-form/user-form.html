@@ -3,39 +3,32 @@
 <div class="modal-box animate-fade-in">
   
   @if (!showSuccessModal) {
-    <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+    <form [formGroup]="userForm">
       <div class="modal-header">
         <div>
           <h2 class="text-xl font-extrabold text-foreground">{{ userToEdit ? 'Editar Personal' : 'Registrar Nuevo Personal' }}</h2>
-          <p class="text-xs text-muted-foreground mt-0.5">{{ stepConfig[currentStep-1].description }}</p>
+          <p class="text-xs text-muted-foreground mt-0.5">Complete la información del funcionario</p>
         </div>
         <button type="button" class="close-btn" (click)="closeForm.emit()">
             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
       </div>
 
-      <!-- Step Indicator -->
-      <div class="px-6 mb-4">
-        <div class="flex items-center gap-2">
-            <div class="flex-1 h-1.5 rounded-full transition-all duration-300" [ngClass]="currentStep >= 1 ? 'bg-primary' : 'bg-muted'"></div>
-            <div class="flex-1 h-1.5 rounded-full transition-all duration-300" [ngClass]="currentStep >= 2 ? 'bg-primary' : 'bg-muted'"></div>
-        </div>
-        <div class="flex justify-between mt-2">
-            <span class="text-[10px] font-bold uppercase tracking-wider" [ngClass]="currentStep === 1 ? 'text-primary' : 'text-muted-foreground'">Paso 1: Personal</span>
-            <span class="text-[10px] font-bold uppercase tracking-wider" [ngClass]="currentStep === 2 ? 'text-primary' : 'text-muted-foreground'">Paso 2: Acceso</span>
-        </div>
+      <!-- Error Message Alert -->
+      <div *ngIf="errorMessage" class="mx-6 mt-4 p-3 bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-lg flex items-start gap-2 animate-fade-in">
+        <svg class="w-5 h-5 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        <span>{{ errorMessage }}</span>
       </div>
 
-      <div class="modal-body py-2">
-        <!-- Step 1: Personal Data -->
-        <div *ngIf="currentStep === 1" class="space-y-4 animate-fade-in-right">
+      <div class="modal-body py-4">
+        <div class="space-y-4 animate-fade-in">
             <div class="grid grid-cols-2 gap-4">
                 <div class="form-group col-span-2 sm:col-span-1">
                   <label for="nombres">Nombres</label>
                   <input type="text" id="nombres" formControlName="nombres" placeholder="Ej: Juan Pablo"
                          (keypress)="allowOnlyLetters($event)"
                          [class.is-invalid]="submitted && f['nombres'].errors">
-                  <div *ngIf="submitted && f['nombres'].errors" class="invalid-feedback">Requerido</div>
+                  <div *ngIf="submitted && f['nombres'].errors" class="invalid-feedback">Nombres son requeridos y solo letras</div>
                 </div>
         
                 <div class="form-group col-span-2 sm:col-span-1">
@@ -43,29 +36,15 @@
                   <input type="text" id="apellidos" formControlName="apellidos" placeholder="Ej: Mamani"
                          (keypress)="allowOnlyLetters($event)"
                          [class.is-invalid]="submitted && f['apellidos'].errors">
-                  <div *ngIf="submitted && f['apellidos'].errors" class="invalid-feedback">Requerido</div>
+                  <div *ngIf="submitted && f['apellidos'].errors" class="invalid-feedback">Apellidos son requeridos y solo letras</div>
                 </div>
             </div>
 
             <div class="form-group">
-              <label for="ci">Documento de Identidad (CI)</label>
-              <input type="text" id="ci" formControlName="ci" placeholder="Ej: 1234567"
-                     (keypress)="allowOnlyNumbers($event)"
-                     [class.is-invalid]="submitted && f['ci'].errors">
-              <div *ngIf="submitted && f['ci'].errors" class="invalid-feedback">
-                <span *ngIf="f['ci'].errors['required']">CI es obligatorio</span>
-                <span *ngIf="f['ci'].errors['minlength'] || f['ci'].errors['maxlength']">Debe tener entre 7 y 10 dígitos</span>
-              </div>
-            </div>
-        </div>
-
-        <!-- Step 2: Access & Role -->
-        <div *ngIf="currentStep === 2" class="space-y-4 animate-fade-in-right">
-            <div class="form-group">
               <label for="correo">Correo Electrónico Institucional</label>
               <input type="email" id="correo" formControlName="correo" placeholder="ejemplo@gams.gob.bo"
                      [class.is-invalid]="submitted && f['correo'].errors">
-              <div *ngIf="submitted && f['correo'].errors" class="invalid-feedback">Correo inválido o requerido</div>
+              <div *ngIf="submitted && f['correo'].errors" class="invalid-feedback">Correo válido es obligatorio</div>
             </div>
 
             <div class="form-group" *ngIf="!userToEdit">
@@ -73,8 +52,8 @@
               <input type="password" id="password" formControlName="password" placeholder="Mínimo 8 caracteres"
                      [class.is-invalid]="submitted && f['password'].errors">
               <div *ngIf="submitted && f['password'].errors" class="invalid-feedback">
-                <span *ngIf="f['password'].errors['required']">Contraseña requerida</span>
-                <span *ngIf="f['password'].errors['minlength']">Mínimo 8 caracteres</span>
+                <span *ngIf="f['password'].errors['required']">Contraseña requerida.</span>
+                <span *ngIf="f['password'].errors['minlength']">Mínimo 8 caracteres.</span>
               </div>
             </div>
     
@@ -87,7 +66,7 @@
                     <option value="SECRETARIA">Secretaría</option>
                     <option value="INSPECTOR">Inspector</option>
                   </select>
-                  <div *ngIf="submitted && f['rol'].errors" class="invalid-feedback">Requerido</div>
+                  <div *ngIf="submitted && f['rol'].errors" class="invalid-feedback">El rol es requerido</div>
                 </div>
 
                 <div class="form-group col-span-2 sm:col-span-1">
@@ -102,15 +81,11 @@
       </div>
 
       <div class="modal-footer mt-6">
-        <button type="button" class="btn-secondary" (click)="currentStep === 1 ? closeForm.emit() : prevStep()">
-            {{ currentStep === 1 ? 'Cancelar' : 'Anterior' }}
+        <button type="button" class="btn-secondary" (click)="closeForm.emit()">
+            Cancelar
         </button>
         
-        <button *ngIf="currentStep < totalSteps" type="button" class="btn-primary" (click)="nextStep()">
-            Siguiente Paso
-        </button>
-
-        <button *ngIf="currentStep === totalSteps" type="button" class="btn-primary" [disabled]="isLoading" (click)="onSubmit()">
+        <button type="button" class="btn-primary" [disabled]="isLoading" (click)="onSubmit()">
             <div *ngIf="isLoading" class="spinner-sm mr-2"></div>
             {{ userToEdit ? 'Actualizar Datos' : 'Registrar Personal' }}
         </button>

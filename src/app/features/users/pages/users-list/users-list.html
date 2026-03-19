@@ -19,8 +19,11 @@
 
             <!-- Table -->
             <app-users-table
+                [searchQuery]="searchQuery"
+                [sortBy]="sortBy"
                 (edit)="openUserModal($event)"
-                (delete)="onDeleteUser($event)">
+                (delete)="onDeleteUser($event)"
+                (reactivate)="onReactivateUser($event)">
             </app-users-table>
         </div>
     </main>
@@ -32,4 +35,50 @@
         (closeForm)="closeUserModal()"
         (userSaved)="onUserSaved()"
     ></app-user-form>
+
+    <!-- Confirm Soft Delete Modal -->
+    <div *ngIf="userToDelete" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+        <div class="bg-card w-full max-w-md p-6 rounded-2xl shadow-xl border border-border shrink-0 m-4">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center shrink-0">
+                    <svg class="w-6 h-6 text-destructive" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-foreground">Dar de Baja Oficial</h3>
+                    <p class="text-sm text-muted-foreground mt-1">¿Estás seguro de que deseas desactivar la cuenta de <span class="font-semibold text-foreground">{{ userToDelete.firstName }} {{ userToDelete.lastName }}</span>?</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center justify-end gap-3 mt-6">
+                <button type="button" class="px-4 py-2 text-sm font-semibold text-foreground hover:bg-accent rounded-lg transition-colors" (click)="cancelDelete()">Cancelar</button>
+                <button type="button" class="px-4 py-2 text-sm font-semibold bg-destructive hover:bg-destructive/90 text-destructive-foreground rounded-lg transition-colors flex items-center gap-2" [disabled]="isDeleting" (click)="confirmDelete()">
+                    <span *ngIf="isDeleting" class="inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
+                    Desactivar Cuenta
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Reactivate Modal -->
+    <div *ngIf="userToReactivate" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
+        <div class="bg-card w-full max-w-md p-6 rounded-2xl shadow-xl border border-border shrink-0 m-4">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center shrink-0">
+                    <svg class="w-6 h-6 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-foreground">Reactivar Membresía</h3>
+                    <p class="text-sm text-muted-foreground mt-1">¿Deseas dar de alta nuevamente la cuenta de <span class="font-semibold text-foreground">{{ userToReactivate.firstName }} {{ userToReactivate.lastName }}</span>?</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center justify-end gap-3 mt-6">
+                <button type="button" class="px-4 py-2 text-sm font-semibold text-foreground hover:bg-accent rounded-lg transition-colors" (click)="cancelReactivate()">Cancelar</button>
+                <button type="button" class="px-4 py-2 text-sm font-semibold bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg transition-colors flex items-center gap-2" [disabled]="isReactivating" (click)="confirmReactivate()">
+                    <span *ngIf="isReactivating" class="inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
+                    Reactivar Cuenta
+                </button>
+            </div>
+        </div>
+    </div>
 </div>

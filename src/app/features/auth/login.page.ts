@@ -422,7 +422,6 @@ export class LoginPage {
       const data = await this.auth.login(usuario, contrasena);
 
       if (data?.accessToken) {
-        this.auth.setAccessToken(data.accessToken);
         this.router.navigate(['/dashboard']);
       } else {
         this.loginError = 'Respuesta del servidor inválida.';

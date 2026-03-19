@@ -9,14 +9,12 @@ import { Observable, map } from 'rxjs';
 export interface User {
   id?: string;
   email: string;
-  fullName: string;
+  firstName: string;
+  lastName: string;
   isActive: boolean;
   roles: string[];
   createdAt?: string;
   lastLoginAt?: string;
-  // Campos auxiliares para compatibilidad con el formulario actual
-  nombres?: string; 
-  apellidos?: string;
 }
 
 @Injectable({

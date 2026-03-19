@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, OnChanges, SimpleChanges, Output, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UserService, User } from '../../services/user.service';
 import { finalize } from 'rxjs';
@@ -48,24 +48,22 @@ import { finalize } from 'rxjs';
             <tr *ngFor="let user of users" class="hover:bg-muted/50 transition-colors group">
               <td class="px-6 py-4">
                 <div class="flex items-center gap-3">
-                  <div class="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs uppercase border border-emerald-100 shadow-sm">
-                    {{ user.fullName.charAt(0) }}
-                  </div>
                   <div class="flex flex-col">
-                    <span class="text-sm font-semibold text-foreground leading-tight">{{ user.fullName }}</span>
-                    <span class="text-[10px] text-muted-foreground uppercase tracking-wider mt-0.5">ID: {{ user.id?.substring(0, 8) }}</span>
+                    <span class="text-sm font-semibold text-foreground leading-tight">{{ user.firstName }} {{ user.lastName }}</span>
                   </div>
                 </div>
               </td>
               <td class="px-6 py-4 text-sm text-muted-foreground lowercase">
                 {{ user.email }}
               </td>
-              <td class="px-6 py-4">
+              <td class="px-6 py-4" *ngIf="user.roles">
                 <div class="flex flex-wrap gap-1">
                   <span *ngFor="let role of user.roles" class="px-2 py-1 rounded-md bg-secondary text-[11px] font-bold text-primary uppercase tracking-wider">
                     {{ role }}
                   </span>
                 </div>
+              </td>
+              <td class="px-6 py-4" *ngIf="!user.roles">
               </td>
               <td class="px-6 py-4">
                 <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold"
@@ -77,15 +75,20 @@ import { finalize } from 'rxjs';
                 </span>
               </td>
               <td class="px-6 py-4 text-right">
-                <div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button (click)="onEdit(user)" class="p-2 text-muted-foreground hover:text-primary hover:bg-accent rounded-lg transition-all" title="Editar">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="flex items-center justify-end gap-1 transition-opacity">
+                  <button type="button" (click)="onEdit(user, $event)" class="p-2 text-muted-foreground hover:text-primary hover:bg-accent rounded-lg transition-all" title="Editar">
+                    <svg class="w-4 h-4 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                   </button>
-                  <button (click)="onDelete(user)" class="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all" title="Eliminar">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <button type="button" *ngIf="user.isActive" (click)="onDelete(user, $event)" class="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all" title="Eliminar">
+                    <svg class="w-4 h-4 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                  <button type="button" *ngIf="!user.isActive" (click)="onReactivate(user, $event)" class="p-2 text-muted-foreground hover:text-emerald-500 hover:bg-emerald-500/10 rounded-lg transition-all" title="Reactivar">
+                    <svg class="w-4 h-4 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
                   </button>
                 </div>
@@ -105,16 +108,19 @@ import { finalize } from 'rxjs';
   `,
   styles: []
 })
-export class UsersTableComponent implements OnInit {
+export class UsersTableComponent implements OnInit, OnChanges {
   private userService = inject(UserService);
+  private cdr = inject(ChangeDetectorRef);
 
   @Input() searchQuery = '';
-  @Input() sortBy = 'fullName-asc';
+  @Input() sortBy = 'lastName-asc';
   @Input() pageSize = 10;
   
   @Output() edit = new EventEmitter<User>();
   @Output() delete = new EventEmitter<User>();
+  @Output() reactivate = new EventEmitter<User>();
 
+  allUsers: User[] = [];
   users: User[] = [];
   isLoading = true;
 
@@ -122,18 +128,25 @@ export class UsersTableComponent implements OnInit {
     this.loadUsers();
   }
 
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['searchQuery'] || changes['sortBy']) {
+      this.applyFilters();
+    }
+  }
+
   loadUsers() {
     this.isLoading = true;
-    console.log('Cargando usuarios de GAMS...');
+    this.cdr.detectChanges();
     
-    this.userService.getUsers({
-      query: this.searchQuery
-    }).pipe(
-      finalize(() => this.isLoading = false)
+    this.userService.getUsers().pipe(
+      finalize(() => {
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      })
     ).subscribe({
       next: (data: User[]) => {
-        console.log('Usuarios recibidos:', data.length);
-        this.users = data;
+        this.allUsers = data;
+        this.applyFilters();
       },
       error: (err) => {
         console.error('Error loading users:', err);
@@ -141,12 +154,63 @@ export class UsersTableComponent implements OnInit {
     });
   }
 
-  onEdit(user: User) {
+  applyFilters() {
+    if (!this.allUsers) return;
+    
+    let result = [...this.allUsers];
+    
+    if (this.searchQuery) {
+      const q = this.searchQuery.toLowerCase();
+      result = result.filter(u => 
+        (u.firstName || '').toLowerCase().includes(q) || 
+        (u.lastName || '').toLowerCase().includes(q) || 
+        (u.email || '').toLowerCase().includes(q) ||
+        (u.roles || []).join(' ').toLowerCase().includes(q)
+      );
+    }
+
+    if (this.sortBy === 'lastName-asc') {
+      result.sort((a, b) => (a.lastName || '').localeCompare(b.lastName || ''));
+    } else if (this.sortBy === 'firstName-asc') {
+      result.sort((a, b) => (a.firstName || '').localeCompare(b.firstName || ''));
+    } else if (this.sortBy === 'role') {
+      result.sort((a, b) => (a.roles[0] || '').localeCompare(b.roles[0] || ''));
+    }
+    
+    result.sort((a, b) => {
+      if (a.isActive === b.isActive) return 0;
+      return a.isActive ? -1 : 1;
+    });
+    
+    this.users = result;
+    this.cdr.detectChanges();
+  }
+
+  onEdit(user: User, event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    console.log('Action Clicked: EDIT for user', user.email);
     this.edit.emit(user);
   }
 
-  onDelete(user: User) {
+  onDelete(user: User, event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    console.log('Action Clicked: DELETE for user', user.email);
     this.delete.emit(user);
+  }
+
+  onReactivate(user: User, event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    console.log('Action Clicked: REACTIVATE for user', user.email);
+    this.reactivate.emit(user);
   }
 
   refresh() {

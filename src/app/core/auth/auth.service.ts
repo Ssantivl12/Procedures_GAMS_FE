@@ -3,6 +3,7 @@ import { ApiClient } from '../../api/api-client';
 import { BehaviorSubject, firstValueFrom, map, Observable, tap } from 'rxjs';
 
 const ACCESS_TOKEN_KEY = 'gams_access_token';
+const REFRESH_TOKEN_KEY = 'gams_refresh_token';
 
 export enum UserRole {
   SUPERADMIN = 'SUPERADMIN',
@@ -15,11 +16,14 @@ export interface UserPayload {
   sub: string;
   email: string;
   roles: UserRole[];
-  fullName: string;
+  firstName: string;
+  lastName: string;
+  isActive: boolean;
 }
 
 export interface LoginResponse {
   accessToken: string;
+  refreshToken: string;
   user?: UserPayload;
 }
 
@@ -49,14 +53,25 @@ export class AuthService {
     return localStorage.getItem(ACCESS_TOKEN_KEY);
   }
 
-  setAccessToken(token: string): void {
-    localStorage.setItem(ACCESS_TOKEN_KEY, token);
-    const payload = this.decodeToken(token);
-    this.currentUserSubject.next(payload);
+  getRefreshToken(): string | null {
+    return localStorage.getItem(REFRESH_TOKEN_KEY);
+  }
+
+  setTokens(accessToken: string, refreshToken: string): void {
+    localStorage.setItem(ACCESS_TOKEN_KEY, accessToken);
+    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+    
+    try {
+      const payload = this.decodeToken(accessToken);
+      this.currentUserSubject.next(payload);
+    } catch {
+      this.clearSession();
+    }
   }
 
   clearSession(): void {
     localStorage.removeItem(ACCESS_TOKEN_KEY);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
     this.currentUserSubject.next(null);
   }
 
@@ -80,8 +95,23 @@ export class AuthService {
     return firstValueFrom(
       this.api.post<LoginResponse>('/auth/login', { email, password }).pipe(
         tap(res => {
-          if (res.accessToken) {
-            this.setAccessToken(res.accessToken);
+          if (res.accessToken && res.refreshToken) {
+            this.setTokens(res.accessToken, res.refreshToken);
+          }
+        })
+      )
+    );
+  }
+
+  async refreshToken(): Promise<LoginResponse> {
+    const rfToken = this.getRefreshToken();
+    if (!rfToken) throw new Error('No refresh token available');
+    
+    return firstValueFrom(
+      this.api.post<LoginResponse>('/auth/refresh', { refreshToken: rfToken }).pipe(
+        tap(res => {
+          if (res.accessToken && res.refreshToken) {
+            this.setTokens(res.accessToken, res.refreshToken);
           }
         })
       )

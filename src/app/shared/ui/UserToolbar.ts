@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, inject } from '@angular/core';
+import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
   standalone: true,
@@ -24,10 +25,10 @@ import { Component, EventEmitter, Output } from '@angular/core';
         </svg>
       </button>
 
-      <div class="user-toolbar__profile">
+      <div class="user-toolbar__profile" *ngIf="auth.currentUser$ | async as user">
         <div class="user-toolbar__info">
-          <span class="user-toolbar__name">Juan Pérez</span>
-          <span class="user-toolbar__role">Administrador</span>
+          <span class="user-toolbar__name">{{ user.firstName }} {{ user.lastName }}</span>
+          <span class="user-toolbar__role">{{ user.roles[0] || 'Usuario' }}</span>
         </div>
         <button
           type="button"
@@ -35,7 +36,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
           aria-label="Abrir menú de usuario"
           (click)="toggleMenu()"
         >
-          <span class="user-toolbar__avatar">JP</span>
+          <span class="user-toolbar__avatar">{{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }}</span>
         </button>
 
         <div class="user-toolbar__menu" *ngIf="menuOpen">
@@ -224,6 +225,8 @@ import { Component, EventEmitter, Output } from '@angular/core';
 })
 export class UserToolbarComponent {
   @Output() logout = new EventEmitter<void>();
+
+  auth = inject(AuthService);
 
   today = new Date();
   now = new Date();
