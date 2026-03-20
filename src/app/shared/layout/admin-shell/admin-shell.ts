@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { DashboardSidebarComponent } from '../../../features/dashboard/components/dashboard-sidebar/dashboard-sidebar';
+import { ConfigCacheService } from '../../../features/configuration/services/config-cache.service';
 
 @Component({
   selector: 'app-admin-shell',
@@ -10,8 +11,14 @@ import { DashboardSidebarComponent } from '../../../features/dashboard/component
   templateUrl: './admin-shell.html',
   styleUrl: './admin-shell.css',
 })
-export class AdminShellComponent {
+export class AdminShellComponent implements OnInit {
+  private readonly configCache = inject(ConfigCacheService);
+  
   isSidebarOpen = false;
-  isSidebarCollapsed = false; // New: Manage collapsible state
+  isSidebarCollapsed = false;
+
+  ngOnInit(): void {
+    this.configCache.loadInitialConfig();
+  }
 }
 
