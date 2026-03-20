@@ -8,9 +8,9 @@
         <h3 class="text-sm font-semibold text-foreground">Observaciones</h3>
       </div>
       <div class="flex items-center gap-3 text-xs">
-        <span class="text-muted-foreground">Total: <strong>{{ summary.total }}</strong></span>
-        <span class="text-orange-600">Pendientes: <strong>{{ summary.pending }}</strong></span>
-        <span class="text-emerald-600">Resueltas: <strong>{{ summary.resolved }}</strong></span>
+        <span class="text-muted-foreground">Total: <strong>{{ summary?.total || 0 }}</strong></span>
+        <span class="text-orange-600">Pendientes: <strong>{{ summary?.pending || 0 }}</strong></span>
+        <span class="text-emerald-600">Resueltas: <strong>{{ summary?.resolved || 0 }}</strong></span>
       </div>
     </div>
 
@@ -21,7 +21,7 @@
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
         </svg>
       </div>
-    } @else if (groupedByCycle.length === 0) {
+    } @else if (!groupedByCycle || groupedByCycle.length === 0) {
       <div class="px-6 py-8 text-center">
         <p class="text-sm text-muted-foreground">No hay observaciones registradas.</p>
       </div>
@@ -33,12 +33,14 @@
               <span class="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Ciclo {{ group.cycleNumber }}</span>
             </div>
             <div class="px-3">
-              @for (obs of group.observations; track obs.id) {
-                <app-observation-item
-                  [observation]="obs"
-                  (resolve)="onResolve($event)"
-                  (reopen)="onReopen($event)">
-                </app-observation-item>
+              @if (group.observations && group.observations.length > 0) {
+                @for (obs of group.observations; track obs.id) {
+                  <app-observation-item
+                    [observation]="obs"
+                    (resolve)="onResolve($event)"
+                    (reopen)="onReopen($event)">
+                  </app-observation-item>
+                }
               }
             </div>
           </div>

@@ -10,7 +10,8 @@ import { StatusBadgeComponent } from '../../../../shared/ui/status-badge/status-
   template: `
     <div class="bg-card rounded-xl border border-border shadow-sm p-6">
       <h3 class="text-sm font-semibold text-foreground mb-4">Historial de Cambios</h3>
-      @if (auditItems.length === 0) {
+      
+      @if (!auditItems || auditItems.length === 0) {
         <p class="text-sm text-muted-foreground">Sin historial disponible.</p>
       } @else {
         <div class="relative">

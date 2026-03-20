@@ -32,6 +32,10 @@ export class AuthService {
   private readonly api = inject(ApiClient);
   private currentUserSubject = new BehaviorSubject<UserPayload | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
+  
+  get currentUserId(): string | null {
+    return this.currentUserSubject.value?.sub || null;
+  }
 
   constructor() {
     this.hydrateSession();

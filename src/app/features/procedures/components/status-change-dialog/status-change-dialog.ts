@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { ChangeDetectorRef } from '@angular/core';
@@ -21,8 +21,19 @@ import { ProcedureStatus, ProcedureTypeCode, ChangeStatusPayload } from '../../.
           </button>
         </div>
 
+        @if (feedbackMessage()) {
+          <div class="px-6 pt-4 animate-in fade-in slide-in-from-top-4 duration-300">
+            <div class="bg-red-50 border border-red-200 text-red-800 p-3 rounded-xl text-xs font-medium flex items-center gap-2">
+              <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              {{ feedbackMessage() }}
+            </div>
+          </div>
+        }
+
         <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-6 space-y-4">
-          @if (action === 'advance' && currentStatus === 'RECIBIDO') {
+          @if (action === 'advance' && currentStatus === ProcedureStatus.RECIBIDO) {
             <div>
               <label class="block text-sm font-medium text-foreground mb-1.5">Fecha de Inicio de Revisión</label>
               <input formControlName="reviewStartDate" type="date"
@@ -78,8 +89,11 @@ import { ProcedureStatus, ProcedureTypeCode, ChangeStatusPayload } from '../../.
               Cancelar
             </button>
             <button type="submit" [disabled]="isLoading"
-                    class="px-4 py-2 text-sm font-medium rounded-xl text-white transition-colors disabled:opacity-50"
-                    [ngClass]="action === 'abandon' ? 'bg-red-600 hover:bg-red-700' : 'bg-primary hover:bg-primary/90'">
+                    class="px-5 py-2.5 text-sm font-semibold rounded-xl text-white transition-all shadow-sm hover:shadow-md active:scale-95 disabled:opacity-50 block min-w-[120px]"
+                    [class.bg-red-600]="action === 'abandon'"
+                    [class.hover:bg-red-700]="action === 'abandon'"
+                    [class.bg-primary]="action !== 'abandon'"
+                    [class.hover:bg-primary/90]="action !== 'abandon'">
               @if (isLoading) {
                 <svg class="animate-spin w-4 h-4 mr-1.5 inline-block" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -104,6 +118,7 @@ import { ProcedureStatus, ProcedureTypeCode, ChangeStatusPayload } from '../../.
   `],
 })
 export class StatusChangeDialogComponent {
+  ProcedureStatus = ProcedureStatus;
   private readonly fb = inject(FormBuilder);
   private readonly procedureService = inject(ProcedureService);
   private readonly cdr = inject(ChangeDetectorRef);
@@ -116,6 +131,7 @@ export class StatusChangeDialogComponent {
   @Output() statusChanged = new EventEmitter<void>();
 
   isLoading = false;
+  feedbackMessage = signal<string | null>(null);
 
   form = this.fb.group({
     reviewStartDate: [''],
@@ -183,11 +199,19 @@ export class StatusChangeDialogComponent {
     this.procedureService.changeStatus(this.procedureId, payload).subscribe({
       next: () => {
         this.isLoading = false;
+        this.feedbackMessage.set(null);
         this.statusChanged.emit();
       },
-      error: () => {
+      error: (err) => {
         this.isLoading = false;
+        if (err.status === 422) {
+          this.feedbackMessage.set('Error: Transición de estado inválida para este trámite');
+        } else {
+          this.feedbackMessage.set('Error crítico al cambiar estado. Verifique los requisitos.');
+        }
         this.cdr.detectChanges();
+        // Auto-clear after 5s
+        setTimeout(() => this.feedbackMessage.set(null), 5000);
       },
     });
   }

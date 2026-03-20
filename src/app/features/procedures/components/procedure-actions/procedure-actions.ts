@@ -94,6 +94,7 @@ export class ProcedureActionsComponent {
 
   @Input({ required: true }) currentStatus!: ProcedureStatus;
   @Input() procedureTypeCode: ProcedureTypeCode = ProcedureTypeCode.RAI;
+  @Input() assignedInspectorUserId: string | null = null;
   @Output() actionClick = new EventEmitter<ActionEvent>();
 
   get isSuperadminOrEncargado(): boolean {
@@ -108,12 +109,17 @@ export class ProcedureActionsComponent {
     return this.auth.hasRole(UserRole.SECRETARIA);
   }
 
+  get isAssignedInspector(): boolean {
+    const currentUserId = this.auth.currentUserId;
+    return !!currentUserId && !!this.assignedInspectorUserId && currentUserId === this.assignedInspectorUserId;
+  }
+
   get canAdvance(): boolean {
     if (this.currentStatus === ProcedureStatus.RECIBIDO) {
-      return this.isSuperadminOrEncargado || this.isInspector;
+      return this.isSuperadminOrEncargado || this.isAssignedInspector;
     }
     if (this.currentStatus === ProcedureStatus.EN_REVISION) {
-      return this.isSuperadminOrEncargado || this.isInspector;
+      return this.isSuperadminOrEncargado || this.isAssignedInspector;
     }
     return false;
   }
@@ -141,7 +147,7 @@ export class ProcedureActionsComponent {
   }
 
   get canAssign(): boolean {
-    return this.isSuperadminOrEncargado;
+    return this.isSuperadminOrEncargado && this.currentStatus === ProcedureStatus.RECIBIDO;
   }
 
   get canAbandon(): boolean {

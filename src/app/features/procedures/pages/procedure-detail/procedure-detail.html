@@ -55,6 +55,7 @@
           <app-procedure-actions
             [currentStatus]="procedure.currentStatus"
             [procedureTypeCode]="procedureTypeCode"
+            [assignedInspectorUserId]="procedure.assignedInspectorUserId"
             (actionClick)="onAction($event)">
           </app-procedure-actions>
         </div>

@@ -25,11 +25,22 @@ import { UserService, User } from '../../../users/services/user.service';
           <label class="block text-sm font-medium text-foreground mb-1.5">Inspector</label>
           <select [(ngModel)]="selectedInspectorId"
                   class="w-full px-3 py-2 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/30">
-            <option value="">Seleccionar inspector</option>
+            <option value="">Seleccionar inspector...</option>
+            @if (isLoading) {
+              <option value="" disabled>Cargando inspectores...</option>
+            }
             @for (inspector of inspectors; track inspector.id) {
               <option [value]="inspector.id">{{ inspector.firstName }} {{ inspector.lastName }}</option>
             }
           </select>
+          @if (!isLoading && inspectors.length === 0) {
+            <p class="mt-1.5 text-xs text-orange-600 flex items-center gap-1">
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              No se encontraron inspectores activos.
+            </p>
+          }
 
           <div class="flex justify-end gap-3 mt-6">
             <button (click)="closeDialog.emit()"
@@ -78,12 +89,34 @@ export class AssignInspectorDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.selectedInspectorId = this.currentInspectorId || '';
-    this.userService.getUsers({ roles: 'INSPECTOR' }).subscribe({
-      next: (users) => {
-        this.inspectors = (Array.isArray(users) ? users : (users as any).data || [])
-          .filter((u: User) => u.isActive);
+    this.isLoading = true;
+    
+    // Usamos un limit alto para pruebas de depuración
+    this.userService.getUsers({ limit: 1000 }).subscribe({
+      next: (response: any) => {
+        console.log('Respuesta cruda de usuarios:', response);
+        
+        // Extraer el arreglo de forma robusta (maneja array directo o paginado {data: [...]})
+        const usersArray = Array.isArray(response) ? response : (response?.data || []);
+        
+        // Filtro local tolerante a mayúsculas/minúsculas y formatos de rol
+        this.inspectors = usersArray.filter((user: any) => {
+          if (!user.isActive) return false;
+          
+          const roles = Array.isArray(user.roles) ? user.roles : (user.role ? [user.role] : []);
+          return roles.some((r: string) => r?.toUpperCase() === 'INSPECTOR');
+        });
+        
+        console.log('Inspectores filtrados localmente:', this.inspectors);
+        this.isLoading = false;
         this.cdr.detectChanges();
       },
+      error: (err) => {
+        console.error('Error al obtener usuarios:', err);
+        this.inspectors = [];
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 

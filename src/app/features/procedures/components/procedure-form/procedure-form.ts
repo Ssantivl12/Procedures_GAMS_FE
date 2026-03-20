@@ -1,10 +1,11 @@
-import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { ChangeDetectorRef } from '@angular/core';
 import { ProcedureService } from '../../services/procedure.service';
 import { ProcedureTypesService } from '../../../configuration/services/procedure-types.service';
-import { ProcedureType, ProcedureKind } from '../../../../shared/models';
+import { ProcedureType, ProcedureKind, CaseFile } from '../../../../shared/models';
+import { CaseFileService } from '../../../case-files/services/case-file.service';
 
 @Component({
   selector: 'app-procedure-form',
@@ -17,6 +18,7 @@ export class ProcedureFormComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly procedureService = inject(ProcedureService);
   private readonly procedureTypesService = inject(ProcedureTypesService);
+  private readonly caseFileService = inject(CaseFileService);
   private readonly cdr = inject(ChangeDetectorRef);
 
   @Input() caseFileId: string | null = null;
@@ -25,9 +27,13 @@ export class ProcedureFormComponent implements OnInit {
   @Output() procedureSaved = new EventEmitter<void>();
 
   procedureTypes: ProcedureType[] = [];
+  caseFiles: CaseFile[] = [];
   isLoading = false;
   submitted = false;
   showSuccess = false;
+  
+  feedbackMessage = signal<string | null>(null);
+  feedbackType = signal<'success' | 'error'>('error');
 
   today = new Date().toISOString().split('T')[0];
 
@@ -44,8 +50,19 @@ export class ProcedureFormComponent implements OnInit {
   ngOnInit(): void {
     if (this.caseFileId) {
       this.form.patchValue({ caseFileId: this.caseFileId });
+    } else {
+      this.loadCaseFiles();
     }
     this.loadProcedureTypes();
+  }
+
+  loadCaseFiles(): void {
+    this.caseFileService.getCaseFiles({ limit: 50, status: 'open' }).subscribe({
+      next: (res) => {
+        this.caseFiles = res.data;
+        this.cdr.detectChanges();
+      },
+    });
   }
 
   loadProcedureTypes(): void {
@@ -82,13 +99,28 @@ export class ProcedureFormComponent implements OnInit {
       next: () => {
         this.isLoading = false;
         this.showSuccess = true;
+        this.feedbackMessage.set(null);
         this.cdr.detectChanges();
         setTimeout(() => this.procedureSaved.emit(), 1500);
       },
-      error: () => {
+      error: (err) => {
         this.isLoading = false;
+        if (err.status === 409) {
+          this.showFeedback('Error: El trámite ya existe en este expediente o es inválido', 'error');
+        } else {
+          this.showFeedback('Error al crear el trámite. Verifique los datos.', 'error');
+        }
         this.cdr.detectChanges();
       },
     });
+  }
+
+  private showFeedback(message: string, type: 'success' | 'error') {
+    this.feedbackMessage.set(message);
+    this.feedbackType.set(type);
+    // Auto-clear error after 5 seconds, success stays until redirect
+    if (type === 'error') {
+      setTimeout(() => this.feedbackMessage.set(null), 5000);
+    }
   }
 }
