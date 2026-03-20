@@ -1,80 +1,40 @@
 <div class="dashboard-wrapper">
   <app-dashboard-header></app-dashboard-header>
 
-  <main class="main-content">
+  <main class="main-content" style="animation: fadeIn 0.3s ease-out">
+
     <!-- Welcome Header -->
-    <div class="welcome-section animate-fade-in-up">
+    <div class="welcome-section">
       <div class="welcome-text">
-        <h1 class="welcome-title">Bienvenido al Portal GAMS</h1>
-        <p class="welcome-subtitle">Gestión Ambiental y Recursos Naturales - Sacaba</p>
+        <h1 class="welcome-title">{{ greeting }}{{ userName ? ', ' + userName : '' }}</h1>
+        <p class="welcome-subtitle">Portal de Gestión Ambiental — GAMS Sacaba</p>
       </div>
       <div class="welcome-actions">
         <button class="btn-secondary" routerLink="/inbox">
-          Ver Bandeja completa
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 13.5h3.86a2.25 2.25 0 012.012 1.244l.256.512a2.25 2.25 0 002.013 1.244h3.218a2.25 2.25 0 002.013-1.244l.256-.512a2.25 2.25 0 012.013-1.244h3.859" />
+          </svg>
+          Ver Bandeja
+        </button>
+        <button class="btn-secondary" routerLink="/companies">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+          </svg>
+          Empresas
         </button>
       </div>
     </div>
 
-    <!-- Main Grid -->
-    <div class="dashboard-grid">
-      <!-- Daily Pendings Column -->
-      <div class="pendings-column lg:col-span-2">
-        <div class="card premium-card">
-          <div class="card-header">
-            <div class="header-left">
-              <div class="icon-circle primary">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-              </div>
-              <h2 class="card-title">Pendientes del Día</h2>
-            </div>
-            <a routerLink="/inbox" class="see-all-link">Ver Todo</a>
-          </div>
+    <!-- Role-based Dashboard -->
+    @if (isAdmin) {
+      <app-admin-dashboard />
+    } @else if (isSecretaria) {
+      <app-secretaria-dashboard />
+    } @else if (isInspector) {
+      <app-inspector-dashboard />
+    } @else {
+      <app-admin-dashboard />
+    }
 
-          <div class="card-body">
-            <!-- Loading State -->
-            <div *ngIf="isLoading" class="state-container">
-              <div class="spinner border-primary"></div>
-              <p>Cargando pendientes...</p>
-            </div>
-
-            <!-- Empty State -->
-            <div *ngIf="!isLoading && pendingItems.length === 0" class="state-container empty">
-              <div class="empty-illustration">
-                <div class="circle-bg"></div>
-                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="text-primary/40"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
-              </div>
-              <h3 class="state-title">¡Todo al día!</h3>
-              <p class="state-desc">No tienes actividades o trámites pendientes para hoy.</p>
-            </div>
-
-            <!-- List of Items (Placeholder for future) -->
-            <ul *ngIf="!isLoading && pendingItems.length > 0" class="pendings-list">
-              <li *ngFor="let item of pendingItems" class="pending-item">
-                <!-- Estructura para items cuando haya datos -->
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-
-      <!-- Quick Stats / Info Sidebar (Optional but recommended for visual balance) -->
-      <div class="info-sidebar">
-        <div class="card info-card">
-          <div class="card-header mini">
-            <h3 class="card-title mini text-primary">Resumen Rápido</h3>
-          </div>
-          <div class="card-body mini">
-            <div class="quick-stat">
-              <span class="stat-label">Trámites en curso</span>
-              <span class="stat-value">0</span>
-            </div>
-            <div class="quick-stat">
-              <span class="stat-label">Alertas activas</span>
-              <span class="stat-value text-destructive">0</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
   </main>
 </div>

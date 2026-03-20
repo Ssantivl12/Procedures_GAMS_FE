@@ -1,0 +1,151 @@
+@if (isLoading) {
+  <div class="loading-container">
+    <svg class="animate-spin w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+    </svg>
+  </div>
+} @else {
+
+  <!-- Stat Cards -->
+  <div class="stats-grid">
+    <app-stat-card
+      label="Trámites Activos"
+      [value]="totalActive"
+      icon="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15a2.251 2.251 0 011.152.567"
+      color="primary" />
+    <app-stat-card
+      label="Vencidos"
+      [value]="overdueCount"
+      icon="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z"
+      color="danger" />
+    <app-stat-card
+      label="Cerrados"
+      [value]="totalClosed"
+      icon="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+      color="success" />
+    <app-stat-card
+      label="Alertas RAI"
+      [value]="alerts?.raiExpiration || 0"
+      icon="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"
+      color="warning" />
+  </div>
+
+  <!-- Activity Summary -->
+  @if (dashboard?.activityThisMonth) {
+    <div class="section">
+      <h2 class="section-title">Actividad del Mes</h2>
+      <div class="activity-grid">
+        <div class="activity-item">
+          <span class="activity-value text-info">{{ dashboard!.activityThisMonth.received }}</span>
+          <span class="activity-label">Recibidos</span>
+        </div>
+        <div class="activity-item">
+          <span class="activity-value text-success">{{ dashboard!.activityThisMonth.closed }}</span>
+          <span class="activity-label">Cerrados</span>
+        </div>
+        <div class="activity-item">
+          <span class="activity-value text-danger">{{ dashboard!.activityThisMonth.abandoned }}</span>
+          <span class="activity-label">Abandonados</span>
+        </div>
+        <div class="activity-item">
+          <span class="activity-value">{{ dashboard!.activityThisMonth.avgDaysToClose ?? '—' }}</span>
+          <span class="activity-label">Promedio días cierre</span>
+        </div>
+      </div>
+    </div>
+  }
+
+  <div class="two-columns">
+    <!-- Inspector Workload -->
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">Carga de Inspectores</h2>
+        <a routerLink="/users" class="section-link">Ver todos</a>
+      </div>
+      @if (inspectors.length === 0) {
+        <div class="empty-card">
+          <app-empty-state
+            icon="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"
+            title="Sin inspectores"
+            message="No hay inspectores con carga asignada.">
+          </app-empty-state>
+        </div>
+      } @else {
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Inspector</th>
+                <th class="text-center">Activos</th>
+                <th class="text-center">Vencidos</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (ins of inspectors; track ins.inspectorId) {
+                <tr>
+                  <td class="font-medium">{{ ins.inspectorName }}</td>
+                  <td class="text-center">
+                    <span class="count-badge">{{ ins.activeCount }}</span>
+                  </td>
+                  <td class="text-center">
+                    @if (ins.overdueCount > 0) {
+                      <span class="count-badge danger">{{ ins.overdueCount }}</span>
+                    } @else {
+                      <span class="count-badge success">0</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+    <!-- Overdue List -->
+    <div class="section">
+      <div class="section-header">
+        <h2 class="section-title">Trámites Vencidos</h2>
+        <a routerLink="/inbox" class="section-link">Ver bandeja</a>
+      </div>
+      @if (overdueList.length === 0) {
+        <div class="empty-card">
+          <app-empty-state
+            icon="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            title="Sin vencidos"
+            message="No hay trámites con plazo vencido.">
+          </app-empty-state>
+        </div>
+      } @else {
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Empresa</th>
+                <th>Tipo</th>
+                <th class="text-center">Días</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of overdueList; track item.procedureId) {
+                <tr>
+                  <td>
+                    <a [routerLink]="['/procedures', item.procedureId]" class="link-name">
+                      {{ item.companyName }}
+                    </a>
+                  </td>
+                  <td class="text-sm text-muted">{{ item.procedureType }}</td>
+                  <td class="text-center">
+                    <span class="count-badge danger">{{ item.daysOverdue }}d</span>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </div>
+
+}

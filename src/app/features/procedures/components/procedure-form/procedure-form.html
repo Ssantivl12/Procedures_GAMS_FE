@@ -1,0 +1,105 @@
+<div class="modal-overlay" (click)="closeForm.emit()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+    @if (showSuccess) {
+      <div class="flex flex-col items-center justify-center py-8">
+        <div class="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mb-4">
+          <svg class="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-foreground">Trámite Creado</h3>
+        <p class="text-sm text-muted-foreground mt-1">El trámite se ha registrado exitosamente.</p>
+      </div>
+    } @else {
+      <div class="flex items-center justify-between p-6 border-b border-border">
+        <h2 class="text-lg font-semibold text-foreground">Nuevo Trámite</h2>
+        <button class="p-1.5 rounded-lg hover:bg-muted transition-colors" (click)="closeForm.emit()">
+          <svg class="w-5 h-5 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-6 space-y-4">
+        @if (!caseFileId) {
+          <div>
+            <label class="block text-sm font-medium text-foreground mb-1.5">ID Expediente *</label>
+            <input formControlName="caseFileId" type="text" placeholder="ID del expediente"
+                   class="w-full px-3 py-2 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/30"
+                   [class.border-red-400]="submitted && f['caseFileId'].invalid" />
+          </div>
+        }
+
+        <div>
+          <label class="block text-sm font-medium text-foreground mb-1.5">Tipo de Trámite *</label>
+          <select formControlName="procedureTypeId"
+                  class="w-full px-3 py-2 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  [class.border-red-400]="submitted && f['procedureTypeId'].invalid">
+            <option [value]="0" disabled>Seleccionar tipo</option>
+            @for (pt of procedureTypes; track pt.id) {
+              <option [value]="pt.id">{{ pt.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-foreground mb-1.5">Modalidad *</label>
+          <div class="flex gap-4">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" formControlName="procedureKind" value="NUEVO"
+                     class="w-4 h-4 text-primary border-border focus:ring-primary" />
+              <span class="text-sm">Nuevo</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="radio" formControlName="procedureKind" value="RENOVACION"
+                     class="w-4 h-4 text-primary border-border focus:ring-primary" />
+              <span class="text-sm">Renovación</span>
+            </label>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-foreground mb-1.5">Fecha de Ingreso *</label>
+          <input formControlName="receptionDate" type="date" [max]="today"
+                 class="w-full px-3 py-2 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/30"
+                 [class.border-red-400]="submitted && f['receptionDate'].invalid" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-foreground mb-1.5">Hoja de Ruta</label>
+          <input formControlName="routeSheetNumber" type="text" placeholder="Nro. hoja de ruta"
+                 class="w-full px-3 py-2 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/30" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-foreground mb-1.5">Nro. Expediente Interno</label>
+          <input formControlName="internalFileNumber" type="text" placeholder="Nro. expediente interno"
+                 class="w-full px-3 py-2 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/30" />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-foreground mb-1.5">Notas Generales</label>
+          <textarea formControlName="generalNotes" rows="3" placeholder="Notas adicionales..."
+                    class="w-full px-3 py-2 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"></textarea>
+        </div>
+
+        <div class="flex justify-end gap-3 pt-4 border-t border-border">
+          <button type="button" (click)="closeForm.emit()"
+                  class="px-4 py-2 text-sm font-medium rounded-xl border border-border text-foreground hover:bg-muted transition-colors">
+            Cancelar
+          </button>
+          <button type="submit" [disabled]="isLoading"
+                  class="px-4 py-2 text-sm font-medium rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50">
+            @if (isLoading) {
+              <svg class="animate-spin w-4 h-4 mr-1.5 inline-block" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>
+            }
+            Crear Trámite
+          </button>
+        </div>
+      </form>
+    }
+  </div>
+</div>

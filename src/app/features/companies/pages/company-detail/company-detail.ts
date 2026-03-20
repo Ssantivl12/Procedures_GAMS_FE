@@ -1,40 +1,125 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule,Location } from '@angular/common';
-import { ActivatedRoute, RouterModule } from '@angular/router'; 
+import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule, Location } from '@angular/common';
+import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ChangeDetectorRef } from '@angular/core';
 import { DashboardHeaderComponent } from '../../../dashboard/components/dashboard-header/dashboard-header';
+import { CompanyService, Company } from '../../services/company.service';
+import { CaseFileService } from '../../../case-files/services/case-file.service';
+import { ProcedureService } from '../../../procedures/services/procedure.service';
+import { CaseFileFormComponent } from '../../../case-files/components/case-file-form/case-file-form';
+import { ProcedureFormComponent } from '../../../procedures/components/procedure-form/procedure-form';
+import { StatusBadgeComponent } from '../../../../shared/ui/status-badge/status-badge';
+import { TypeBadgeComponent } from '../../../../shared/ui/type-badge/type-badge';
+import { EmptyStateComponent } from '../../../../shared/ui/empty-state/empty-state';
+import { CaseFile, Procedure, PaginatedResponse } from '../../../../shared/models';
 
 @Component({
   selector: 'app-company-detail',
   standalone: true,
-  imports: [CommonModule, DashboardHeaderComponent, RouterModule],
-  templateUrl: './company-detail.html', 
-  styleUrl: './company-detail.css'    
+  imports: [
+    CommonModule, RouterModule, DashboardHeaderComponent,
+    CaseFileFormComponent, ProcedureFormComponent,
+    StatusBadgeComponent, TypeBadgeComponent, EmptyStateComponent,
+  ],
+  templateUrl: './company-detail.html',
+  styleUrl: './company-detail.css',
 })
 export class CompanyDetailComponent implements OnInit {
-  companyId: string | null = null;
-  
-  company = {
-    id: '1', name: 'INDUSTRIAS ALIMENTICIAS CORONILLA S.A.', nit: '1016839028',
-    cate: '3', subCate: 'Elaboración de galletas', sub: '9 de 10', vigencia: '23/04/2026',
-    estado: 'Vigente', lic: 'LIC-IND-2023-004', fec: '15/05/1998', ciud: 'SACABA', dire: 'Zona Industrial Quintanilla, Km 6.5 Av. Villazón', 
-    tel: '4712345', rep: 'Juan Pérez García'
-  };
+  private readonly route = inject(ActivatedRoute);
+  private readonly location = inject(Location);
+  private readonly companyService = inject(CompanyService);
+  private readonly caseFileService = inject(CaseFileService);
+  private readonly procedureService = inject(ProcedureService);
+  private readonly cdr = inject(ChangeDetectorRef);
 
+  company: Company | null = null;
+  caseFile: CaseFile | null = null;
+  procedures: Procedure[] = [];
+  isLoadingCompany = true;
+  isLoadingCaseFile = true;
+  isLoadingProcedures = false;
 
-  activeTab = 'general'; 
-
-  personal = [
-    { name: 'María', lastName: 'González', ci: '12345678', email: 'maria.gonzalez@gams.gob.bo', role: 'Inspector', status: 'Activo' },
-    { name: 'Carlos', lastName: 'Pérez', ci: '87654321', email: 'carlos.inspector@gams.gob.bo', role: 'Inspector', status: 'Activo' },
-  ];
-
- constructor(private route: ActivatedRoute, private location: Location) { }
+  activeTab = 'general';
+  showCaseFileForm = false;
+  showProcedureForm = false;
 
   ngOnInit(): void {
-    this.companyId = this.route.snapshot.paramMap.get('id');
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.loadCompany(id);
+      this.loadCaseFile(id);
+    }
   }
-  
+
+  loadCompany(id: string): void {
+    this.isLoadingCompany = true;
+    this.companyService.getCompanyById(id).subscribe({
+      next: (company) => {
+        this.company = company;
+        this.isLoadingCompany = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.isLoadingCompany = false;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  loadCaseFile(companyId: string): void {
+    this.isLoadingCaseFile = true;
+    this.caseFileService.getCaseFileByCompany(companyId).subscribe({
+      next: (cf) => {
+        this.caseFile = cf;
+        this.isLoadingCaseFile = false;
+        if (cf) {
+          this.loadProcedures(cf.id);
+        }
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.caseFile = null;
+        this.isLoadingCaseFile = false;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  loadProcedures(caseFileId: string): void {
+    this.isLoadingProcedures = true;
+    this.procedureService.getProcedures({ caseFileId, limit: 50 }).subscribe({
+      next: (res: PaginatedResponse<Procedure>) => {
+        this.procedures = res.data || [];
+        this.isLoadingProcedures = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.isLoadingProcedures = false;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
   goBack(): void {
     this.location.back();
+  }
+
+  onCaseFileSaved(): void {
+    this.showCaseFileForm = false;
+    if (this.company) {
+      this.loadCaseFile(this.company.id);
+    }
+  }
+
+  onProcedureSaved(): void {
+    this.showProcedureForm = false;
+    if (this.caseFile) {
+      this.loadProcedures(this.caseFile.id);
+    }
+  }
+
+  formatDate(date: string | null): string {
+    if (!date) return '—';
+    return new Date(date).toLocaleDateString('es-BO', { day: '2-digit', month: '2-digit', year: 'numeric' });
   }
 }

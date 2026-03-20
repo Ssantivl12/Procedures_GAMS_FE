@@ -1,0 +1,33 @@
+<div class="page-wrapper">
+  <app-dashboard-header></app-dashboard-header>
+
+  <main class="main-content p-6">
+    <app-procedure-header (addProcedure)="openModal()"></app-procedure-header>
+
+    <app-procedure-filters
+      [searchQuery]="searchQuery"
+      [statusFilter]="statusFilter"
+      [typeFilter]="typeFilter"
+      [pageSize]="pageSize"
+      (search)="onSearch($event)"
+      (statusChange)="onStatusChange($event)"
+      (typeChange)="onTypeChange($event)"
+      (pageSizeChange)="onPageSizeChange($event)"
+      (refresh)="onRefresh()">
+    </app-procedure-filters>
+
+    <app-procedure-table
+      [searchQuery]="searchQuery"
+      [statusFilter]="statusFilter"
+      [typeFilter]="typeFilter"
+      [pageSize]="pageSize">
+    </app-procedure-table>
+  </main>
+
+  @if (isModalOpen) {
+    <app-procedure-form
+      (closeForm)="closeModal()"
+      (procedureSaved)="onProcedureSaved()">
+    </app-procedure-form>
+  }
+</div>

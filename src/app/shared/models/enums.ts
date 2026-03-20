@@ -1,0 +1,52 @@
+export enum ProcedureStatus {
+  RECIBIDO = 'RECIBIDO',
+  EN_REVISION = 'EN_REVISION',
+  OBSERVADO_PENDIENTE_RECOJO = 'OBSERVADO_PENDIENTE_RECOJO',
+  SUBSANACION_PENDIENTE_REINGRESO = 'SUBSANACION_PENDIENTE_REINGRESO',
+  CERRADO = 'CERRADO',
+  ABANDONADO = 'ABANDONADO',
+}
+
+export enum ProcedureTypeCode {
+  RAI = 'RAI',
+  MAI_PMA = 'MAI_PMA',
+  IAA = 'IAA',
+  CIERRE = 'CIERRE',
+}
+
+export enum ProcedureKind {
+  NUEVO = 'NUEVO',
+  RENOVACION = 'RENOVACION',
+}
+
+export enum DocumentGroup {
+  INGRESO = 'INGRESO',
+  ANEXO = 'ANEXO',
+  ACTA = 'ACTA',
+  INFORME = 'INFORME',
+  OBSERVACIONES = 'OBSERVACIONES',
+  REINGRESO = 'REINGRESO',
+  RESULTADO_FINAL = 'RESULTADO_FINAL',
+  OTRO = 'OTRO',
+}
+
+export enum ObservationCategory {
+  DOCUMENTAL = 'DOCUMENTAL',
+  TECNICA = 'TECNICA',
+  ADMINISTRATIVA = 'ADMINISTRATIVA',
+  LEGAL = 'LEGAL',
+  OTRA = 'OTRA',
+}
+
+export enum ObservationPriority {
+  ALTA = 'ALTA',
+  MEDIA = 'MEDIA',
+  BAJA = 'BAJA',
+}
+
+export enum RaiStatus {
+  VIGENTE = 'VIGENTE',
+  POR_VENCER = 'POR_VENCER',
+  VENCIDO = 'VENCIDO',
+  SIN_RAI = 'SIN_RAI',
+}

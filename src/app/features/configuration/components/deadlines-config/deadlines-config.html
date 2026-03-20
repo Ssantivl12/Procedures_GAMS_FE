@@ -1,0 +1,111 @@
+<div class="deadlines-section">
+  <div class="section-header">
+    <div>
+      <h2 class="section-title">Plazos por Tipo de Trámite</h2>
+      <p class="section-desc">Define los días hábiles de revisión y subsanación para cada tipo y ciclo</p>
+    </div>
+    <button class="btn-primary" (click)="openCreate()">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="16" height="16">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+      </svg>
+      Agregar Plazo
+    </button>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <span>Cargando plazos...</span>
+    </div>
+  } @else if (deadlines.length === 0 && !showForm) {
+    <app-empty-state
+      title="Sin plazos configurados"
+      message="Agrega plazos para definir los días hábiles de cada tipo de trámite."
+      icon="clock"
+    />
+  } @else {
+    <div class="table-container">
+      <table class="config-table">
+        <thead>
+          <tr>
+            <th>Tipo de Trámite</th>
+            <th>Ciclo</th>
+            <th>Días Revisión</th>
+            <th>Días Subsanación</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (d of deadlines; track d.id) {
+            <tr>
+              <td>{{ d.procedureType?.name || getTypeName(d.procedureTypeId) }}</td>
+              <td>
+                <span class="cycle-badge">Ciclo {{ d.cycleNumber }}</span>
+              </td>
+              <td>
+                <span class="days-value">{{ d.reviewDays }}</span> días
+              </td>
+              <td>
+                <span class="days-value">{{ d.subsanationDays }}</span> días
+              </td>
+              <td>
+                <div class="action-btns">
+                  <button class="btn-icon" title="Editar" (click)="openEdit(d)">
+                    <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="16" height="16">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+                    </svg>
+                  </button>
+                  <button class="btn-icon btn-danger" title="Eliminar" (click)="confirmDelete(d)">
+                    <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="16" height="16">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <!-- Form modal -->
+  @if (showForm) {
+    <div class="form-overlay" (click)="cancelForm()">
+      <div class="form-card" (click)="$event.stopPropagation()">
+        <h3 class="form-title">{{ editingId ? 'Editar Plazo' : 'Nuevo Plazo' }}</h3>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Tipo de Trámite</label>
+            <select [(ngModel)]="form.procedureTypeId" [disabled]="!!editingId">
+              <option [ngValue]="undefined" disabled>Seleccionar...</option>
+              @for (t of procedureTypes; track t.id) {
+                <option [ngValue]="t.id">{{ t.name }}</option>
+              }
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Ciclo</label>
+            <input type="number" [(ngModel)]="form.cycleNumber" min="1" max="5" />
+          </div>
+          <div class="form-group">
+            <label>Días de Revisión</label>
+            <input type="number" [(ngModel)]="form.reviewDays" min="1" max="365" />
+          </div>
+          <div class="form-group">
+            <label>Días de Subsanación</label>
+            <input type="number" [(ngModel)]="form.subsanationDays" min="1" max="365" />
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-cancel" (click)="cancelForm()">Cancelar</button>
+          <button class="btn-primary" (click)="save()" [disabled]="isSaving || !form.procedureTypeId">
+            {{ isSaving ? 'Guardando...' : (editingId ? 'Actualizar' : 'Crear') }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

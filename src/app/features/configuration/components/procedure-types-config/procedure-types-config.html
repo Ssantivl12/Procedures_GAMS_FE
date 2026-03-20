@@ -1,0 +1,111 @@
+<div class="types-section">
+  <div class="section-header">
+    <div>
+      <h2 class="section-title">Tipos de Trámite</h2>
+      <p class="section-desc">Configuración de los tipos de trámite del sistema</p>
+    </div>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <span>Cargando tipos...</span>
+    </div>
+  } @else if (types.length === 0) {
+    <app-empty-state
+      title="Sin tipos de trámite"
+      message="No se encontraron tipos de trámite en el sistema."
+      icon="document"
+    />
+  } @else {
+    <div class="types-grid">
+      @for (t of types; track t.id) {
+        <div class="type-card" [class.inactive-card]="!t.isActive">
+          <div class="type-card-header">
+            <div class="type-code">{{ t.code }}</div>
+            <button class="btn-icon" title="Editar" (click)="openEdit(t)">
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="16" height="16">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+              </svg>
+            </button>
+          </div>
+          <h3 class="type-name">{{ t.name }}</h3>
+          @if (t.description) {
+            <p class="type-desc">{{ t.description }}</p>
+          }
+          <div class="type-flags">
+            <span class="flag" [class.flag-on]="t.allowsObservations" [class.flag-off]="!t.allowsObservations">
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="14" height="14">
+                @if (t.allowsObservations) {
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                } @else {
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                }
+              </svg>
+              Observaciones
+            </span>
+            <span class="flag" [class.flag-on]="t.allowsReentry" [class.flag-off]="!t.allowsReentry">
+              <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="14" height="14">
+                @if (t.allowsReentry) {
+                  <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                } @else {
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                }
+              </svg>
+              Reingreso
+            </span>
+            @if (!t.isActive) {
+              <span class="flag flag-off">
+                <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="14" height="14">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+                </svg>
+                Inactivo
+              </span>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Edit modal -->
+  @if (showForm && editingType) {
+    <div class="form-overlay" (click)="cancelForm()">
+      <div class="form-card" (click)="$event.stopPropagation()">
+        <h3 class="form-title">Editar Tipo: {{ editingType.code }}</h3>
+
+        <div class="form-stack">
+          <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" [(ngModel)]="form.name" />
+          </div>
+          <div class="form-group">
+            <label>Descripción</label>
+            <textarea [(ngModel)]="form.description" rows="3"></textarea>
+          </div>
+          <div class="form-checks">
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="form.allowsObservations" />
+              Permite observaciones
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="form.allowsReentry" />
+              Permite reingreso
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" [(ngModel)]="form.isActive" />
+              Activo
+            </label>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-cancel" (click)="cancelForm()">Cancelar</button>
+          <button class="btn-primary" (click)="save()" [disabled]="isSaving || !form.name">
+            {{ isSaving ? 'Guardando...' : 'Actualizar' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

@@ -1,60 +1,114 @@
 <div class="page-wrapper">
   <app-dashboard-header></app-dashboard-header>
 
-  <main class="main-content">
-    
+  <main class="main-content" style="animation: fadeIn 0.3s ease-out">
+
     <div class="page-header">
       <div>
-        <h1 class="page-title">Bandeja de Pendientes</h1>
-        <p class="page-subtitle">Ver y gestionar los trámites en curso que requieren atención</p>
+        <h1 class="page-title">{{ pageTitle }}</h1>
+        <p class="page-subtitle">{{ pageSubtitle }}</p>
       </div>
+      <button class="btn-refresh" (click)="loadProcedures()">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182" />
+        </svg>
+        Actualizar
+      </button>
     </div>
 
-    <div class="search-container">
+    <!-- Filters -->
+    <div class="filters-bar">
       <div class="search-box">
         <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="search-icon">
           <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
         </svg>
-        <input type="text" placeholder="Buscar por código de trámite, empresa o estado...">
+        <input type="text" placeholder="Buscar por hoja de ruta, empresa o tipo..."
+               [value]="searchQuery" (input)="onSearch($any($event.target).value)">
+      </div>
+      <div class="filter-chips">
+        @for (opt of filterOptions; track opt.value) {
+          <button class="filter-chip" [class.active]="activeFilter === opt.value"
+                  (click)="onFilterChange(opt.value)">
+            {{ opt.label }}
+          </button>
+        }
       </div>
     </div>
 
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Código Trámite</th>
-            <th>Empresa</th>
-            <th>Tipo de Trámite</th>
-            <th>Fecha Solicitud</th>
-            <th>Estado Actual</th>
-            <th>Días Pendientes</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (item of pendingItems; track item.id) {
+    <!-- Content -->
+    @if (isLoading) {
+      <div class="loading-container">
+        <svg class="animate-spin w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+        </svg>
+        <span class="text-muted-foreground text-sm mt-2">Cargando trámites...</span>
+      </div>
+    } @else if (filteredProcedures.length === 0) {
+      <div class="empty-card">
+        <app-empty-state
+          icon="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+          title="Sin Pendientes"
+          [message]="searchQuery ? 'No se encontraron trámites con los filtros aplicados.' : 'No hay trámites pendientes de atención.'">
+        </app-empty-state>
+      </div>
+    } @else {
+      <div class="results-count">
+        {{ filteredProcedures.length }} trámite{{ filteredProcedures.length !== 1 ? 's' : '' }} pendiente{{ filteredProcedures.length !== 1 ? 's' : '' }}
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
             <tr>
-              <td class="font-medium">{{ item.id }}</td>
-              <td class="cell-name">{{ item.empresa }}</td>
-              <td>{{ item.tramite }}</td>
-              <td>{{ item.fecha }}</td>
-              <td>
-                <span class="status-badge" [ngClass]="item.estado.toLowerCase().replace(' ', '-')">
-                  {{ item.estado }}
-                </span>
-              </td>
-              <td>
-                <span class="days-badge" [class.urgent]="item.dias > 5">{{ item.dias }} días</span>
-              </td>
-              <td class="actions-cell">
-                <button class="btn-view" [routerLink]="['/inbox', item.id]">Ver Detalle →</button>
-              </td>
+              <th>Hoja de Ruta</th>
+              <th>Empresa</th>
+              <th>Tipo</th>
+              <th>Estado</th>
+              <th>Fecha Recepción</th>
+              <th>Días</th>
+              <th>Inspector</th>
+              <th>Acciones</th>
             </tr>
-          }
-        </tbody>
-      </table>
-    </div>
+          </thead>
+          <tbody>
+            @for (proc of filteredProcedures; track proc.id) {
+              <tr [class.overdue]="proc.isOverdue">
+                <td class="font-medium">{{ proc.routeSheetNumber || '—' }}</td>
+                <td class="cell-name">{{ proc.caseFile?.company?.legalName || '—' }}</td>
+                <td><app-type-badge [type]="proc.procedureType?.code!" /></td>
+                <td><app-status-badge [status]="proc.currentStatus" /></td>
+                <td class="text-sm">{{ formatDate(proc.receptionDate) }}</td>
+                <td>
+                  @if (proc.daysElapsed !== null && proc.daysElapsed !== undefined) {
+                    <span class="days-badge" [class.urgent]="proc.isOverdue">
+                      {{ proc.daysElapsed }}d
+                    </span>
+                  } @else {
+                    <span class="days-badge">{{ getDaysElapsed(proc.receptionDate) }}d</span>
+                  }
+                </td>
+                <td class="text-sm">
+                  @if (proc.assignedInspector) {
+                    {{ proc.assignedInspector.firstName }} {{ proc.assignedInspector.lastName }}
+                  } @else {
+                    <span class="text-muted-foreground">Sin asignar</span>
+                  }
+                </td>
+                <td>
+                  <a [routerLink]="['/procedures', proc.id]" class="btn-view">
+                    Ver detalle
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    </svg>
+                  </a>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
 
   </main>
 </div>

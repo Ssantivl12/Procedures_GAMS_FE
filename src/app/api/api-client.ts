@@ -29,6 +29,17 @@ export class ApiClient {
     return this.http.delete<T>(this.baseUrl + path);
   }
 
+  postFormData<T>(path: string, formData: FormData) {
+    return this.http.post<T>(this.baseUrl + path, formData);
+  }
+
+  getBlob(path: string, params?: Record<string, string | number | boolean>) {
+    return this.http.get(this.baseUrl + path, {
+      params: this.toParams(params),
+      responseType: 'blob',
+    });
+  }
+
   private toParams(params?: Record<string, string | number | boolean>): HttpParams | undefined {
     if (!params) return undefined;
     let httpParams = new HttpParams();

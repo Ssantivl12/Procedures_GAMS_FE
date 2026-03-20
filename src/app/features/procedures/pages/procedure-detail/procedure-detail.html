@@ -1,0 +1,92 @@
+<div class="page-wrapper">
+  <app-dashboard-header></app-dashboard-header>
+
+  <main class="main-content p-6">
+    <button class="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-4 transition-colors" (click)="goBack()">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+      </svg>
+      Volver
+    </button>
+
+    @if (isLoading) {
+      <div class="flex items-center justify-center py-20">
+        <svg class="animate-spin w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+        </svg>
+      </div>
+    } @else if (procedure) {
+      <!-- Header -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <div>
+          <div class="flex items-center gap-3 mb-1">
+            <h1 class="text-2xl font-bold text-foreground">{{ procedure.routeSheetNumber || 'Sin Hoja de Ruta' }}</h1>
+            <app-status-badge [status]="procedure.currentStatus"></app-status-badge>
+          </div>
+          <div class="flex items-center gap-2 text-sm text-muted-foreground">
+            <span>{{ procedure.caseFile?.company?.legalName || '—' }}</span>
+            @if (procedure.procedureType) {
+              <span>·</span>
+              <app-type-badge [type]="$any(procedure.procedureType.code)"></app-type-badge>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Stepper -->
+      <app-procedure-stepper
+        [currentStatus]="procedure.currentStatus"
+        [procedureTypeCode]="procedureTypeCode">
+      </app-procedure-stepper>
+
+      <!-- Content Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Left Column (2/3) -->
+        <div class="lg:col-span-2 space-y-6">
+          <app-procedure-info-card [procedure]="procedure"></app-procedure-info-card>
+          <app-observations-card [procedureId]="procedure.id" [currentStatus]="procedure.currentStatus" [procedureTypeCode]="procedureTypeCode"></app-observations-card>
+          <app-documents-card [procedureId]="procedure.id" [currentStatus]="procedure.currentStatus"></app-documents-card>
+          <app-procedure-audit-timeline [auditItems]="auditItems"></app-procedure-audit-timeline>
+        </div>
+
+        <!-- Right Column (1/3) -->
+        <div class="space-y-6">
+          <app-procedure-actions
+            [currentStatus]="procedure.currentStatus"
+            [procedureTypeCode]="procedureTypeCode"
+            (actionClick)="onAction($event)">
+          </app-procedure-actions>
+        </div>
+      </div>
+    }
+  </main>
+
+  @if (showStatusDialog && procedure) {
+    <app-status-change-dialog
+      [procedureId]="procedure.id"
+      [currentStatus]="procedure.currentStatus"
+      [procedureTypeCode]="procedureTypeCode"
+      [action]="statusDialogAction"
+      (closeDialog)="showStatusDialog = false"
+      (statusChanged)="onStatusChanged()">
+    </app-status-change-dialog>
+  }
+
+  @if (showAssignDialog && procedure) {
+    <app-assign-inspector-dialog
+      [procedureId]="procedure.id"
+      [currentInspectorId]="procedure.assignedInspectorUserId"
+      (closeDialog)="showAssignDialog = false"
+      (inspectorAssigned)="onInspectorAssigned()">
+    </app-assign-inspector-dialog>
+  }
+
+  @if (showObservationForm && procedure) {
+    <app-observation-form
+      [procedureId]="procedure.id"
+      (closeForm)="showObservationForm = false"
+      (observationCreated)="onObservationCreated()">
+    </app-observation-form>
+  }
+</div>

@@ -80,6 +80,45 @@ export const routes: Routes = [
             './features/status-companies/pages/status-companies-detail/status-companies-detail'
           ).then((m) => m.StatusCompaniesDetailComponent),
       },
+      {
+        path: 'case-files',
+        loadComponent: () =>
+          import('./features/case-files/pages/case-files-list/case-files-list').then(
+            (m) => m.CaseFilesListComponent
+          ),
+      },
+      {
+        path: 'procedures',
+        loadComponent: () =>
+          import('./features/procedures/pages/procedures-list/procedures-list').then(
+            (m) => m.ProceduresListComponent
+          ),
+      },
+      {
+        path: 'procedures/:id',
+        loadComponent: () =>
+          import('./features/procedures/pages/procedure-detail/procedure-detail').then(
+            (m) => m.ProcedureDetailComponent
+          ),
+      },
+      {
+        path: 'configuration',
+        canActivate: [authGuard],
+        data: { roles: [UserRole.SUPERADMIN] },
+        loadComponent: () =>
+          import('./features/configuration/pages/config-layout/config-layout').then(
+            (m) => m.ConfigLayoutComponent
+          ),
+      },
+      {
+        path: 'reports',
+        canActivate: [authGuard],
+        data: { roles: [UserRole.SUPERADMIN, UserRole.ENCARGADO] },
+        loadComponent: () =>
+          import('./features/reports/pages/reports-page/reports-page').then(
+            (m) => m.ReportsPageComponent
+          ),
+      },
     ],
   },
   {

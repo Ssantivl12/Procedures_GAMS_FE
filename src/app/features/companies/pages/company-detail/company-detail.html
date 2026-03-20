@@ -2,86 +2,259 @@
   <app-dashboard-header></app-dashboard-header>
 
   <main class="main-content">
-    
+
     <button class="btn-back" (click)="goBack()">
       <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
       </svg>
       Volver a empresas
     </button>
-    
-    <div class="page-header">
-      <div>
-        <div class="header-pretitle">Detalle de Empresa</div>
-        <h1 class="page-title">{{ company.name }}</h1>
-        <p class="page-subtitle">NIT: {{ company.nit }} | Categoría: {{ company.cate }}</p>
-      </div>
-      <div class="header-actions">
-        <span class="status-badge" [ngClass]="company.estado.toLowerCase()">
-          {{ company.estado }}
-        </span>
-      </div>
-    </div>
 
-    <div class="tabs-container">
-      <button class="tab-item" [class.active]="activeTab === 'general'" (click)="activeTab = 'general'">
-        Información General
-      </button>
-      <button class="tab-item" [class.active]="activeTab === 'personal'" (click)="activeTab = 'personal'">
-        Personal Asignado
-      </button>
-      <button class="tab-item" [class.active]="activeTab === 'licencias'" (click)="activeTab = 'licencias'">
-        Licencias y Permisos
-      </button>
-    </div>
-
-    @if (activeTab === 'general') {
-      <div class="detail-grid">
-        <div class="detail-card">
-          <h3 class="card-title">Identificación y Ubicación</h3>
-          <div class="info-list">
-            <div class="info-item"><span class="label">Licencia GAMS:</span><span class="value">{{ company.lic }}</span></div>
-            <div class="info-item"><span class="label">Categoría:</span><span class="value">{{ company.cate }}</span></div>
-            <div class="info-item"><span class="label">Subcategoría:</span><span class="value">{{ company.subCate }}</span></div>
-            <div class="info-item"><span class="label">Vigencia:</span><span class="value font-bold text-vigente">{{ company.vigencia }}</span></div>
-            <div class="info-item"><span class="label">Fecha Registro:</span><span class="value">{{ company.fec }}</span></div>
-            <div class="info-item"><span class="label">Ciudad/Municipio:</span><span class="value">{{ company.ciud }}</span></div>
-            <div class="info-item dire-item"><span class="label">Dirección:</span><span class="value">{{ company.dire }}</span></div>
-          </div>
+    @if (isLoadingCompany) {
+      <div class="loading-container">
+        <svg class="animate-spin w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+        </svg>
+        <span class="text-muted-foreground text-sm mt-2">Cargando empresa...</span>
+      </div>
+    } @else if (company) {
+      <!-- Header -->
+      <div class="page-header">
+        <div>
+          <div class="header-pretitle">Detalle de Empresa</div>
+          <h1 class="page-title">{{ company.legalName }}</h1>
+          <p class="page-subtitle">
+            NIT: {{ company.nit || '—' }} | Categoría: {{ company.category }}
+          </p>
         </div>
-
-        <div class="detail-card">
-          <h3 class="card-title">Contacto y Representación Legal</h3>
-          <div class="info-list">
-            <div class="info-item"><span class="label">NIT:</span><span class="value font-medium">{{ company.nit }}</span></div>
-            <div class="info-item"><span class="label">Teléfono/Cel:</span><span class="value">{{ company.tel }}</span></div>
-            <div class="info-item"><span class="label">Representante Legal:</span><span class="value">{{ company.rep }}</span></div>
-          </div>
+        <div class="header-actions">
+          <span class="category-badge" [class.c3]="company.category === 'C3'" [class.c4]="company.category === 'C4'">
+            {{ company.category }}
+          </span>
+          <span class="status-indicator" [class.active]="company.isActive" [class.inactive]="!company.isActive">
+            {{ company.isActive ? 'Activa' : 'Inactiva' }}
+          </span>
         </div>
       </div>
+
+      <!-- Tabs -->
+      <div class="tabs-container">
+        <button class="tab-item" [class.active]="activeTab === 'general'" (click)="activeTab = 'general'">
+          <svg class="tab-icon" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z" />
+          </svg>
+          Información General
+        </button>
+        <button class="tab-item" [class.active]="activeTab === 'expediente'" (click)="activeTab = 'expediente'">
+          <svg class="tab-icon" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
+          </svg>
+          Expediente
+        </button>
+        <button class="tab-item" [class.active]="activeTab === 'tramites'" (click)="activeTab = 'tramites'">
+          <svg class="tab-icon" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
+          </svg>
+          Trámites
+          @if (procedures.length > 0) {
+            <span class="tab-count">{{ procedures.length }}</span>
+          }
+        </button>
+      </div>
+
+      <!-- Tab: General -->
+      @if (activeTab === 'general') {
+        <div class="detail-grid">
+          <div class="detail-card">
+            <h3 class="card-title">
+              <svg class="card-icon" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+              </svg>
+              Identificación y Ubicación
+            </h3>
+            <div class="info-list">
+              <div class="info-item"><span class="label">Razón Social:</span><span class="value">{{ company.legalName }}</span></div>
+              <div class="info-item"><span class="label">NIT:</span><span class="value font-medium">{{ company.nit || '—' }}</span></div>
+              <div class="info-item"><span class="label">Categoría:</span><span class="value">{{ company.category }}</span></div>
+              <div class="info-item"><span class="label">Actividad Económica:</span><span class="value">{{ company.economicActivity || '—' }}</span></div>
+              <div class="info-item"><span class="label">Municipio:</span><span class="value">{{ company.municipality || '—' }}</span></div>
+              <div class="info-item dire-item"><span class="label">Dirección:</span><span class="value">{{ company.address || '—' }}</span></div>
+              <div class="info-item"><span class="label">Fecha de Registro:</span><span class="value">{{ formatDate(company.createdAt) }}</span></div>
+            </div>
+          </div>
+
+          <div class="detail-card">
+            <h3 class="card-title">
+              <svg class="card-icon" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+              </svg>
+              Contacto y Representación Legal
+            </h3>
+            <div class="info-list">
+              <div class="info-item"><span class="label">Representante Legal:</span><span class="value">{{ company.legalRepName || '—' }}</span></div>
+              <div class="info-item"><span class="label">CI Representante:</span><span class="value">{{ company.legalRepCi || '—' }}</span></div>
+              <div class="info-item"><span class="label">Teléfono:</span><span class="value">{{ company.phone || '—' }}</span></div>
+              <div class="info-item"><span class="label">Correo:</span><span class="value">{{ company.email || '—' }}</span></div>
+              <div class="info-item"><span class="label">Nro. RAI:</span><span class="value">{{ company.raiNumber || '—' }}</span></div>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Tab: Expediente -->
+      @if (activeTab === 'expediente') {
+        @if (isLoadingCaseFile) {
+          <div class="loading-container">
+            <svg class="animate-spin w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+          </div>
+        } @else if (caseFile) {
+          <div class="detail-card">
+            <div class="card-header-row">
+              <h3 class="card-title">
+                <svg class="card-icon" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
+                </svg>
+                Expediente
+              </h3>
+              <span class="cf-status" [class.active]="caseFile.isActive" [class.closed]="!caseFile.isActive">
+                {{ caseFile.isActive ? 'Abierto' : 'Cerrado' }}
+              </span>
+            </div>
+            <div class="info-list">
+              <div class="info-item"><span class="label">Código:</span><span class="value font-medium">{{ caseFile.code || '—' }}</span></div>
+              <div class="info-item"><span class="label">Nro. Expediente Físico:</span><span class="value">{{ caseFile.fileNumber || '—' }}</span></div>
+              <div class="info-item"><span class="label">Fecha de Apertura:</span><span class="value">{{ formatDate(caseFile.openedAt) }}</span></div>
+              @if (caseFile.closedAt) {
+                <div class="info-item"><span class="label">Fecha de Cierre:</span><span class="value">{{ formatDate(caseFile.closedAt) }}</span></div>
+              }
+              <div class="info-item"><span class="label">Trámites Asociados:</span><span class="value font-medium">{{ caseFile._count?.procedures ?? 0 }}</span></div>
+            </div>
+          </div>
+        } @else {
+          <div class="detail-card empty-cf">
+            <app-empty-state
+              icon="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"
+              title="Sin Expediente"
+              message="Esta empresa aún no tiene un expediente asociado.">
+            </app-empty-state>
+            <div class="empty-action">
+              <button class="btn-primary" (click)="showCaseFileForm = true">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                Crear Expediente
+              </button>
+            </div>
+          </div>
+        }
+      }
+
+      <!-- Tab: Trámites -->
+      @if (activeTab === 'tramites') {
+        <div class="tramites-header">
+          <h3 class="section-title">Trámites del Expediente</h3>
+          @if (caseFile) {
+            <button class="btn-primary" (click)="showProcedureForm = true">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              Iniciar Trámite
+            </button>
+          }
+        </div>
+
+        @if (!caseFile && !isLoadingCaseFile) {
+          <div class="detail-card">
+            <app-empty-state
+              icon="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"
+              title="Sin Expediente"
+              message="Debe crear un expediente antes de iniciar trámites.">
+            </app-empty-state>
+          </div>
+        } @else if (isLoadingProcedures) {
+          <div class="loading-container">
+            <svg class="animate-spin w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+          </div>
+        } @else if (procedures.length === 0) {
+          <div class="detail-card">
+            <app-empty-state
+              icon="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"
+              title="Sin Trámites"
+              message="Aún no se han registrado trámites para este expediente.">
+            </app-empty-state>
+          </div>
+        } @else {
+          <div class="table-container detail-card">
+            <table>
+              <thead>
+                <tr>
+                  <th>Hoja de Ruta</th>
+                  <th>Tipo</th>
+                  <th>Clase</th>
+                  <th>Estado</th>
+                  <th>Fecha Recepción</th>
+                  <th>Inspector</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (proc of procedures; track proc.id) {
+                  <tr>
+                    <td class="font-medium">{{ proc.routeSheetNumber || '—' }}</td>
+                    <td><app-type-badge [type]="proc.procedureType?.code!" /></td>
+                    <td class="text-sm text-muted-foreground">{{ proc.procedureKind }}</td>
+                    <td><app-status-badge [status]="proc.currentStatus" /></td>
+                    <td class="text-sm">{{ formatDate(proc.receptionDate) }}</td>
+                    <td class="text-sm">
+                      @if (proc.assignedInspector) {
+                        {{ proc.assignedInspector.firstName }} {{ proc.assignedInspector.lastName }}
+                      } @else {
+                        <span class="text-muted-foreground">Sin asignar</span>
+                      }
+                    </td>
+                    <td>
+                      <a [routerLink]="['/procedures', proc.id]" class="btn-view">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        Ver
+                      </a>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      }
     }
 
-    @if (activeTab === 'personal') {
-      <div class="personal-list">
-        <h3 class="card-title">Personal Asignado (Inspectores)</h3>
-        <div class="table-container">
-          <table>
-            <thead><tr><th>Nombres</th><th>CI</th><th>Correo</th><th>Acciones</th></tr></thead>
-            <tbody>
-              @for (p of personal; track p.ci) {
-                <tr>
-                  <td class="font-medium cell-name">{{ p.name }} {{ p.lastName }}</td>
-                  <td>{{ p.ci }}</td>
-                  <td>{{ p.email }}</td>
-                  <td class="actions-cell">
-                    <button class="btn-action-light">Quitar Asignación</button>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      </div>
+    <!-- Case File Form Modal -->
+    @if (showCaseFileForm && company) {
+      <app-case-file-form
+        [companyId]="company.id"
+        (closeForm)="showCaseFileForm = false"
+        (caseFileSaved)="onCaseFileSaved()">
+      </app-case-file-form>
+    }
+
+    <!-- Procedure Form Modal -->
+    @if (showProcedureForm && caseFile && company) {
+      <app-procedure-form
+        [caseFileId]="caseFile.id"
+        [companyCategory]="company.category"
+        (closeForm)="showProcedureForm = false"
+        (procedureSaved)="onProcedureSaved()">
+      </app-procedure-form>
     }
 
   </main>

@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
-import { ApiClient } from '../../../api/api-client'; 
+import { ApiClient } from '../../../api/api-client';
+import { PaginatedResponse } from '../../../shared/models';
 
 export interface Company {
   id: string;
@@ -11,23 +12,11 @@ export interface Company {
   createdAt: string;
   municipality?: string;
   address?: string;
-  legalRepName?: string; 
+  legalRepName?: string;
   legalRepCi?: string;
   phone?: string;
   email?: string;
   economicActivity?: string;
-}
-
-export interface PaginatedResponse<T> {
-  data: T[];
-  meta: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-    hasPreviousPage: boolean;
-    hasNextPage: boolean;
-  };
 }
 
 @Injectable({

@@ -1,0 +1,162 @@
+<div class="reports-page">
+  <div class="reports-header">
+    <h1 class="reports-title">Reportes</h1>
+    <p class="reports-subtitle">Informes y estadísticas del sistema de trámites</p>
+  </div>
+
+  <div class="reports-tabs">
+    <button class="tab-btn" [class.active]="activeTab === 'procedures'" (click)="switchTab('procedures')">
+      Trámites
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'status'" (click)="switchTab('status')">
+      Por Estado
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'types'" (click)="switchTab('types')">
+      Por Tipo
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'inspectors'" (click)="switchTab('inspectors')">
+      Inspectores
+    </button>
+  </div>
+
+  <div class="report-content">
+    <app-report-filters
+      [showStatus]="activeTab === 'procedures'"
+      [showType]="activeTab === 'procedures' || activeTab === 'types'"
+      [exporting]="isExporting"
+      (filtersChange)="onFiltersChange($event)"
+      (exportCsv)="onExportCsv()"
+    />
+
+    @if (isLoading) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <span>Cargando reporte...</span>
+      </div>
+    } @else {
+
+      <!-- Procedures report -->
+      @if (activeTab === 'procedures') {
+        <div class="table-container">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Empresa</th>
+                <th>Tipo</th>
+                <th>Estado</th>
+                <th>Fecha Recepción</th>
+                <th>Fecha Cierre</th>
+                <th>Inspector</th>
+                <th>Días</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (r of proceduresData; track r.id) {
+                <tr [class.row-overdue]="r.isOverdue">
+                  <td>{{ r.companyName }}</td>
+                  <td>{{ r.procedureType }}</td>
+                  <td>{{ statusLabel(r.status) }}</td>
+                  <td>{{ formatDate(r.receivedDate) }}</td>
+                  <td>{{ r.closedDate ? formatDate(r.closedDate) : '—' }}</td>
+                  <td>{{ r.inspectorName || '—' }}</td>
+                  <td>
+                    {{ r.daysElapsed }}
+                    @if (r.isOverdue) {
+                      <span class="overdue-tag">Vencido</span>
+                    }
+                  </td>
+                </tr>
+              } @empty {
+                <tr><td colspan="7" style="text-align:center; padding:2rem; color:hsl(var(--muted-foreground))">Sin datos para los filtros seleccionados</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      <!-- Status summary -->
+      @if (activeTab === 'status') {
+        <div class="summary-grid">
+          @for (s of statusData; track s.status) {
+            <div class="summary-card">
+              <p class="summary-card-label">{{ statusLabel(s.status) }}</p>
+              <p class="summary-card-value">{{ s.count }}</p>
+              <p class="summary-card-sub">{{ s.percentage | number:'1.1-1' }}%</p>
+              <div class="pct-bar">
+                <div class="pct-fill" [style.width.%]="s.percentage"></div>
+              </div>
+            </div>
+          } @empty {
+            <p style="text-align:center; padding:2rem; color:hsl(var(--muted-foreground))">Sin datos</p>
+          }
+        </div>
+      }
+
+      <!-- Type summary -->
+      @if (activeTab === 'types') {
+        <div class="table-container">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Tipo de Trámite</th>
+                <th>Total</th>
+                <th>Activos</th>
+                <th>Cerrados</th>
+                <th>Promedio Días</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (t of typeData; track t.procedureType) {
+                <tr>
+                  <td>{{ t.procedureType }}</td>
+                  <td><strong>{{ t.total }}</strong></td>
+                  <td>{{ t.active }}</td>
+                  <td>{{ t.closed }}</td>
+                  <td>{{ t.avgDays | number:'1.0-0' }} días</td>
+                </tr>
+              } @empty {
+                <tr><td colspan="5" style="text-align:center; padding:2rem; color:hsl(var(--muted-foreground))">Sin datos</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      <!-- Inspector report -->
+      @if (activeTab === 'inspectors') {
+        <div class="table-container">
+          <table class="report-table">
+            <thead>
+              <tr>
+                <th>Inspector</th>
+                <th>Asignados</th>
+                <th>Cerrados</th>
+                <th>Vencidos</th>
+                <th>Promedio Días</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (i of inspectorData; track i.inspectorId) {
+                <tr>
+                  <td>{{ i.inspectorName }}</td>
+                  <td><strong>{{ i.assigned }}</strong></td>
+                  <td>{{ i.closed }}</td>
+                  <td>
+                    {{ i.overdue }}
+                    @if (i.overdue > 0) {
+                      <span class="overdue-tag">{{ i.overdue }}</span>
+                    }
+                  </td>
+                  <td>{{ i.avgDays | number:'1.0-0' }} días</td>
+                </tr>
+              } @empty {
+                <tr><td colspan="5" style="text-align:center; padding:2rem; color:hsl(var(--muted-foreground))">Sin datos</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+    }
+  </div>
+</div>

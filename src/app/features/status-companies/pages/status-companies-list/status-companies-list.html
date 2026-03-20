@@ -1,74 +1,217 @@
 <div class="page-wrapper">
   <app-dashboard-header></app-dashboard-header>
 
-  <main class="main-content">
-    
-    <button class="btn-back" routerLink="/dashboard">
-      <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-      </svg>
-      Volver al inicio
-    </button>
+  <main class="main-content" style="animation: fadeIn 0.3s ease-out">
 
     <div class="page-header">
-      <h1 class="page-title">Estado de Empresas</h1>
-      <p class="page-subtitle">Seguimiento de trámites por categoría</p>
+      <div>
+        <h1 class="page-title">Estado de Empresas</h1>
+        <p class="page-subtitle">Seguimiento de trámites ambientales por tipo y empresa</p>
+      </div>
+      <button class="btn-refresh" (click)="loadData()">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182" />
+        </svg>
+        Actualizar
+      </button>
     </div>
 
+    <!-- Search -->
+    <div class="search-box">
+      <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="search-icon">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+      </svg>
+      <input type="text" placeholder="Buscar empresa..." [value]="searchQuery" (input)="searchQuery = $any($event.target).value">
+    </div>
+
+    <!-- Tabs -->
     <div class="tabs-pill-container">
-      <button class="tab-pill" [class.active]="activeTab === 'proceso'" (click)="activeTab = 'proceso'">Proceso</button>
-      <button class="tab-pill" [class.active]="activeTab === 'rai'" (click)="activeTab = 'rai'">RAI</button>
-      <button class="tab-pill" [class.active]="activeTab === 'mai'" (click)="activeTab = 'mai'">MAI/PMA</button>
+      <button class="tab-pill" [class.active]="activeTab === 'proceso'" (click)="activeTab = 'proceso'">
+        En Proceso
+        @if (procesoProcedures.length > 0) {
+          <span class="tab-count">{{ procesoProcedures.length }}</span>
+        }
+      </button>
+      <button class="tab-pill" [class.active]="activeTab === 'rai'" (click)="activeTab = 'rai'">
+        RAI
+        @if (raiGroups.length > 0) {
+          <span class="tab-count">{{ raiGroups.length }}</span>
+        }
+      </button>
+      <button class="tab-pill" [class.active]="activeTab === 'mai'" (click)="activeTab = 'mai'">
+        MAI/PMA
+        @if (maiGroups.length > 0) {
+          <span class="tab-count">{{ maiGroups.length }}</span>
+        }
+      </button>
     </div>
 
-    <div class="cards-grid">
-      @for (item of currentCompanies; track item.id) {
-        <div class="status-card">
-          
-          <h3 class="card-company-name">{{ item.name }}</h3>
-          <span class="cat-badge">{{ item.category }}</span>
+    @if (isLoading) {
+      <div class="loading-container">
+        <svg class="animate-spin w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+        </svg>
+      </div>
+    } @else {
 
-          @if (activeTab === 'rai') {
-            <div class="status-section">
-              <span class="section-label">N° RAI</span>
-              <span class="text-bold">{{ item.nro }}</span>
-            </div>
-          } @else if (activeTab === 'mai') {
-            <div class="status-section">
-              <span class="section-label">N° MAI</span>
-              <span class="text-bold">{{ item.nro }}</span>
-            </div>
-          }
-
-          <div class="status-section">
-            <span class="section-label">Estado actual</span>
-            <span class="badge-status">{{ item.status }}</span>
+      <!-- Tab: En Proceso -->
+      @if (activeTab === 'proceso') {
+        @if (filteredProceso.length === 0) {
+          <div class="empty-card">
+            <app-empty-state
+              icon="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              title="Sin Trámites en Proceso"
+              message="No hay trámites activos en este momento.">
+            </app-empty-state>
           </div>
+        } @else {
+          <div class="cards-grid">
+            @for (proc of filteredProceso; track proc.id) {
+              <div class="status-card" [class.overdue]="proc.isOverdue">
+                <div class="card-top">
+                  <h3 class="card-company-name">{{ proc.caseFile?.company?.legalName || '—' }}</h3>
+                  <span class="cat-badge">{{ proc.caseFile?.company?.category || '—' }}</span>
+                </div>
 
-          @if (activeTab === 'proceso' && item.expiry) {
-            <div class="status-section">
-              <span class="section-label">Vencimiento</span>
-              <span class="badge-expiry">{{ item.expiry }}</span>
-            </div>
-          } @else if (activeTab !== 'proceso') {
-            <div class="status-section">
-              <span class="section-label">Vigencia</span>
-              <span class="badge-vigencia" [ngClass]="item.vigenciaColor">{{ item.vigencia }}</span>
-            </div>
-          }
+                <div class="card-details">
+                  <div class="detail-row">
+                    <span class="detail-label">Tipo</span>
+                    <app-type-badge [type]="proc.procedureType?.code!" />
+                  </div>
+                  <div class="detail-row">
+                    <span class="detail-label">Estado</span>
+                    <app-status-badge [status]="proc.currentStatus" />
+                  </div>
+                  <div class="detail-row">
+                    <span class="detail-label">Hoja de Ruta</span>
+                    <span class="detail-value">{{ proc.routeSheetNumber || '—' }}</span>
+                  </div>
+                  @if (proc.deadlineDate) {
+                    <div class="detail-row">
+                      <span class="detail-label">Plazo</span>
+                      <span class="detail-value" [class.text-red]="proc.isOverdue">{{ formatDate(proc.deadlineDate) }}</span>
+                    </div>
+                  }
+                  @if (proc.assignedInspector) {
+                    <div class="detail-row">
+                      <span class="detail-label">Inspector</span>
+                      <span class="detail-value">{{ proc.assignedInspector.firstName }} {{ proc.assignedInspector.lastName }}</span>
+                    </div>
+                  }
+                </div>
 
-          <div class="card-footer">
-            <button class="btn-ver-detalle" [routerLink]="['/status-companies', item.id]">
-              Ver detalle
-              <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-              </svg>
-            </button>
+                <div class="card-footer">
+                  <a [routerLink]="['/procedures', proc.id]" class="btn-ver-detalle">
+                    Ver detalle
+                    <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            }
           </div>
-
-        </div>
+        }
       }
-    </div>
+
+      <!-- Tab: RAI -->
+      @if (activeTab === 'rai') {
+        @if (filteredRai.length === 0) {
+          <div class="empty-card">
+            <app-empty-state
+              icon="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              title="Sin Trámites RAI"
+              message="No hay trámites RAI activos.">
+            </app-empty-state>
+          </div>
+        } @else {
+          <div class="cards-grid">
+            @for (group of filteredRai; track group.companyId) {
+              <div class="status-card">
+                <div class="card-top">
+                  <h3 class="card-company-name">{{ group.companyName }}</h3>
+                  <span class="cat-badge">{{ group.category }}</span>
+                </div>
+
+                <div class="card-details">
+                  @if (group.raiAlert) {
+                    <div class="detail-row">
+                      <span class="detail-label">RAI</span>
+                      <app-rai-semaphore
+                        [expirationDate]="group.raiAlert.expirationDate" />
+                    </div>
+                    <div class="detail-row">
+                      <span class="detail-label">Vence</span>
+                      <span class="detail-value">{{ formatDate(group.raiAlert.expirationDate) }}</span>
+                    </div>
+                  }
+
+                  @for (proc of group.procedures; track proc.id) {
+                    <div class="proc-row">
+                      <app-status-badge [status]="proc.currentStatus" />
+                      <span class="proc-route">{{ proc.routeSheetNumber || '—' }}</span>
+                    </div>
+                  }
+                </div>
+
+                <div class="card-footer">
+                  <a [routerLink]="['/companies', group.companyId]" class="btn-ver-detalle">
+                    Ver empresa
+                    <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      }
+
+      <!-- Tab: MAI/PMA -->
+      @if (activeTab === 'mai') {
+        @if (filteredMai.length === 0) {
+          <div class="empty-card">
+            <app-empty-state
+              icon="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              title="Sin Trámites MAI/PMA"
+              message="No hay trámites MAI/PMA activos.">
+            </app-empty-state>
+          </div>
+        } @else {
+          <div class="cards-grid">
+            @for (group of filteredMai; track group.companyId) {
+              <div class="status-card">
+                <div class="card-top">
+                  <h3 class="card-company-name">{{ group.companyName }}</h3>
+                  <span class="cat-badge">{{ group.category }}</span>
+                </div>
+
+                <div class="card-details">
+                  @for (proc of group.procedures; track proc.id) {
+                    <div class="proc-row">
+                      <app-status-badge [status]="proc.currentStatus" />
+                      <span class="proc-route">{{ proc.routeSheetNumber || '—' }}</span>
+                    </div>
+                  }
+                </div>
+
+                <div class="card-footer">
+                  <a [routerLink]="['/companies', group.companyId]" class="btn-ver-detalle">
+                    Ver empresa
+                    <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      }
+
+    }
 
   </main>
 </div>
