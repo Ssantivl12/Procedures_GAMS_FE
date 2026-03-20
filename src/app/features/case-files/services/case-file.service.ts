@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { ApiClient } from '../../../api/api-client';
-import { CaseFile, PaginatedResponse } from '../../../shared/models';
+import { CaseFile, CreateCaseFileDto, UpdateCaseFileDto } from '../../../shared/models/case-file.model';
+import { PaginatedResponse } from '../../../shared/models/paginated-response';
 
 @Injectable({ providedIn: 'root' })
 export class CaseFileService {
@@ -19,11 +20,11 @@ export class CaseFileService {
     return this.api.get<CaseFile>(`${this.basePath}/company/${companyId}`);
   }
 
-  createCaseFile(data: { companyId: string; fileNumber?: string }) {
+  createCaseFile(data: CreateCaseFileDto) {
     return this.api.post<CaseFile>(this.basePath, data);
   }
 
-  updateCaseFile(id: string, data: { fileNumber: string }) {
+  updateCaseFile(id: string, data: UpdateCaseFileDto) {
     return this.api.patch<CaseFile>(`${this.basePath}/${id}`, data);
   }
 

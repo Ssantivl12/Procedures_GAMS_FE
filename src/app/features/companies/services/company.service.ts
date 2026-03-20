@@ -16,7 +16,21 @@ export interface Company {
   legalRepCi?: string;
   phone?: string;
   email?: string;
+  caebCodes?: string[];
   economicActivity?: string;
+  observations?: string;
+}
+
+export interface CompanyParams {
+  page?: number;
+  limit?: number;
+  search?: string;
+  category?: string;
+  municipality?: string;
+  hasRaiNumber?: boolean;
+  isActive?: boolean;
+  sortBy?: 'legalName' | 'createdAt' | 'raiNumber';
+  sortOrder?: 'asc' | 'desc';
 }
 
 @Injectable({
@@ -26,12 +40,17 @@ export class CompanyService {
   private readonly api = inject(ApiClient);
   private readonly basePath = '/companies'; 
 
-  getCompanies(params?: any) {
-    return this.api.get<PaginatedResponse<Company>>(this.basePath, params);
+  getCompanies(params?: CompanyParams) {
+    return this.api.get<PaginatedResponse<Company>>(this.basePath, params as any);
   }
 
-  getCompanyById(id: string) {
-    return this.api.get<Company>(`${this.basePath}/${id}`);
+  getCompanyById(id: string, include?: string) {
+    const params = include ? { include } : undefined;
+    return this.api.get<Company>(`${this.basePath}/${id}`, params);
+  }
+
+  getCompanyCaseFile(id: string) {
+    return this.api.get<any>(`${this.basePath}/${id}/case-file`);
   }
 
   createCompany(data: Partial<Company>) {

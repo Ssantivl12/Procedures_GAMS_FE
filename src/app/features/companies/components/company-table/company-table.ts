@@ -1,7 +1,8 @@
 import { Component, EventEmitter, Input, OnInit, Output, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { CompanyService, Company } from '../../services/company.service';
+import { CompanyService, Company, CompanyParams } from '../../services/company.service';
+import { AuthService, UserRole } from '../../../../core/auth/auth.service';
 import { finalize } from 'rxjs';
 
 @Component({
@@ -47,7 +48,7 @@ import { finalize } from 'rxjs';
             </tr>
 
             <!-- Data Rows -->
-            <tr *ngFor="let company of companies" class="hover:bg-muted/50 transition-colors group">
+            <tr *ngFor="let company of companies" class="hover:bg-muted/50 transition-colors group" [class.opacity-60]="!company.isActive">
               <td class="px-6 py-4">
                 <div class="flex items-center gap-3">
                   <div class="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs uppercase border border-emerald-100 shadow-sm">
@@ -67,7 +68,7 @@ import { finalize } from 'rxjs';
               </td>
               <td class="px-6 py-4">
                 <span class="px-2.5 py-1 rounded-md bg-secondary text-[11px] font-bold text-primary uppercase tracking-wider">
-                  {{ company.category }}
+                   {{ company.category }}
                 </span>
               </td>
               <td class="px-6 py-4">
@@ -86,19 +87,19 @@ import { finalize } from 'rxjs';
                 </span>
               </td>
               <td class="px-6 py-4 text-right">
-                <div class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <div class="flex items-center justify-end gap-1 transition-opacity">
                   <button [routerLink]="['/companies', company.id]" class="p-2 text-muted-foreground hover:text-primary hover:bg-accent rounded-lg transition-all" title="Ver Detalle">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
                   </button>
-                  <button (click)="onEdit(company)" class="p-2 text-muted-foreground hover:text-primary hover:bg-accent rounded-lg transition-all" title="Editar">
+                  <button *ngIf="canEdit" (click)="onEdit(company)" class="p-2 text-muted-foreground hover:text-primary hover:bg-accent rounded-lg transition-all" title="Editar">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                   </button>
-                  <button (click)="onDelete(company)" class="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all" title="Eliminar">
+                  <button *ngIf="canDelete && company.isActive" (click)="onDelete(company)" class="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-all" title="Eliminar">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
@@ -138,10 +139,9 @@ import { finalize } from 'rxjs';
 })
 export class CompanyTableComponent implements OnInit {
   private companyService = inject(CompanyService);
+  private authService = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
 
-  @Input() searchQuery = '';
-  @Input() sortBy = 'legalName-asc';
   @Input() pageSize = 10;
   
   @Output() edit = new EventEmitter<Company>();
@@ -151,23 +151,35 @@ export class CompanyTableComponent implements OnInit {
   isLoading = true;
   currentPage = 1;
   totalPages = 1;
+  
+  currentFilters: CompanyParams = {
+    isActive: true,
+    sortBy: 'legalName',
+    sortOrder: 'asc'
+  };
+
+  canEdit = false;
+  canDelete = false;
 
   ngOnInit() {
+    this.checkPermissions();
     this.loadCompanies();
+  }
+
+  private checkPermissions() {
+    this.canEdit = !this.authService.hasRole(UserRole.INSPECTOR);
+    this.canDelete = this.authService.hasRole([UserRole.SUPERADMIN, UserRole.ENCARGADO]);
   }
 
   loadCompanies() {
     this.isLoading = true;
     this.cdr.detectChanges();
     
-    const [sortField, sortOrder] = this.sortBy.split('-');
-    const params: any = {
+    const params: CompanyParams = {
+      ...this.currentFilters,
       page: this.currentPage,
-      limit: this.pageSize,
-      sortBy: sortField,
-      sortOrder: sortOrder || 'asc'
+      limit: this.pageSize
     };
-    if (this.searchQuery) params.search = this.searchQuery;
 
     this.companyService.getCompanies(params).pipe(
       finalize(() => {
@@ -185,6 +197,18 @@ export class CompanyTableComponent implements OnInit {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  updateFilters(filters: any) {
+    const [sortField, sortOrder] = (filters.sortBy || 'legalName-asc').split('-');
+    
+    this.currentFilters = {
+      ...filters,
+      sortBy: sortField as any,
+      sortOrder: sortOrder as any
+    };
+    
+    this.refresh();
   }
 
   changePage(page: number) {

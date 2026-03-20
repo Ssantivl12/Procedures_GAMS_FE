@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { AuthService, UserRole } from '../../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-company-filters',
@@ -8,72 +9,139 @@ import { FormsModule } from '@angular/forms';
   imports: [CommonModule, FormsModule],
   template: `
     <div class="bg-card p-4 rounded-xl border border-border shadow-sm animate-fade-in">
-        <div class="flex flex-col lg:flex-row gap-4 items-end lg:items-center">
-            <!-- Search -->
-            <div class="relative flex-1 w-full">
-                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg class="h-4 w-4 text-muted-foreground" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd"
-                            d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                            clip-rule="evenodd" />
-                    </svg>
+        <div class="flex flex-col gap-4">
+            <div class="flex flex-col lg:flex-row gap-4 items-end lg:items-center">
+                <!-- Search -->
+                <div class="relative flex-1 w-full">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-4 w-4 text-muted-foreground" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <input type="text" [(ngModel)]="searchQuery" (input)="onFilterChange()"
+                        placeholder="Buscar por nombre, NIT o RAI..."
+                        class="block w-full pl-9 pr-4 py-2 bg-muted/50 border border-transparent rounded-lg text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary focus:bg-background transition-all" />
                 </div>
-                <input type="text" [(ngModel)]="searchQuery" (input)="onSearchChange()"
-                    placeholder="Buscar por nombre, NIT o categoría..."
-                    class="block w-full pl-9 pr-4 py-2 bg-muted/50 border border-transparent rounded-lg text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary focus:bg-background transition-all" />
+
+                <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+                    <!-- Sort By -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider whitespace-nowrap">Ordenar:</label>
+                        <select [(ngModel)]="sortBy" (change)="onFilterChange()"
+                            class="bg-background border border-input text-foreground text-sm rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary block p-2 outline-none transition-all cursor-pointer">
+                            <option value="legalName-asc">Nombre (A-Z)</option>
+                            <option value="legalName-desc">Nombre (Z-A)</option>
+                            <option value="raiNumber-asc">RAI (Creciente)</option>
+                            <option value="createdAt-desc">Más recientes</option>
+                        </select>
+                    </div>
+
+                    <!-- Page Size -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider whitespace-nowrap">Ver:</label>
+                        <select [(ngModel)]="pageSize" (change)="onPageSizeChange()"
+                            class="bg-background border border-input text-foreground text-sm rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary block p-2 outline-none transition-all cursor-pointer">
+                            <option [value]="10">10</option>
+                            <option [value]="25">25</option>
+                            <option [value]="50">50</option>
+                        </select>
+                    </div>
+
+                    <!-- Refresh -->
+                    <button (click)="onRefresh()"
+                        class="inline-flex items-center justify-center p-2 bg-muted/50 text-muted-foreground rounded-lg border border-transparent hover:bg-muted hover:text-primary transition-all cursor-pointer"
+                        title="Actualizar">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                    </button>
+                </div>
             </div>
 
-            <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-                <!-- Sort By -->
+            <!-- Advanced Filters -->
+            <div class="flex flex-wrap items-center gap-4 pt-2 border-t border-border/50">
                 <div class="flex items-center gap-2">
-                    <label class="text-xs font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap">Ordenar por:</label>
-                    <select [(ngModel)]="sortBy" (change)="onSortChange()"
-                        class="bg-background border border-input text-foreground text-sm rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary block p-2 outline-none transition-all cursor-pointer">
-                        <option value="legalName-asc">Nombre (A-Z)</option>
-                        <option value="legalName-desc">Nombre (Z-A)</option>
-                        <option value="nit-asc">NIT (Creciente)</option>
-                        <option value="createdAt-desc">Más recientes</option>
+                    <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Categoría:</label>
+                    <select [(ngModel)]="category" (change)="onFilterChange()"
+                        class="bg-muted/30 border-none text-foreground text-xs font-semibold rounded-lg p-1.5 outline-none cursor-pointer">
+                        <option value="">Todas</option>
+                        <option value="C3">C3</option>
+                        <option value="C4">C4</option>
                     </select>
                 </div>
 
-                <!-- Page Size -->
                 <div class="flex items-center gap-2">
-                    <label class="text-xs font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap">Por página:</label>
-                    <select [(ngModel)]="pageSize" (change)="onPageSizeChange()"
-                        class="bg-background border border-input text-foreground text-sm rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary block p-2 outline-none transition-all cursor-pointer">
-                        <option [value]="5">5</option>
-                        <option [value]="10">10</option>
-                        <option [value]="25">25</option>
-                        <option [value]="50">50</option>
+                    <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Municipio:</label>
+                    <select [(ngModel)]="municipality" (change)="onFilterChange()"
+                        class="bg-muted/30 border-none text-foreground text-xs font-semibold rounded-lg p-1.5 outline-none cursor-pointer">
+                        <option value="">Todos</option>
+                        <option value="Sacaba">Sacaba</option>
+                        <option value="Cochabamba">Cochabamba</option>
                     </select>
                 </div>
 
-                <!-- Refresh -->
-                <button (click)="onRefresh()"
-                    class="inline-flex items-center justify-center p-2 bg-muted/50 text-muted-foreground rounded-lg border border-transparent hover:bg-muted hover:text-primary transition-all cursor-pointer"
-                    title="Actualizar">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                    </svg>
-                </button>
+                <div class="flex items-center gap-2">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" [(ngModel)]="hasRaiNumber" (change)="onFilterChange()"
+                            class="w-3.5 h-3.5 rounded border-gray-300 text-primary focus:ring-primary/30">
+                        <span class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Tiene RAI</span>
+                    </label>
+                </div>
+
+                <div class="flex items-center gap-2" *ngIf="canSeeInactive">
+                    <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Estado:</label>
+                    <select [(ngModel)]="statusFilter" (change)="onFilterChange()"
+                        class="bg-muted/30 border-none text-foreground text-xs font-semibold rounded-lg p-1.5 outline-none cursor-pointer">
+                        <option value="active">Activas</option>
+                        <option value="inactive">Inactivas</option>
+                        <option value="all">Todas</option>
+                    </select>
+                </div>
             </div>
         </div>
     </div>
   `
 })
-export class CompanyFiltersComponent {
+export class CompanyFiltersComponent implements OnInit {
+    private authService = inject(AuthService);
+
     @Input() searchQuery = '';
     @Input() sortBy = 'legalName-asc';
     @Input() pageSize = 10;
+    
+    category = '';
+    municipality = '';
+    hasRaiNumber = false;
+    statusFilter = 'active';
 
-    @Output() search = new EventEmitter<string>();
-    @Output() sortChange = new EventEmitter<string>();
+    @Output() filtersChanged = new EventEmitter<any>();
     @Output() pageSizeChange = new EventEmitter<number>();
     @Output() refresh = new EventEmitter<void>();
 
-    onSearchChange() { this.search.emit(this.searchQuery); }
-    onSortChange() { this.sortChange.emit(this.sortBy); }
+    canSeeInactive = false;
+
+    ngOnInit() {
+        this.canSeeInactive = this.authService.hasRole([UserRole.SUPERADMIN, UserRole.ENCARGADO]);
+    }
+
+    onFilterChange() {
+        const isActive = this.statusFilter === 'all' 
+            ? undefined 
+            : (this.statusFilter === 'active' ? true : false);
+
+        this.filtersChanged.emit({
+            search: this.searchQuery,
+            sortBy: this.sortBy,
+            category: this.category || undefined,
+            municipality: this.municipality || undefined,
+            hasRaiNumber: this.hasRaiNumber || undefined,
+            isActive: isActive
+        });
+    }
+
     onPageSizeChange() { this.pageSizeChange.emit(this.pageSize); }
     onRefresh() { this.refresh.emit(); }
 }

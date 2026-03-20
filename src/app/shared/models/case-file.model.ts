@@ -11,5 +11,19 @@ export interface CaseFile {
   createdAt: string;
   updatedAt: string;
   company?: Company;
-  _count?: { procedures: number };
+  raiStatus?: 'VIGENTE' | 'POR_VENCER' | 'VENCIDO' | null;
+  proceduresSummary?: {
+    total: number;
+    active: number;
+    closed: number;
+  };
+}
+
+export interface CreateCaseFileDto {
+  companyId: string;
+  fileNumber?: string;
+}
+
+export interface UpdateCaseFileDto {
+  fileNumber: string;
 }

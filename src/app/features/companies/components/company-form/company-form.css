@@ -43,6 +43,20 @@
   padding: 0 1.75rem;
 }
 
+.modal-body::-webkit-scrollbar {
+  width: 6px;
+}
+.modal-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+.modal-body::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 10px;
+}
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted-foreground);
+}
+
 .form-group {
   display: flex;
   flex-direction: column;

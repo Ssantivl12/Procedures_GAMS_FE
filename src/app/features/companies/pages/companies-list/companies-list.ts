@@ -27,21 +27,13 @@ export class CompaniesListComponent {
 
   isModalOpen = false;
   selectedCompany: Company | null = null;
-  
-  searchQuery = '';
-  sortBy = 'legalName-asc';
   pageSize = 10;
 
-  onSearch(query: string) {
-    this.searchQuery = query;
-    this.companyTable.searchQuery = query;
-    this.companyTable.refresh();
-  }
+  companyToDelete: Company | null = null;
+  isDeleting = false;
 
-  onSortChange(sortBy: string) {
-    this.sortBy = sortBy;
-    this.companyTable.sortBy = sortBy;
-    this.companyTable.refresh();
+  onFiltersChanged(filters: any) {
+    this.companyTable.updateFilters(filters);
   }
 
   onPageSizeChange(size: number) {
@@ -70,16 +62,30 @@ export class CompaniesListComponent {
   }
 
   onDeleteCompany(company: Company) {
-    if (confirm(`¿Estás seguro de eliminar la empresa ${company.legalName}? Esta acción no se puede deshacer.`)) {
-      this.companyService.deleteCompany(company.id).subscribe({
-        next: () => {
-          this.onRefresh();
-        },
-        error: (err) => {
-          console.error('Error deleting company:', err);
-          alert('No se pudo eliminar la empresa. Intente de nuevo.');
-        }
-      });
-    }
+    this.companyToDelete = company;
+  }
+
+  cancelDelete() {
+    this.companyToDelete = null;
+    this.isDeleting = false;
+  }
+
+  confirmDelete() {
+    if (!this.companyToDelete) return;
+    this.isDeleting = true;
+    
+    this.companyService.deleteCompany(this.companyToDelete.id).subscribe({
+      next: () => {
+        this.isDeleting = false;
+        this.companyToDelete = null;
+        this.onRefresh();
+      },
+      error: (err) => {
+        this.isDeleting = false;
+        console.error('Error deleting company:', err);
+        alert('No se pudo eliminar la empresa. Intente de nuevo.');
+        this.companyToDelete = null;
+      }
+    });
   }
 }

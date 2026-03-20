@@ -82,6 +82,16 @@
               <div class="info-item"><span class="label">Municipio:</span><span class="value">{{ company.municipality || '—' }}</span></div>
               <div class="info-item dire-item"><span class="label">Dirección:</span><span class="value">{{ company.address || '—' }}</span></div>
               <div class="info-item"><span class="label">Fecha de Registro:</span><span class="value">{{ formatDate(company.createdAt) }}</span></div>
+              @if (company.caebCodes && company.caebCodes.length > 0) {
+                <div class="info-item dire-item">
+                  <span class="label">Códigos CAEB:</span>
+                  <div class="flex flex-wrap gap-2 mt-1">
+                    <span *ngFor="let code of company.caebCodes" class="px-2 py-1 bg-secondary text-primary text-[10px] font-bold rounded-md">
+                      {{ code }}
+                    </span>
+                  </div>
+                </div>
+              }
             </div>
           </div>
 
@@ -98,6 +108,12 @@
               <div class="info-item"><span class="label">Teléfono:</span><span class="value">{{ company.phone || '—' }}</span></div>
               <div class="info-item"><span class="label">Correo:</span><span class="value">{{ company.email || '—' }}</span></div>
               <div class="info-item"><span class="label">Nro. RAI:</span><span class="value">{{ company.raiNumber || '—' }}</span></div>
+              @if (company.observations) {
+                <div class="info-item dire-item">
+                  <span class="label">Observaciones:</span>
+                  <span class="value text-xs italic">{{ company.observations }}</span>
+                </div>
+              }
             </div>
           </div>
         </div>
@@ -132,7 +148,7 @@
               @if (caseFile.closedAt) {
                 <div class="info-item"><span class="label">Fecha de Cierre:</span><span class="value">{{ formatDate(caseFile.closedAt) }}</span></div>
               }
-              <div class="info-item"><span class="label">Trámites Asociados:</span><span class="value font-medium">{{ caseFile._count?.procedures ?? 0 }}</span></div>
+              <div class="info-item"><span class="label">Trámites Asociados:</span><span class="value font-medium">{{ caseFile.proceduresSummary?.total ?? 0 }}</span></div>
             </div>
           </div>
         } @else {

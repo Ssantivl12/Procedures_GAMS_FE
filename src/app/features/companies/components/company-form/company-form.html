@@ -18,71 +18,139 @@
             </button>
         </div>
 
-        <div class="modal-body py-4" *ngIf="!showSuccessModal">
+        <div class="modal-body py-4 overflow-y-auto max-h-[70vh]" *ngIf="!showSuccessModal">
             <form [formGroup]="companyForm" class="flex flex-col gap-5">
                 
                 <!-- Razon Social -->
                 <div class="form-group">
                     <label>Razón Social / Nombre Comercial *</label>
-                    <input type="text" formControlName="nombres" 
+                    <input type="text" formControlName="legalName" 
                            placeholder="Ej: INDUSTRIAS DEL VALLE S.A."
-                           [class.is-invalid]="submitted && f['nombres'].invalid">
-                    <div *ngIf="submitted && f['nombres'].errors?.['required']" class="invalid-feedback mt-1">
-                        La razón social es obligatoria
+                           [class.is-invalid]="submitted && f['legalName'].invalid">
+                    <div *ngIf="submitted && f['legalName'].errors?.['required']" class="invalid-feedback mt-1">
+                        La razón social es obligatoria (mín. 3 caracteres)
                     </div>
                 </div>
 
-                <!-- NIT y Categoria -->
+                <!-- NIT y RAI -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="form-group">
-                        <label>NIT *</label>
+                        <label>NIT</label>
                         <input type="text" formControlName="nit" 
-                               placeholder="Ej: 12345678"
+                               placeholder="7-13 dígitos"
                                [class.is-invalid]="submitted && f['nit'].invalid">
-                        <div *ngIf="submitted && f['nit'].errors?.['required']" class="invalid-feedback mt-1">
-                            El NIT es obligatorio
+                        <div *ngIf="submitted && f['nit'].errors?.['pattern']" class="invalid-feedback mt-1">
+                            Debe tener entre 7 y 13 dígitos
                         </div>
                     </div>
                     <div class="form-group">
+                        <label>RAI (9 dígitos)</label>
+                        <input type="text" formControlName="raiNumber" 
+                               placeholder="Ej: 123456789"
+                               [class.is-invalid]="(submitted && f['raiNumber'].invalid) || conflictError">
+                        <div *ngIf="submitted && f['raiNumber'].errors?.['pattern']" class="invalid-feedback mt-1">
+                            Debe tener exactamente 9 dígitos
+                        </div>
+                        <div *ngIf="conflictError" class="invalid-feedback mt-1">
+                            {{ conflictError }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Categoria y Municipio -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
                         <label>Categoría GAMS *</label>
-                        <select formControlName="cate" [class.is-invalid]="submitted && f['cate'].invalid">
+                        <select formControlName="category" [class.is-invalid]="submitted && f['category'].invalid">
                             <option value="">Seleccione...</option>
-                            <option value="CATEGORIA 3">Categoría 3 (C3)</option>
-                            <option value="CATEGORIA 4">Categoría 4 (C4)</option>
+                            <option value="C3">Categoría 3 (C3)</option>
+                            <option value="C4">Categoría 4 (C4)</option>
                         </select>
-                        <div *ngIf="submitted && f['cate'].errors?.['required']" class="invalid-feedback mt-1">
+                        <div *ngIf="submitted && f['category'].errors?.['required']" class="invalid-feedback mt-1">
                             Seleccione categoría
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Municipio</label>
+                        <input type="text" formControlName="municipality" readonly class="bg-accent/30 cursor-not-allowed">
                     </div>
                 </div>
 
                 <!-- Direccion -->
                 <div class="form-group">
-                    <label>Dirección del Establecimiento *</label>
-                    <input type="text" formControlName="dire" 
-                           placeholder="Av./Calle, # de puerta, Zona"
-                           [class.is-invalid]="submitted && f['dire'].invalid">
+                    <label>Dirección del Establecimiento</label>
+                    <input type="text" formControlName="address" 
+                           placeholder="Av./Calle, # de puerta, Zona">
                 </div>
 
-                <!-- Municipio y Telefono -->
+                <!-- Telefono y Email -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="form-group">
-                        <label>Municipio *</label>
-                        <input type="text" formControlName="ciud" readonly class="bg-accent/30 cursor-not-allowed">
+                        <label>Teléfono (+591XXXXXXXX)</label>
+                        <input type="text" formControlName="phone" placeholder="+59170000000"
+                               [class.is-invalid]="submitted && f['phone'].invalid">
+                        <div *ngIf="submitted && f['phone'].errors?.['pattern']" class="invalid-feedback mt-1">
+                            Formato inválido: +591 seguido de 8 dígitos
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label>Teléfono de Contacto</label>
-                        <input type="text" formControlName="tel" placeholder="Ej: 4321567">
+                        <label>Correo Electrónico</label>
+                        <input type="email" formControlName="email" placeholder="empresa@ejemplo.com"
+                               [class.is-invalid]="submitted && f['email'].invalid">
                     </div>
                 </div>
 
-                <!-- Representante -->
-                <div class="form-group">
-                    <label>Representante Legal *</label>
-                    <input type="text" formControlName="rep" 
-                           placeholder="Nombre completo del titular"
-                           [class.is-invalid]="submitted && f['rep'].invalid">
+                <!-- Representante Legal -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label>Representante Legal</label>
+                        <input type="text" formControlName="legalRepName" placeholder="Nombre completo">
+                    </div>
+                    <div class="form-group">
+                        <label>CI Representante</label>
+                        <input type="text" formControlName="legalRepCi" placeholder="Número de documento">
+                    </div>
                 </div>
+
+                <!-- Actividad Económica -->
+                <div class="form-group">
+                    <label>Actividad Económica</label>
+                    <textarea formControlName="economicActivity" rows="2" placeholder="Describa la actividad principal"></textarea>
+                </div>
+
+                <!-- CAEB Codes -->
+                <div class="form-group">
+                    <label>Códigos CAEB (5 dígitos, máx 10)</label>
+                    <div class="flex gap-2">
+                        <input type="text" [(ngModel)]="caebInput" [ngModelOptions]="{standalone: true}" 
+                               placeholder="Ej: 12345" 
+                               (keyup.enter)="addCaebCode()"
+                               maxlength="5"
+                               class="flex-1">
+                        <button type="button" (click)="addCaebCode()" 
+                                class="px-4 py-2 bg-accent rounded-xl text-xs font-bold hover:bg-accent/80 transition-colors">
+                            Agregar
+                        </button>
+                    </div>
+                    <div class="flex flex-wrap gap-2 mt-2">
+                        <div *ngFor="let code of caebList; let i = index" 
+                             class="flex items-center gap-2 bg-primary/10 text-primary text-xs font-bold px-3 py-1.5 rounded-lg border border-primary/20">
+                            {{ code }}
+                            <button type="button" (click)="removeCaebCode(i)" class="text-primary hover:text-red-500">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                                    <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Observaciones -->
+                <div class="form-group">
+                    <label>Observaciones</label>
+                    <textarea formControlName="observations" rows="2" placeholder="Notas adicionales"></textarea>
+                </div>
+
             </form>
         </div>
 

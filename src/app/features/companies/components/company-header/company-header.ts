@@ -1,5 +1,6 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { AuthService, UserRole } from '../../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-company-header',
@@ -14,7 +15,7 @@ import { CommonModule } from '@angular/common';
             </p>
         </div>
 
-        <div class="flex items-center space-x-3 w-full sm:w-auto">
+        <div class="flex items-center space-x-3 w-full sm:w-auto" *ngIf="canCreate">
             <button 
                 class="btn-primary-horus w-full sm:w-auto flex items-center justify-center gap-2"
                 (click)="onAddCompany()"
@@ -46,7 +47,16 @@ import { CommonModule } from '@angular/common';
     }
   `]
 })
-export class CompanyHeaderComponent {
+export class CompanyHeaderComponent implements OnInit {
+  private authService = inject(AuthService);
+  
   @Output() addCompany = new EventEmitter<void>();
+  
+  canCreate = false;
+
+  ngOnInit() {
+    this.canCreate = !this.authService.hasRole(UserRole.INSPECTOR);
+  }
+
   onAddCompany() { this.addCompany.emit(); }
 }

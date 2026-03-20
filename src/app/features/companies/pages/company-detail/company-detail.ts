@@ -68,7 +68,7 @@ export class CompanyDetailComponent implements OnInit {
 
   loadCaseFile(companyId: string): void {
     this.isLoadingCaseFile = true;
-    this.caseFileService.getCaseFileByCompany(companyId).subscribe({
+    this.companyService.getCompanyCaseFile(companyId).subscribe({
       next: (cf) => {
         this.caseFile = cf;
         this.isLoadingCaseFile = false;
