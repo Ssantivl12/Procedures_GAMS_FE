@@ -9,8 +9,10 @@ export interface Observation {
   category: ObservationCategory;
   priority: ObservationPriority;
   isResolved: boolean;
+  issuedAt: string;
   resolvedAt: string | null;
   resolvedByUserId: string | null;
+  resolutionNote: string | null;
   issuedByUserId: string;
   isActive: boolean;
   createdAt: string;

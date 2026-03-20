@@ -35,8 +35,8 @@ export class ObservationService {
     return this.api.patch<Observation>(`/procedures/${procedureId}/observations/${id}`, data);
   }
 
-  resolveObservation(procedureId: string, id: string) {
-    return this.api.patch<Observation>(`/procedures/${procedureId}/observations/${id}/resolve`, {});
+  resolveObservation(procedureId: string, id: string, resolutionNote?: string) {
+    return this.api.patch<Observation>(`/procedures/${procedureId}/observations/${id}/resolve`, resolutionNote ? { resolutionNote } : {});
   }
 
   reopenObservation(procedureId: string, id: string) {

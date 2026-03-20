@@ -15,13 +15,16 @@ import { ProcedureDocument } from '../../../../shared/models';
         </svg>
       </div>
       <div class="flex-1 min-w-0">
-        <p class="text-sm font-medium text-foreground truncate">{{ doc.originalName }}</p>
+        <p class="text-sm font-medium text-foreground truncate">{{ getFileName() }}</p>
         <div class="flex items-center gap-2 text-xs text-muted-foreground">
           <span class="px-1.5 py-0.5 rounded bg-muted text-muted-foreground font-medium">{{ doc.docGroup }}</span>
           <span>v{{ doc.version }}</span>
-          <span>{{ formatSize(doc.sizeBytes) }}</span>
-          <span>{{ doc.createdAt | date:'dd/MM/yyyy' }}</span>
+          <span>{{ formatSize(getFileSize()) }}</span>
+          <span>{{ (doc.uploadedAt) | date:'dd/MM/yyyy' }}</span>
         </div>
+        @if (doc.description) {
+          <p class="text-xs text-muted-foreground mt-0.5 truncate">{{ doc.description }}</p>
+        }
       </div>
       <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
         <button class="p-1.5 rounded-lg hover:bg-muted transition-colors" title="Descargar"
@@ -51,6 +54,14 @@ export class DocumentItemComponent {
 
   get canDelete(): boolean {
     return this.auth.hasRole(UserRole.SUPERADMIN);
+  }
+
+  getFileName(): string {
+    return (this.doc as any).originalFileName || (this.doc as any).originalName || 'Documento';
+  }
+
+  getFileSize(): number {
+    return (this.doc as any).fileSize || (this.doc as any).sizeBytes || 0;
   }
 
   formatSize(bytes: number): string {

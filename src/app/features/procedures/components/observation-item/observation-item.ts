@@ -28,13 +28,29 @@ import { PriorityBadgeComponent } from '../../../../shared/ui/priority-badge/pri
           <p class="text-xs text-muted-foreground mt-0.5">{{ observation.details }}</p>
         }
         <div class="flex items-center gap-2 mt-2 flex-wrap">
-          <app-category-badge [category]="observation.category"></app-category-badge>
-          <app-priority-badge [priority]="observation.priority"></app-priority-badge>
+          @if (observation.category) {
+            <app-category-badge [category]="observation.category"></app-category-badge>
+          }
+          @if (observation.priority) {
+            <app-priority-badge [priority]="observation.priority"></app-priority-badge>
+          }
           <span class="text-xs text-muted-foreground">
-            {{ observation.issuedBy ? observation.issuedBy.firstName + ' ' + observation.issuedBy.lastName : '' }}
+            {{ getIssuedByName() }}
           </span>
-          <span class="text-xs text-muted-foreground">{{ observation.createdAt | date:'dd/MM/yyyy' }}</span>
+          <span class="text-xs text-muted-foreground">{{ (observation.issuedAt || observation.createdAt) | date:'dd/MM/yyyy' }}</span>
         </div>
+        @if (observation.isResolved && observation.resolutionNote) {
+          <div class="mt-2 px-2.5 py-1.5 bg-emerald-50 border border-emerald-100 rounded-lg">
+            <p class="text-xs text-emerald-700">
+              <span class="font-medium">Resolución:</span> {{ observation.resolutionNote }}
+            </p>
+            @if (observation.resolvedBy) {
+              <p class="text-xs text-emerald-600 mt-0.5">
+                {{ getResolvedByName() }} · {{ observation.resolvedAt | date:'dd/MM/yyyy' }}
+              </p>
+            }
+          </div>
+        }
       </div>
       <div class="flex items-center gap-1 flex-shrink-0">
         @if (!observation.isResolved && canResolve) {
@@ -66,5 +82,17 @@ export class ObservationItemComponent {
 
   get canReopen(): boolean {
     return this.auth.hasRole([UserRole.SUPERADMIN, UserRole.ENCARGADO]);
+  }
+
+  getIssuedByName(): string {
+    const ib = this.observation.issuedBy;
+    if (!ib) return '';
+    return (ib as any).fullName || `${(ib as any).firstName || ''} ${(ib as any).lastName || ''}`.trim();
+  }
+
+  getResolvedByName(): string {
+    const rb = this.observation.resolvedBy;
+    if (!rb) return '';
+    return (rb as any).fullName || `${(rb as any).firstName || ''} ${(rb as any).lastName || ''}`.trim();
   }
 }

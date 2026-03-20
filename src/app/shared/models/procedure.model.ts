@@ -48,10 +48,9 @@ export interface ProcedureAudit {
   procedureId: string;
   fromStatus: ProcedureStatus | null;
   toStatus: ProcedureStatus;
-  changedBy: string;
+  changedBy: { id: string; fullName: string };
   changedAt: string;
   note: string | null;
-  user?: { id: string; firstName: string; lastName: string };
 }
 
 export interface ChangeStatusPayload {

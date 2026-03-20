@@ -58,7 +58,7 @@ export class ObservationFormComponent implements OnInit {
     this.procedureService.getCycles(this.procedureId).subscribe({
       next: (cycles) => {
         this.cycles = cycles;
-        const activeCycle = cycles.find(c => !c.closedAt);
+        const activeCycle = cycles.find((c: ProcedureCycle) => !c.closedAt);
         if (activeCycle) {
           this.form.patchValue({ cycleId: activeCycle.id });
         }

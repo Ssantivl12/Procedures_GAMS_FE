@@ -5,15 +5,16 @@ export interface ProcedureDocument {
   procedureId: string;
   cycleId: string | null;
   docGroup: DocumentGroup;
-  originalName: string;
+  originalFileName: string;
+  fileSize: number;
   mimeType: string;
-  sizeBytes: number;
+  description: string | null;
   version: number;
   isLatest: boolean;
   checksum: string;
-  description: string | null;
   uploadedByUserId: string;
+  uploadedAt: string;
   isActive: boolean;
-  createdAt: string;
-  uploadedBy?: { id: string; firstName: string; lastName: string };
+  downloadUrl?: string;
+  uploadedBy?: { id: string; fullName: string };
 }

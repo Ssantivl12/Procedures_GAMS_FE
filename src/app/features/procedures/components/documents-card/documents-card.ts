@@ -49,7 +49,7 @@ export class DocumentsCardComponent implements OnInit {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = doc.originalName;
+        a.download = this.getDocName(doc);
         a.click();
         window.URL.revokeObjectURL(url);
       },
@@ -57,10 +57,15 @@ export class DocumentsCardComponent implements OnInit {
   }
 
   onDelete(doc: ProcedureDocument): void {
-    if (!confirm(`¿Eliminar "${doc.originalName}"?`)) return;
+    const name = this.getDocName(doc);
+    if (!confirm(`¿Eliminar "${name}"?`)) return;
     this.documentService.deleteDocument(this.procedureId, doc.id).subscribe({
       next: () => this.loadDocuments(),
     });
+  }
+
+  private getDocName(doc: ProcedureDocument): string {
+    return (doc as any).originalFileName || (doc as any).originalName || 'documento.pdf';
   }
 
   onUploaded(): void {

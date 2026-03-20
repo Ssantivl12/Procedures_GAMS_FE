@@ -1,4 +1,5 @@
 import { Injectable, inject } from '@angular/core';
+import { map } from 'rxjs';
 import { ApiClient } from '../../../api/api-client';
 import {
   Procedure,
@@ -47,11 +48,15 @@ export class ProcedureService {
   }
 
   getAuditHistory(id: string) {
-    return this.api.get<ProcedureAudit[]>(`${this.basePath}/${id}/audit`);
+    return this.api.get<any>(`${this.basePath}/${id}/audit`).pipe(
+      map(resp => Array.isArray(resp) ? resp : (resp?.data || []))
+    );
   }
 
   getCycles(procedureId: string) {
-    return this.api.get<ProcedureCycle[]>(`${this.basePath}/${procedureId}/cycles`);
+    return this.api.get<any>(`${this.basePath}/${procedureId}/cycles`).pipe(
+      map(resp => Array.isArray(resp) ? resp : (resp?.data || []))
+    );
   }
 
   getCycle(procedureId: string, cycleId: string) {

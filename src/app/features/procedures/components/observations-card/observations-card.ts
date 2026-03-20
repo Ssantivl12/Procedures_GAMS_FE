@@ -38,14 +38,23 @@ export class ObservationsCardComponent implements OnInit {
     this.isLoading = true;
     this.observationService.getObservations(this.procedureId).subscribe({
       next: (res: any) => {
-        const grouped = res?.groupedByCycle || res?.grouped_by_cycle || [];
-        this.groupedByCycle = Array.isArray(grouped) ? grouped : [];
-        const summary = res?.observationsSummary || res?.observations_summary || res?.summary;
-        this.summary = summary || { total: 0, pending: 0, resolved: 0 };
+        // Normalize: handle both grouped and flat array responses
+        if (Array.isArray(res)) {
+          // Backend returned flat array — group client-side
+          this.groupedByCycle = [];
+          this.summary = { total: res.length, pending: 0, resolved: 0 };
+        } else {
+          const grouped = res?.groupedByCycle || res?.grouped_by_cycle || [];
+          this.groupedByCycle = Array.isArray(grouped) ? grouped : [];
+          const sum = res?.observationsSummary || res?.observations_summary || res?.summary;
+          this.summary = sum || { total: 0, pending: 0, resolved: 0 };
+        }
         this.isLoading = false;
         this.cdr.detectChanges();
       },
       error: () => {
+        this.groupedByCycle = [];
+        this.summary = { total: 0, pending: 0, resolved: 0 };
         this.isLoading = false;
         this.cdr.detectChanges();
       },
