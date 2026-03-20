@@ -34,6 +34,12 @@ export class UserService {
     );
   }
 
+  getInspectors(): Observable<User[]> {
+    return this.api.get<any>(`${this.basePath}/inspectors`).pipe(
+      map(resp => Array.isArray(resp) ? resp : (resp.data || []))
+    );
+  }
+
   getUserById(id: string): Observable<User> {
     return this.api.get<User>(`${this.basePath}/${id}`);
   }

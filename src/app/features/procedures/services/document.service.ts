@@ -1,4 +1,5 @@
 import { Injectable, inject } from '@angular/core';
+import { map } from 'rxjs';
 import { ApiClient } from '../../../api/api-client';
 import { ProcedureDocument, DocumentGroup } from '../../../shared/models';
 
@@ -7,7 +8,9 @@ export class DocumentService {
   private readonly api = inject(ApiClient);
 
   getDocuments(procedureId: string, params?: Record<string, string | number | boolean>) {
-    return this.api.get<ProcedureDocument[]>(`/procedures/${procedureId}/documents`, params);
+    return this.api.get<any>(`/procedures/${procedureId}/documents`, params).pipe(
+      map(resp => Array.isArray(resp) ? resp : (resp?.data || []))
+    );
   }
 
   getDocument(procedureId: string, id: string) {

@@ -37,9 +37,11 @@ export class ObservationsCardComponent implements OnInit {
   loadObservations(): void {
     this.isLoading = true;
     this.observationService.getObservations(this.procedureId).subscribe({
-      next: (res) => {
-        this.groupedByCycle = res.groupedByCycle || [];
-        this.summary = res.observationsSummary || { total: 0, pending: 0, resolved: 0 };
+      next: (res: any) => {
+        const grouped = res?.groupedByCycle || res?.grouped_by_cycle || [];
+        this.groupedByCycle = Array.isArray(grouped) ? grouped : [];
+        const summary = res?.observationsSummary || res?.observations_summary || res?.summary;
+        this.summary = summary || { total: 0, pending: 0, resolved: 0 };
         this.isLoading = false;
         this.cdr.detectChanges();
       },

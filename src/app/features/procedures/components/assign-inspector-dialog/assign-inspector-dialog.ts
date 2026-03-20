@@ -90,33 +90,23 @@ export class AssignInspectorDialogComponent implements OnInit {
   ngOnInit(): void {
     this.selectedInspectorId = this.currentInspectorId || '';
     this.isLoading = true;
-    
-    // Usamos un limit alto para pruebas de depuración
-    this.userService.getUsers({ limit: 1000 }).subscribe({
-      next: (response: any) => {
-        console.log('Respuesta cruda de usuarios:', response);
-        
-        // Extraer el arreglo de forma robusta (maneja array directo o paginado {data: [...]})
-        const usersArray = Array.isArray(response) ? response : (response?.data || []);
-        
-        // Filtro local tolerante a mayúsculas/minúsculas y formatos de rol
-        this.inspectors = usersArray.filter((user: any) => {
-          if (!user.isActive) return false;
-          
-          const roles = Array.isArray(user.roles) ? user.roles : (user.role ? [user.role] : []);
-          return roles.some((r: string) => r?.toUpperCase() === 'INSPECTOR');
+
+    this.userService.getInspectors().subscribe({
+      next: (inspectors) => {
+        const all = Array.isArray(inspectors) ? inspectors : [];
+        this.inspectors = all.filter((u: any) => {
+          const roles: string[] = Array.isArray(u.roles) ? u.roles : [];
+          return roles.some(r => r?.toUpperCase() === 'INSPECTOR');
         });
-        
-        console.log('Inspectores filtrados localmente:', this.inspectors);
         this.isLoading = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Error al obtener usuarios:', err);
+        console.error('[AssignDialog] Error fetching inspectors:', err);
         this.inspectors = [];
         this.isLoading = false;
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
