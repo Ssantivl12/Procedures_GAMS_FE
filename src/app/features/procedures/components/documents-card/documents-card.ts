@@ -7,6 +7,7 @@ import { Procedure, ProcedureDocument, ProcedureStatus } from '../../../../share
 import { DocumentItemComponent } from '../document-item/document-item';
 import { DocumentUploadComponent } from '../document-upload/document-upload';
 import { showToast } from '../../../../shared/utils/toast.utils';
+import Swal from 'sweetalert2'; 
 
 @Component({
   selector: 'app-documents-card',
@@ -29,10 +30,7 @@ export class DocumentsCardComponent implements OnInit {
 
   get activeCycleId(): string | null {
     if (!this.procedure.cycles || this.procedure.cycles.length === 0) return null;
-    // Find the latest cycle (highest cycleNumber)
     const sorted = [...this.procedure.cycles].sort((a, b) => b.cycleNumber - a.cycleNumber);
-    // Usually the active one is the latest open one, but if all are closed, we might still want to upload to the latest.
-    // However, the rule typically applies to the "current" one.
     return sorted[0]?.id || null;
   }
 
@@ -79,18 +77,39 @@ export class DocumentsCardComponent implements OnInit {
       });
   }
 
-  onDelete(doc: ProcedureDocument): void {
+  async onDelete(doc: ProcedureDocument): Promise<void> {
     const name = this.getDocName(doc);
-    if (!confirm(`¿Eliminar "${name}"?`)) return;
-    this.documentService.deleteDocument(this.procedureId, doc.id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          showToast('success', 'Documento eliminado');
-          this.loadDocuments();
-        },
-        error: () => showToast('error', 'Error al eliminar el documento'),
-      });
+    
+    const result = await Swal.fire({
+      title: '¿Estás seguro?',
+      text: `Vas a eliminar el documento "${name}". Esta acción no se puede deshacer.`,
+      icon: 'warning',
+      width: '400px', 
+      showCancelButton: true,
+      buttonsStyling: false,
+      confirmButtonText: 'Sí, eliminar',
+      cancelButtonText: 'Cancelar',
+      customClass: {
+        popup: 'rounded-xl border border-border bg-card text-foreground shadow-lg p-4',
+        title: 'text-lg font-semibold pt-2',
+        htmlContainer: 'text-sm text-muted-foreground mt-2 mb-4',
+        actions: 'flex gap-3 w-full justify-center',
+        confirmButton: 'bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors',
+        cancelButton: 'bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md text-sm font-medium transition-colors dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600'
+      }
+    });
+
+    if (result.isConfirmed) {
+      this.documentService.deleteDocument(this.procedureId, doc.id)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: () => {
+            showToast('success', 'Documento eliminado correctamente');
+            this.loadDocuments(); 
+          },
+          error: () => showToast('error', 'Error al eliminar el documento'),
+        });
+    }
   }
 
   private getDocName(doc: ProcedureDocument): string {
