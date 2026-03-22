@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ObservationService } from '../../services/observation.service';
-import { Observation, ObservationsGroupedByCycle, ObservationsSummary, ProcedureStatus, ProcedureTypeCode } from '../../../../shared/models';
+import { Observation, ObservationsGroupedByCycle, ObservationsSummary, Procedure, ProcedureStatus, ProcedureTypeCode } from '../../../../shared/models';
 import { ObservationItemComponent } from '../observation-item/observation-item';
 import { showToast } from '../../../../shared/utils/toast.utils';
 
@@ -19,9 +19,19 @@ export class ObservationsCardComponent implements OnInit {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
 
-  @Input({ required: true }) procedureId!: string;
+  @Input({ required: true }) procedure!: Procedure;
   @Input() currentStatus: ProcedureStatus = ProcedureStatus.RECIBIDO;
   @Input() procedureTypeCode: ProcedureTypeCode = ProcedureTypeCode.RAI;
+
+  get procedureId(): string {
+    return this.procedure.id;
+  }
+
+  get activeCycleId(): string | null {
+    if (!this.procedure.cycles || this.procedure.cycles.length === 0) return null;
+    const sorted = [...this.procedure.cycles].sort((a, b) => b.cycleNumber - a.cycleNumber);
+    return sorted[0]?.id || null;
+  }
 
   groupedByCycle: ObservationsGroupedByCycle[] = [];
   summary: ObservationsSummary = { total: 0, pending: 0, resolved: 0 };

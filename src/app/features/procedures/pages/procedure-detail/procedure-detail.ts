@@ -134,4 +134,10 @@ export class ProcedureDetailComponent implements OnInit {
   get procedureTypeCode(): ProcedureTypeCode {
     return (this.procedure?.procedureType?.code as ProcedureTypeCode) || ProcedureTypeCode.RAI;
   }
+
+  get activeCycleId(): string | null {
+    if (!this.procedure?.cycles || this.procedure.cycles.length === 0) return null;
+    const sorted = [...this.procedure.cycles].sort((a, b) => b.cycleNumber - a.cycleNumber);
+    return sorted[0]?.id || null;
+  }
 }

@@ -20,6 +20,7 @@ export class ObservationFormComponent implements OnInit {
   private readonly cdr = inject(ChangeDetectorRef);
 
   @Input({ required: true }) procedureId!: string;
+  @Input() activeCycleId: string | null = null;
   @Output() closeForm = new EventEmitter<void>();
   @Output() observationCreated = new EventEmitter<void>();
 
@@ -58,9 +59,13 @@ export class ObservationFormComponent implements OnInit {
     this.procedureService.getCycles(this.procedureId).subscribe({
       next: (cycles) => {
         this.cycles = cycles;
-        const activeCycle = cycles.find((c: ProcedureCycle) => !c.closedAt);
-        if (activeCycle) {
-          this.form.patchValue({ cycleId: activeCycle.id });
+        if (this.activeCycleId) {
+          this.form.patchValue({ cycleId: this.activeCycleId });
+        } else {
+          const activeCycle = cycles.find((c: ProcedureCycle) => !c.closedAt);
+          if (activeCycle) {
+            this.form.patchValue({ cycleId: activeCycle.id });
+          }
         }
         this.cdr.detectChanges();
       },

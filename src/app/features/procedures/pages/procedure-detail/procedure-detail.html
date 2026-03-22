@@ -45,7 +45,7 @@
         <!-- Left Column (2/3) -->
         <div class="lg:col-span-2 space-y-6">
           <app-procedure-info-card [procedure]="procedure"></app-procedure-info-card>
-          <app-observations-card [procedureId]="procedure.id" [currentStatus]="procedure.currentStatus" [procedureTypeCode]="procedureTypeCode"></app-observations-card>
+          <app-observations-card [procedure]="procedure" [currentStatus]="procedure.currentStatus" [procedureTypeCode]="procedureTypeCode"></app-observations-card>
           <app-documents-card [procedure]="procedure"></app-documents-card>
           <app-procedure-audit-timeline [auditItems]="auditItems"></app-procedure-audit-timeline>
         </div>
@@ -86,6 +86,7 @@
   @if (showObservationForm && procedure) {
     <app-observation-form
       [procedureId]="procedure.id"
+      [activeCycleId]="activeCycleId"
       (closeForm)="showObservationForm = false"
       (observationCreated)="onObservationCreated()">
     </app-observation-form>

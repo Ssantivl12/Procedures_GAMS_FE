@@ -36,7 +36,10 @@ export class ObservationService {
   }
 
   resolveObservation(procedureId: string, id: string, resolutionNote?: string) {
-    return this.api.patch<Observation>(`/procedures/${procedureId}/observations/${id}/resolve`, resolutionNote ? { resolutionNote } : {});
+    return this.api.patch<Observation>(`/procedures/${procedureId}/observations/${id}/resolve`, {
+      isResolved: true,
+      ...(resolutionNote ? { resolutionNote } : {}),
+    });
   }
 
   reopenObservation(procedureId: string, id: string) {
