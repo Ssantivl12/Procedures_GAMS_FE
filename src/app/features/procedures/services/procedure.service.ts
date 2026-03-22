@@ -48,13 +48,13 @@ export class ProcedureService {
   }
 
   getAuditHistory(id: string) {
-    return this.api.get<any>(`${this.basePath}/${id}/audit`).pipe(
+    return this.api.get<ProcedureAudit[] | { data: ProcedureAudit[] }>(`${this.basePath}/${id}/audit`).pipe(
       map(resp => Array.isArray(resp) ? resp : (resp?.data || []))
     );
   }
 
   getCycles(procedureId: string) {
-    return this.api.get<any>(`${this.basePath}/${procedureId}/cycles`).pipe(
+    return this.api.get<ProcedureCycle[] | { data: ProcedureCycle[] }>(`${this.basePath}/${procedureId}/cycles`).pipe(
       map(resp => Array.isArray(resp) ? resp : (resp?.data || []))
     );
   }

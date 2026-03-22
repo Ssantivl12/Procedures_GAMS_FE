@@ -1,5 +1,6 @@
 import { ProcedureStatus, ProcedureKind, ProcedureTypeCode } from './enums';
 import { CaseFile } from './case-file.model';
+import { ProcedureCycle } from './procedure-cycle.model';
 
 export interface ProcedureType {
   id: number;
@@ -41,6 +42,7 @@ export interface Procedure {
   caseFile?: CaseFile & { company?: { id: string; legalName: string; nit?: string; category: string } };
   assignedInspector?: { id: string; firstName: string; lastName: string };
   createdBy?: { id: string; firstName: string; lastName: string };
+  cycles?: ProcedureCycle[];
 }
 
 export interface ProcedureAudit {

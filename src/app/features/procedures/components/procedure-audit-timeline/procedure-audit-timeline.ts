@@ -14,7 +14,7 @@ import { StatusBadgeComponent } from '../../../../shared/ui/status-badge/status-
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <h3 class="text-sm font-semibold text-foreground">Historial de Cambios</h3>
-        <span class="text-xs text-muted-foreground">({{ auditItems?.length || 0 }})</span>
+        <span class="text-xs text-muted-foreground">({{ auditItems.length || 0 }})</span>
       </div>
 
       @if (!auditItems || auditItems.length === 0) {

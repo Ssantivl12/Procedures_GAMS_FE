@@ -87,12 +87,12 @@ export class ObservationItemComponent {
   getIssuedByName(): string {
     const ib = this.observation.issuedBy;
     if (!ib) return '';
-    return (ib as any).fullName || `${(ib as any).firstName || ''} ${(ib as any).lastName || ''}`.trim();
+    return `${ib.firstName} ${ib.lastName}`.trim();
   }
 
   getResolvedByName(): string {
     const rb = this.observation.resolvedBy;
     if (!rb) return '';
-    return (rb as any).fullName || `${(rb as any).firstName || ''} ${(rb as any).lastName || ''}`.trim();
+    return `${rb.firstName} ${rb.lastName}`.trim();
   }
 }

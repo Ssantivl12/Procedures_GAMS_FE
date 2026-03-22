@@ -1,9 +1,11 @@
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { ChangeDetectorRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DocumentService } from '../../services/document.service';
 import { DocumentGroup } from '../../../../shared/models';
+import { showToast } from '../../../../shared/utils/toast.utils';
 
 @Component({
   selector: 'app-document-upload',
@@ -16,6 +18,7 @@ export class DocumentUploadComponent {
   private readonly fb = inject(FormBuilder);
   private readonly documentService = inject(DocumentService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly destroyRef = inject(DestroyRef);
 
   @Input({ required: true }) procedureId!: string;
   @Input() cycleId: string | null = null;
@@ -81,14 +84,17 @@ export class DocumentUploadComponent {
       val.docGroup as DocumentGroup,
       this.cycleId || undefined,
       val.description || undefined,
-    ).subscribe({
+    ).pipe(takeUntilDestroyed(this.destroyRef))
+    .subscribe({
       next: () => {
         this.isLoading = false;
+        showToast('success', 'Documento subido con éxito');
         this.uploaded.emit();
       },
       error: (err) => {
         this.isLoading = false;
         this.error = err?.error?.message || 'Error al subir el documento.';
+        showToast('error', this.error);
         this.cdr.detectChanges();
       },
     });

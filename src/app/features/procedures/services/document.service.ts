@@ -8,7 +8,7 @@ export class DocumentService {
   private readonly api = inject(ApiClient);
 
   getDocuments(procedureId: string, params?: Record<string, string | number | boolean>) {
-    return this.api.get<any>(`/procedures/${procedureId}/documents`, params).pipe(
+    return this.api.get<ProcedureDocument[] | { data: ProcedureDocument[] }>(`/procedures/${procedureId}/documents`, params).pipe(
       map(resp => Array.isArray(resp) ? resp : (resp?.data || []))
     );
   }
