@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { UserService, User } from '../../services/user.service';
 import { finalize } from 'rxjs';
+import { showToast } from '../../../../shared/utils/toast.utils';
 
 @Component({
   selector: 'app-user-form',
@@ -23,7 +24,6 @@ export class UserFormComponent implements OnInit {
   userForm: FormGroup;
   isLoading = false;
   submitted = false;
-  showSuccessModal = false;
   errorMessage: string | null = null;
 
   constructor() {
@@ -39,7 +39,6 @@ export class UserFormComponent implements OnInit {
 
   ngOnInit() {
     if (this.userToEdit) {
-      // Cargar nombres/apellidos directos del usuario
       this.userForm.patchValue({
         nombres: this.userToEdit.firstName || '',
         apellidos: this.userToEdit.lastName || '',
@@ -80,14 +79,11 @@ export class UserFormComponent implements OnInit {
     this.cdr.detectChanges();
     const formVals = this.userForm.value;
     
-    // Map to Backend DTO: CreateUserDto { email, password, firstName, lastName, roles: UserRole[] }
-    // En edición, password es opcional normalmente
     const mappedData: any = {
       email: formVals.correo,
       firstName: formVals.nombres.trim(),
       lastName: formVals.apellidos.trim(),
-      roles: [formVals.rol] // Backend expects an array
-      // Solo enviamos el password en creación o si realmente lo escribió (para actualización futura)
+      roles: [formVals.rol] 
     };
 
     if (formVals.password) {
@@ -100,9 +96,10 @@ export class UserFormComponent implements OnInit {
 
     request.subscribe({
       next: (resp) => {
-        console.log('Operación exitosa:', resp);
-        this.isLoading = false; // Detener carga inmediatamente
-        this.showSuccessModal = true;
+        this.isLoading = false;
+        const msg = this.userToEdit ? 'Datos actualizados correctamente.' : 'Personal registrado exitosamente.';
+        showToast('success', msg);
+        this.finishAndClose();
         this.cdr.detectChanges();
       },
       error: (err) => {

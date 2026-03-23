@@ -16,7 +16,7 @@ import { CommonModule } from '@angular/common';
 
         <div class="flex items-center space-x-3 w-full sm:w-auto">
             <button 
-                class="btn-primary-horus w-full sm:w-auto flex items-center justify-center gap-2"
+                class="cursor-pointer btn-primary-horus w-full sm:w-auto flex items-center justify-center gap-2"
                 (click)="onAddUser()"
             >
                 <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">

@@ -29,9 +29,9 @@ import { FormsModule } from '@angular/forms';
                     <label class="text-xs font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap">Ordenar por:</label>
                     <select [(ngModel)]="sortBy" (change)="onSortChange()"
                         class="bg-background border border-input text-foreground text-sm rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary block p-2 outline-none transition-all cursor-pointer">
-                        <option value="apellidos-asc">Apellidos (A-Z)</option>
-                        <option value="apellidos-desc">Apellidos (Z-A)</option>
-                        <option value="nombres-asc">Nombre (A-Z)</option>
+                        <option value="lastName-asc">Apellidos (A-Z)</option>
+                        <option value="lastName-desc">Apellidos (Z-A)</option>
+                        <option value="firstName-asc">Nombre (A-Z)</option>
                         <option value="createdAt-desc">Más recientes</option>
                     </select>
                 </div>
