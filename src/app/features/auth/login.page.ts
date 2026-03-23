@@ -130,7 +130,8 @@ interface LoginResponse {
 
     /* Form Styles */
     .form-group {
-      margin-bottom: 24px;
+      margin-bottom: 16px; 
+      position: relative;
     }
 
     label {
@@ -161,6 +162,12 @@ interface LoginResponse {
       border-color: var(--color-primary);
       box-shadow: 0 0 0 4px var(--color-accent);
       background-color: #ffffff;
+    }
+
+    .form-control.is-invalid {
+      border-color: var(--color-destructive) !important;
+      box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.1) !important;
+      background-color: #fffafb;
     }
 
     .password-wrapper {
@@ -278,22 +285,27 @@ interface LoginResponse {
       font-weight: 500;
     }
 
-    .error-message {
-      margin-top: 16px;
-      padding: 12px 16px;
-      border-radius: 12px;
-      background-color: var(--color-destructive);
-      color: #fff;
-      font-size: 13px;
+    .error-feedback {
+      color: var(--color-destructive); /* El rojo de tu sistema */
+      font-size: 11px;
       font-weight: 700;
-      text-align: center;
-      box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.2);
+      margin-top: 4px;
+      text-transform: none;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      animation: fadeIn 0.2s ease-in;
     }
 
     @keyframes pulse {
       0% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.7; transform: scale(1.1); }
       100% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   `],
   template: `
@@ -327,12 +339,13 @@ interface LoginResponse {
               id="usuario"
               type="email"
               class="form-control"
+              [class.is-invalid]="loginForm.get('usuario')?.invalid && loginForm.get('usuario')?.touched"
               placeholder="nombre@ejemplo.com"
               formControlName="usuario"
               autocomplete="username"
             />
-            <div *ngIf="loginForm.get('usuario')?.invalid && loginForm.get('usuario')?.touched" class="error-message" style="background: none; color: var(--color-destructive); box-shadow: none; text-align: left; padding: 4px 0;">
-              {{ loginForm.get('usuario')?.errors?.['email'] ? 'Correo inválido.' : 'Campo requerido.' }}
+            <div *ngIf="loginForm.get('usuario')?.invalid && loginForm.get('usuario')?.touched" class="error-feedback">
+              {{ loginForm.get('usuario')?.errors?.['email'] ? 'El formato de correo no es válido.' : 'Este campo es obligatorio.' }}
             </div>
           </div>
 
@@ -344,19 +357,29 @@ interface LoginResponse {
                 id="contrasena"
                 [type]="showPassword ? 'text' : 'password'"
                 class="form-control"
+                [class.is-invalid]="loginForm.get('contrasena')?.invalid && loginForm.get('contrasena')?.touched"
                 placeholder="••••••••"
                 formControlName="contrasena"
                 autocomplete="current-password"
               />
-              <button
-                type="button"
-                class="toggle-password"
+              <button 
+                type="button" 
+                class="toggle-password" 
                 (click)="togglePasswordVisibility()"
-                [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
-              >
-                <svg *ngIf="!showPassword" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
-                <svg *ngIf="showPassword" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064-7 9.542-7 1.225 0 2.39.218 3.475.613m1.34 1.34A9.961 9.961 0 0119.542 12c-1.274 4.057-5.064 7-9.542 7-1.225 0-2.39-.218-3.475-.613M9 9l6 6m0-6l-6 6" /></svg>
+                [title]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'">
+                
+                <svg *ngIf="!showPassword" class="icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+                  <path fill="currentColor" d="M320 144C254.8 144 201.2 173.6 160.1 211.7C121.6 247.5 95 290 81.4 320C95 350 121.6 392.5 160.1 428.3C201.2 466.4 254.8 496 320 496C385.2 496 438.8 466.4 479.9 428.3C518.4 392.5 545 350 558.6 320C545 290 518.4 247.5 479.9 211.7C438.8 173.6 385.2 144 320 144zM127.4 176.6C174.5 132.8 239.2 96 320 96C400.8 96 465.5 132.8 512.6 176.6C559.4 220.1 590.7 272 605.6 307.7C608.9 315.6 608.9 324.4 605.6 332.3C590.7 368 559.4 420 512.6 463.4C465.5 507.1 400.8 544 320 544C239.2 544 174.5 507.2 127.4 463.4C80.6 419.9 49.3 368 34.4 332.3C31.1 324.4 31.1 315.6 34.4 307.7C49.3 272 80.6 220 127.4 176.6zM320 400C364.2 400 400 364.2 400 320C400 290.4 383.9 264.5 360 250.7C358.6 310.4 310.4 358.6 250.7 360C264.5 383.9 290.4 400 320 400zM240.4 311.6C242.9 311.9 245.4 312 248 312C283.3 312 312 283.3 312 248C312 245.4 311.8 242.9 311.6 240.4C274.2 244.3 244.4 274.1 240.5 311.5zM286 196.6C296.8 193.6 308.2 192.1 319.9 192.1C328.7 192.1 337.4 193 345.7 194.7C346 194.8 346.2 194.8 346.5 194.9C404.4 207.1 447.9 258.6 447.9 320.1C447.9 390.8 390.6 448.1 319.9 448.1C258.3 448.1 206.9 404.6 194.7 346.7C192.9 338.1 191.9 329.2 191.9 320.1C191.9 309.1 193.3 298.3 195.9 288.1C196.1 287.4 196.2 286.8 196.4 286.2C208.3 242.8 242.5 208.6 285.9 196.7z"/>
+                </svg>
+
+                <svg *ngIf="showPassword" class="icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+                  <path fill="currentColor" d="M73 39.1C63.6 29.7 48.4 29.7 39.1 39.1C29.8 48.5 29.7 63.7 39 73.1L567 601.1C576.4 610.5 591.6 610.5 600.9 601.1C610.2 591.7 610.3 576.5 600.9 567.2L504.5 470.8C507.2 468.4 509.9 466 512.5 463.6C559.3 420.1 590.6 368.2 605.5 332.5C608.8 324.6 608.8 315.8 605.5 307.9C590.6 272.2 559.3 220.2 512.5 176.8C465.4 133.1 400.7 96.2 319.9 96.2C263.1 96.2 214.3 114.4 173.9 140.4L73 39.1zM208.9 175.1C241 156.2 278.1 144 320 144C385.2 144 438.8 173.6 479.9 211.7C518.4 247.4 545 290 558.5 320C544.9 350 518.3 392.5 479.9 428.3C476.8 431.1 473.7 433.9 470.5 436.7L425.8 392C439.8 371.5 448 346.7 448 320C448 249.3 390.7 192 320 192C293.3 192 268.5 200.2 248 214.2L208.9 175.1zM390.9 357.1L282.9 249.1C294 243.3 306.6 240 320 240C364.2 240 400 275.8 400 320C400 333.4 396.7 346 390.9 357.1zM135.4 237.2L101.4 203.2C68.8 240 46.4 279 34.5 307.7C31.2 315.6 31.2 324.4 34.5 332.3C49.4 368 80.7 420 127.5 463.4C174.6 507.1 239.3 544 320.1 544C357.4 544 391.3 536.1 421.6 523.4L384.2 486C364.2 492.4 342.8 496 320 496C254.8 496 201.2 466.4 160.1 428.3C121.6 392.6 95 350 81.5 320C91.9 296.9 110.1 266.4 135.5 237.2z"/>
+                </svg>
+
               </button>
+            </div>
+            <div *ngIf="loginForm.get('contrasena')?.invalid && loginForm.get('contrasena')?.touched" class="error-feedback">
+              Contraseña requerida para ingresar.
             </div>
           </div>
 
@@ -418,7 +441,6 @@ export class LoginPage {
     const { usuario, contrasena } = this.loginForm.value;
 
     try {
-      // Usamos el servicio de auth que ya utiliza ApiClient e interceptores
       const data = await this.auth.login(usuario, contrasena);
 
       if (data?.accessToken) {
@@ -427,8 +449,6 @@ export class LoginPage {
         this.loginError = 'Respuesta del servidor inválida.';
       }
     } catch (err: any) {
-      // Los errores ya vienen formateados como AppError por el errorInterceptor
-      // o son errores de conexión (status 0)
       this.loginError = err.message || 'No se pudo conectar con el servidor.';
       console.error('Login error:', err);
     } finally {
