@@ -1,7 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, OnInit, DestroyRef } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
+import { interval } from 'rxjs';
+import { startWith, switchMap } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService, UserRole } from '../../../../core/auth/auth.service';
+import { AlertsService } from '../../services/alerts.service';
 
 type SidebarLink = {
   label: string;
@@ -18,16 +22,18 @@ type SidebarLink = {
   templateUrl: './dashboard-sidebar.html',
   styleUrl: './dashboard-sidebar.css',
 })
-export class DashboardSidebarComponent {
+export class DashboardSidebarComponent implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly alertsService = inject(AlertsService);
+  private readonly destroyRef = inject(DestroyRef);
 
   @Input() isOpen = false;
   @Input() isCollapsed = false;
   @Output() close = new EventEmitter<void>();
   @Output() toggleCollapse = new EventEmitter<void>();
 
-  readonly links: SidebarLink[] = [
+  links: SidebarLink[] = [
     { 
       label: 'Inicio', 
       route: '/dashboard', 
@@ -77,6 +83,26 @@ export class DashboardSidebarComponent {
       roles: [UserRole.SUPERADMIN, UserRole.ENCARGADO]
     },
   ];
+
+  ngOnInit(): void {
+    // Poll alerts every 5 minutes as per contract
+    interval(5 * 60 * 1000)
+      .pipe(
+        startWith(0),
+        switchMap(() => this.alertsService.getSummary()),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: (summary) => {
+          // Find "Inicio" link and update its badgeCount with total alerts
+          const homeLink = this.links.find(l => l.route === '/dashboard');
+          if (homeLink) {
+            homeLink.badgeCount = summary.total;
+          }
+        },
+        error: (err) => console.error('Error polling alerts:', err)
+      });
+  }
 
   get availableLinks(): SidebarLink[] {
     return this.links.filter(link => !link.roles || this.auth.hasRole(link.roles));

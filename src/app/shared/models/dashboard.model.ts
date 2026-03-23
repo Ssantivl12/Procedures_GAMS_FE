@@ -96,4 +96,6 @@ export interface AlertsSummary {
   pendingPickup: number;
   raiExpiration: number;
   iaaMissing: number;
+  total: number;
+  asOf: string;
 }

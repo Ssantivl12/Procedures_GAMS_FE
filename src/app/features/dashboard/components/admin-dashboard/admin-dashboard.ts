@@ -8,7 +8,7 @@ import { StatCardComponent } from '../stat-card/stat-card';
 import { EmptyStateComponent } from '../../../../shared/ui/empty-state/empty-state';
 import {
   AdminDashboard, OverdueItem, InspectorWorkload,
-  AlertsSummary, ProcedureStatus,
+  AlertsSummary, ProcedureStatus, RaiExpirationAlert,
 } from '../../../../shared/models';
 
 @Component({
@@ -50,6 +50,14 @@ export class AdminDashboardComponent implements OnInit {
 
   get overdueList(): OverdueItem[] {
     return this.dashboard?.overdueList?.slice(0, 8) || [];
+  }
+
+  get iaaDelinquent(): any[] {
+    return this.dashboard?.iaaDelinquent || [];
+  }
+
+  get raiExpirationAlerts(): RaiExpirationAlert[] {
+    return this.dashboard?.raiExpirationAlerts || [];
   }
 
   ngOnInit(): void {

@@ -1,23 +1,23 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef } from '@angular/core';
+import { DashboardHeaderComponent } from '../../../dashboard/components/dashboard-header/dashboard-header';
 import { ReportFiltersComponent } from '../../components/report-filters/report-filters';
 import {
   ReportsService,
   ReportFilters,
   ProcedureReportRow,
-  StatusSummaryRow,
-  TypeSummaryRow,
-  InspectorReportRow,
+  CompanyReportRow,
+  ActivityReportRow,
 } from '../../services/reports.service';
 import { ProcedureStatus } from '../../../../shared/models';
 
-type ReportTab = 'procedures' | 'status' | 'types' | 'inspectors';
+type ReportTab = 'procedures' | 'companies' | 'expired-rai' | 'iaa-status' | 'activity';
 
 @Component({
   selector: 'app-reports-page',
   standalone: true,
-  imports: [CommonModule, ReportFiltersComponent],
+  imports: [CommonModule, DashboardHeaderComponent, ReportFiltersComponent],
   templateUrl: './reports-page.html',
   styleUrl: './reports-page.css',
 })
@@ -31,9 +31,10 @@ export class ReportsPageComponent implements OnInit {
   currentFilters: ReportFilters = {};
 
   proceduresData: ProcedureReportRow[] = [];
-  statusData: StatusSummaryRow[] = [];
-  typeData: TypeSummaryRow[] = [];
-  inspectorData: InspectorReportRow[] = [];
+  companiesData: CompanyReportRow[] = [];
+  expiredRaiData: CompanyReportRow[] = [];
+  iaaStatusData: CompanyReportRow[] = [];
+  activityData: ActivityReportRow | null = null;
 
   ngOnInit(): void {
     this.loadReport();
@@ -60,22 +61,28 @@ export class ReportsPageComponent implements OnInit {
           error: () => { this.proceduresData = []; this.isLoading = false; this.cdr.detectChanges(); },
         });
         break;
-      case 'status':
-        this.reportsService.getStatusSummary(filters).subscribe({
-          next: (data) => { this.statusData = data; this.isLoading = false; this.cdr.detectChanges(); },
-          error: () => { this.statusData = []; this.isLoading = false; this.cdr.detectChanges(); },
+      case 'companies':
+        this.reportsService.getCompanies(filters).subscribe({
+          next: (data) => { this.companiesData = data; this.isLoading = false; this.cdr.detectChanges(); },
+          error: () => { this.companiesData = []; this.isLoading = false; this.cdr.detectChanges(); },
         });
         break;
-      case 'types':
-        this.reportsService.getTypeSummary(filters).subscribe({
-          next: (data) => { this.typeData = data; this.isLoading = false; this.cdr.detectChanges(); },
-          error: () => { this.typeData = []; this.isLoading = false; this.cdr.detectChanges(); },
+      case 'expired-rai':
+        this.reportsService.getExpiredRai(filters).subscribe({
+          next: (data) => { this.expiredRaiData = data; this.isLoading = false; this.cdr.detectChanges(); },
+          error: () => { this.expiredRaiData = []; this.isLoading = false; this.cdr.detectChanges(); },
         });
         break;
-      case 'inspectors':
-        this.reportsService.getInspectorReport(filters).subscribe({
-          next: (data) => { this.inspectorData = data; this.isLoading = false; this.cdr.detectChanges(); },
-          error: () => { this.inspectorData = []; this.isLoading = false; this.cdr.detectChanges(); },
+      case 'iaa-status':
+        this.reportsService.getIaaStatus(filters).subscribe({
+          next: (data) => { this.iaaStatusData = data; this.isLoading = false; this.cdr.detectChanges(); },
+          error: () => { this.iaaStatusData = []; this.isLoading = false; this.cdr.detectChanges(); },
+        });
+        break;
+      case 'activity':
+        this.reportsService.getActivity(filters).subscribe({
+          next: (data) => { this.activityData = data; this.isLoading = false; this.cdr.detectChanges(); },
+          error: () => { this.activityData = null; this.isLoading = false; this.cdr.detectChanges(); },
         });
         break;
     }

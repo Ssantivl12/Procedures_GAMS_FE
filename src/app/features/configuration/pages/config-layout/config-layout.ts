@@ -23,9 +23,9 @@ import { DashboardHeaderComponent } from '../../../dashboard/components/dashboar
       <main class="main-content">
         <div class="max-w-[1400px] mx-auto p-4 sm:p-6 lg:p-8 animate-fade-in">
           <!-- Header Section -->
-          <header class="mb-8">
-            <h1 class="text-3xl font-extrabold text-foreground tracking-tight">Configuración del Sistema</h1>
-            <p class="text-base text-muted-foreground mt-2 max-w-2xl">
+          <header class="mb-6">
+            <h1 class="text-2xl font-bold text-foreground">Configuración del Sistema</h1>
+            <p class="text-sm text-muted-foreground mt-1">
               Gestión centralizada de tipos de trámite, plazos de respuesta y calendario de días no laborables. 
               <span *ngIf="!isSuperAdmin()" class="inline-flex items-center gap-1.5 ml-2 text-primary font-medium">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>

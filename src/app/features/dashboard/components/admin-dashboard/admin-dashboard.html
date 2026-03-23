@@ -148,4 +148,41 @@
     </div>
   </div>
 
+  <!-- RAI Expiration Alerts -->
+  @if (raiExpirationAlerts.length > 0) {
+    <div class="section mt-8">
+      <div class="section-header">
+        <h2 class="section-title">Semáforo RAI (Vencidos o Por Vencer)</h2>
+        <span class="badge-count warning">{{ raiExpirationAlerts.length }}</span>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Empresa</th>
+              <th>Nro. RAI</th>
+              <th>Vencimiento</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of raiExpirationAlerts; track item.companyId) {
+              <tr>
+                <td class="font-medium">{{ item.companyName }}</td>
+                <td class="font-mono text-xs">{{ item.raiNumber }}</td>
+                <td class="text-sm">{{ formatDate(item.expirationDate) }}</td>
+                <td>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase"
+                        [ngClass]="{ 'bg-red-100 text-red-700': item.status === 'VENCIDO', 'bg-amber-100 text-amber-700': item.status === 'POR_VENCER' }">
+                    {{ item.status === 'VENCIDO' ? 'Vencido' : 'Por Vencer' }}
+                  </span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+
 }

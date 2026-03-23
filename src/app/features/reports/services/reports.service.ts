@@ -1,48 +1,63 @@
 import { Injectable, inject } from '@angular/core';
 import { ApiClient } from '../../../api/api-client';
 import { ProcedureStatus, ProcedureTypeCode } from '../../../shared/models';
+import { PaginatedResponse } from '../../../shared/models/paginated-response';
+import { map } from 'rxjs/operators';
 
 export interface ReportFilters {
   dateFrom?: string;
   dateTo?: string;
-  status?: ProcedureStatus;
-  procedureType?: ProcedureTypeCode;
-  inspectorId?: number;
+  currentStatus?: ProcedureStatus;
+  procedureTypeCode?: ProcedureTypeCode;
+  assignedInspectorId?: string;
+  category?: string;
+  municipality?: string;
+  format?: 'json' | 'csv';
+  page?: number;
+  limit?: number;
 }
 
 export interface ProcedureReportRow {
-  id: number;
+  procedureId: string;
+  caseFileCode: string;
   companyName: string;
   procedureType: string;
-  status: ProcedureStatus;
-  receivedDate: string;
-  closedDate: string | null;
-  inspectorName: string | null;
+  procedureKind: string;
+  currentStatus: ProcedureStatus;
+  cycleCount: number;
+  receptionDate: string;
+  reviewStartDate: string | null;
+  deadlineDate: string | null;
   daysElapsed: number;
   isOverdue: boolean;
+  approvalDate: string | null;
+  expirationDate: string | null;
+  approvalCertificate: string | null;
+  assignedInspectorName: string | null;
+  routeSheetNumber: string | null;
+  openObservationsCount: number;
 }
 
-export interface StatusSummaryRow {
-  status: ProcedureStatus;
-  count: number;
-  percentage: number;
+export interface CompanyReportRow {
+  companyId: string;
+  legalName: string;
+  raiNumber: string;
+  category: string;
+  currentStatus: string;
+  lastProcedureDate: string | null;
+  raiExpirationDate: string | null;
+  raiStatus: string;
 }
 
-export interface TypeSummaryRow {
-  procedureType: string;
-  total: number;
-  active: number;
+export interface ActivityReportRow {
+  period: { from: string; to: string };
+  received: number;
   closed: number;
-  avgDays: number;
-}
-
-export interface InspectorReportRow {
-  inspectorId: number;
-  inspectorName: string;
-  assigned: number;
-  closed: number;
-  overdue: number;
-  avgDays: number;
+  abandoned: number;
+  avgDaysToClose: number;
+  avgCyclesPerProcedure: number;
+  byType: Record<string, { received: number; closed: number; abandoned: number }>;
+  byInspector: Record<string, { closed: number; abandoned: number }>;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -51,33 +66,44 @@ export class ReportsService {
   private readonly basePath = '/reports';
 
   getProcedures(filters?: ReportFilters) {
-    return this.api.get<ProcedureReportRow[]>(`${this.basePath}/procedures`, this.toParams(filters));
+    return this.api.get<PaginatedResponse<ProcedureReportRow>>(`${this.basePath}/procedures`, this.toParams(filters))
+      .pipe(map(res => res.data));
   }
 
-  getStatusSummary(filters?: ReportFilters) {
-    return this.api.get<StatusSummaryRow[]>(`${this.basePath}/status-summary`, this.toParams(filters));
+  getCompanies(filters?: ReportFilters) {
+    return this.api.get<PaginatedResponse<CompanyReportRow>>(`${this.basePath}/companies`, this.toParams(filters))
+      .pipe(map(res => res.data));
   }
 
-  getTypeSummary(filters?: ReportFilters) {
-    return this.api.get<TypeSummaryRow[]>(`${this.basePath}/type-summary`, this.toParams(filters));
+  getExpiredRai(filters?: ReportFilters) {
+    return this.api.get<PaginatedResponse<CompanyReportRow>>(`${this.basePath}/expired-rai`, this.toParams(filters))
+      .pipe(map(res => res.data));
   }
 
-  getInspectorReport(filters?: ReportFilters) {
-    return this.api.get<InspectorReportRow[]>(`${this.basePath}/inspectors`, this.toParams(filters));
+  getIaaStatus(filters?: ReportFilters) {
+    return this.api.get<PaginatedResponse<CompanyReportRow>>(`${this.basePath}/iaa-status`, this.toParams(filters))
+      .pipe(map(res => res.data));
+  }
+
+  getActivity(filters?: ReportFilters) {
+    return this.api.get<ActivityReportRow>(`${this.basePath}/activity`, this.toParams(filters));
   }
 
   exportCsv(reportType: string, filters?: ReportFilters) {
-    return this.api.getBlob(`${this.basePath}/${reportType}/csv`, this.toParams(filters));
+    return this.api.getBlob(`${this.basePath}/${reportType}`, {
+      ...this.toParams(filters),
+      format: 'csv'
+    });
   }
 
   private toParams(filters?: ReportFilters): Record<string, string | number | boolean> | undefined {
     if (!filters) return undefined;
     const params: Record<string, string | number | boolean> = {};
-    if (filters.dateFrom) params['dateFrom'] = filters.dateFrom;
-    if (filters.dateTo) params['dateTo'] = filters.dateTo;
-    if (filters.status) params['status'] = filters.status;
-    if (filters.procedureType) params['procedureType'] = filters.procedureType;
-    if (filters.inspectorId) params['inspectorId'] = filters.inspectorId;
+    Object.entries(filters).forEach(([k, v]) => {
+      if (v !== undefined && v !== null) {
+        params[k] = v;
+      }
+    });
     return Object.keys(params).length ? params : undefined;
   }
 }

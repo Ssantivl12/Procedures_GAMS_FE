@@ -9,11 +9,11 @@ export interface ProcedureType {
 
 export interface DeadlineConfig {
   id: string;
-  procedureType: string; // Enum code
+  procedureType: string; 
   cycleNumber: number;
-  workingDays: number; // For FE
-  deadlineDays?: number; // From BE
-  procedureTypeData?: ProcedureType; // Renamed to avoid confusion if needed
+  workingDays: number; 
+  deadlineDays?: number; 
+  procedureTypeData?: ProcedureType; 
 }
 
 export interface NonWorkingDay {

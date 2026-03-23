@@ -1,162 +1,195 @@
-<div class="reports-page">
-  <div class="reports-header">
-    <h1 class="reports-title">Reportes</h1>
-    <p class="reports-subtitle">Informes y estadísticas del sistema de trámites</p>
+<div class="page-wrapper">
+  <app-dashboard-header></app-dashboard-header>
+  <div class="reports-page">
+    <div class="reports-header text-start mb-8">
+    <h1 class="reports-title text-3xl font-bold tracking-tight">Reportes</h1>
+    <p class="reports-subtitle text-muted-foreground mt-2">Informes y estadísticas del sistema de trámites</p>
   </div>
 
-  <div class="reports-tabs">
-    <button class="tab-btn" [class.active]="activeTab === 'procedures'" (click)="switchTab('procedures')">
+  <div class="reports-tabs flex justify-center gap-1 mb-6 p-1 bg-muted/30 rounded-lg w-fit mx-auto">
+    <button class="tab-btn px-4 py-2 text-sm font-medium rounded-md transition-all" 
+            [class.active]="activeTab === 'procedures'" [class.bg-background]="activeTab === 'procedures'" 
+            [class.shadow-sm]="activeTab === 'procedures'" (click)="switchTab('procedures')">
       Trámites
     </button>
-    <button class="tab-btn" [class.active]="activeTab === 'status'" (click)="switchTab('status')">
-      Por Estado
+    <button class="tab-btn px-4 py-2 text-sm font-medium rounded-md transition-all" 
+            [class.active]="activeTab === 'companies'" [class.bg-background]="activeTab === 'companies'" 
+            [class.shadow-sm]="activeTab === 'companies'" (click)="switchTab('companies')">
+      Empresas
     </button>
-    <button class="tab-btn" [class.active]="activeTab === 'types'" (click)="switchTab('types')">
-      Por Tipo
+    <button class="tab-btn px-4 py-2 text-sm font-medium rounded-md transition-all" 
+            [class.active]="activeTab === 'expired-rai'" [class.bg-background]="activeTab === 'expired-rai'" 
+            [class.shadow-sm]="activeTab === 'expired-rai'" (click)="switchTab('expired-rai')">
+      Vencimientos RAI
     </button>
-    <button class="tab-btn" [class.active]="activeTab === 'inspectors'" (click)="switchTab('inspectors')">
-      Inspectores
+    <button class="tab-btn px-4 py-2 text-sm font-medium rounded-md transition-all" 
+            [class.active]="activeTab === 'iaa-status'" [class.bg-background]="activeTab === 'iaa-status'" 
+            [class.shadow-sm]="activeTab === 'iaa-status'" (click)="switchTab('iaa-status')">
+      Estado IAA
+    </button>
+    <button class="tab-btn px-4 py-2 text-sm font-medium rounded-md transition-all" 
+            [class.active]="activeTab === 'activity'" [class.bg-background]="activeTab === 'activity'" 
+            [class.shadow-sm]="activeTab === 'activity'" (click)="switchTab('activity')">
+      Actividad
     </button>
   </div>
 
-  <div class="report-content">
+  <div class="report-content max-w-7xl mx-auto px-4 lg:px-8">
     <app-report-filters
-      [showStatus]="activeTab === 'procedures'"
-      [showType]="activeTab === 'procedures' || activeTab === 'types'"
+      [showStatus]="activeTab === 'procedures' || activeTab === 'companies'"
+      [showType]="activeTab === 'procedures' || activeTab === 'activity'"
       [exporting]="isExporting"
       (filtersChange)="onFiltersChange($event)"
       (exportCsv)="onExportCsv()"
     />
 
     @if (isLoading) {
-      <div class="loading-state">
-        <div class="spinner"></div>
-        <span>Cargando reporte...</span>
+      <div class="loading-state flex flex-col items-center justify-center py-20 gap-4">
+        <div class="spinner animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full"></div>
+        <span class="text-muted-foreground font-medium animate-pulse">Cargando reporte...</span>
       </div>
     } @else {
 
       <!-- Procedures report -->
       @if (activeTab === 'procedures') {
-        <div class="table-container">
-          <table class="report-table">
-            <thead>
+        <div class="table-container bg-card border rounded-xl overflow-hidden shadow-sm">
+          <table class="report-table w-full text-left border-collapse">
+            <thead class="bg-muted/50">
               <tr>
-                <th>Empresa</th>
-                <th>Tipo</th>
-                <th>Estado</th>
-                <th>Fecha Recepción</th>
-                <th>Fecha Cierre</th>
-                <th>Inspector</th>
-                <th>Días</th>
+                <th class="px-4 py-3 text-xs font-bold text-muted-foreground uppercase border-b">Expediente</th>
+                <th class="px-4 py-3 text-xs font-bold text-muted-foreground uppercase border-b">Empresa</th>
+                <th class="px-4 py-3 text-xs font-bold text-muted-foreground uppercase border-b">Tipo/Clase</th>
+                <th class="px-4 py-3 text-xs font-bold text-muted-foreground uppercase border-b">Estado</th>
+                <th class="px-4 py-3 text-xs font-bold text-muted-foreground uppercase border-b">F. Recepción</th>
+                <th class="px-4 py-3 text-xs font-bold text-muted-foreground uppercase border-b">F. Límite</th>
+                <th class="px-4 py-3 text-xs font-bold text-muted-foreground uppercase border-b">Info</th>
               </tr>
             </thead>
-            <tbody>
-              @for (r of proceduresData; track r.id) {
-                <tr [class.row-overdue]="r.isOverdue">
-                  <td>{{ r.companyName }}</td>
-                  <td>{{ r.procedureType }}</td>
-                  <td>{{ statusLabel(r.status) }}</td>
-                  <td>{{ formatDate(r.receivedDate) }}</td>
-                  <td>{{ r.closedDate ? formatDate(r.closedDate) : '—' }}</td>
-                  <td>{{ r.inspectorName || '—' }}</td>
-                  <td>
-                    {{ r.daysElapsed }}
-                    @if (r.isOverdue) {
-                      <span class="overdue-tag">Vencido</span>
-                    }
+            <tbody class="divide-y">
+              @for (r of proceduresData; track r.procedureId) {
+                <tr class="hover:bg-muted/30 transition-colors" [class.bg-red-50/50]="r.isOverdue">
+                  <td class="px-4 py-3 font-mono text-xs">{{ r.caseFileCode }}</td>
+                  <td class="px-4 py-3 text-sm font-medium">{{ r.companyName }}</td>
+                  <td class="px-4 py-3">
+                    <div class="text-xs">{{ r.procedureType }}</div>
+                    <div class="text-[10px] text-muted-foreground uppercase">{{ r.procedureKind }}</div>
+                  </td>
+                  <td class="px-4 py-3 text-xs">{{ statusLabel(r.currentStatus) }}</td>
+                  <td class="px-4 py-3 text-xs">{{ formatDate(r.receptionDate) }}</td>
+                  <td class="px-4 py-3 text-xs">{{ r.deadlineDate ? formatDate(r.deadlineDate) : '—' }}</td>
+                  <td class="px-4 py-3">
+                    <div class="flex flex-col gap-1">
+                      <span class="text-[10px] whitespace-nowrap">Ciclos: {{ r.cycleCount }}</span>
+                      @if (r.isOverdue) {
+                        <span class="inline-flex items-center px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-red-100 text-red-700 uppercase">Vencido</span>
+                      }
+                    </div>
                   </td>
                 </tr>
               } @empty {
-                <tr><td colspan="7" style="text-align:center; padding:2rem; color:hsl(var(--muted-foreground))">Sin datos para los filtros seleccionados</td></tr>
+                <tr><td colspan="7" class="text-center py-12 text-muted-foreground italic">Sin datos para los filtros seleccionados</td></tr>
               }
             </tbody>
           </table>
         </div>
       }
 
-      <!-- Status summary -->
-      @if (activeTab === 'status') {
-        <div class="summary-grid">
-          @for (s of statusData; track s.status) {
-            <div class="summary-card">
-              <p class="summary-card-label">{{ statusLabel(s.status) }}</p>
-              <p class="summary-card-value">{{ s.count }}</p>
-              <p class="summary-card-sub">{{ s.percentage | number:'1.1-1' }}%</p>
-              <div class="pct-bar">
-                <div class="pct-fill" [style.width.%]="s.percentage"></div>
-              </div>
+      <!-- Companies / Expired RAI / IAA Status reports -->
+      @if (activeTab === 'companies' || activeTab === 'expired-rai' || activeTab === 'iaa-status') {
+        @let currentData = activeTab === 'companies' ? companiesData : 
+                          activeTab === 'expired-rai' ? expiredRaiData : iaaStatusData;
+        <div class="table-container bg-card border rounded-xl overflow-hidden shadow-sm">
+          <table class="report-table w-full text-left border-collapse">
+            <thead class="bg-muted/50">
+              <tr>
+                <th class="px-4 py-3 text-xs font-bold text-muted-foreground uppercase border-b">Empresa</th>
+                <th class="px-4 py-3 text-xs font-bold text-muted-foreground uppercase border-b">RAI</th>
+                <th class="px-4 py-3 text-xs font-bold text-muted-foreground uppercase border-b">Categoría</th>
+                <th class="px-4 py-3 text-xs font-bold text-muted-foreground uppercase border-b">Estado Expt.</th>
+                <th class="px-4 py-3 text-xs font-bold text-muted-foreground uppercase border-b">Vencimientos</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y">
+              @for (c of currentData; track c.companyId) {
+                <tr class="hover:bg-muted/30 transition-colors">
+                  <td class="px-4 py-3 text-sm font-medium">{{ c.legalName }}</td>
+                  <td class="px-4 py-3 font-mono text-xs">{{ c.raiNumber }}</td>
+                  <td class="px-4 py-3 text-xs">{{ c.category }}</td>
+                  <td class="px-4 py-3 text-xs">{{ c.currentStatus }}</td>
+                  <td class="px-4 py-3">
+                    <div class="flex flex-col gap-1">
+                      <span class="text-[10px]">RAI: {{ c.raiExpirationDate ? formatDate(c.raiExpirationDate) : '—' }}</span>
+                      @if (c.raiStatus === 'VENCIDO') {
+                        <span class="w-fit px-1.5 py-0.5 bg-red-100 text-red-700 text-[9px] font-bold rounded uppercase">RAI Vencido</span>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              } @empty {
+                <tr><td colspan="5" class="text-center py-12 text-muted-foreground italic">Sin datos</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+
+      <!-- Activity report -->
+      @if (activeTab === 'activity' && activityData) {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div class="p-4 bg-muted/20 border rounded-xl">
+            <p class="text-xs font-bold text-muted-foreground uppercase">Recibidos</p>
+            <p class="text-2xl font-bold">{{ activityData.received }}</p>
+          </div>
+          <div class="p-4 bg-muted/20 border rounded-xl">
+            <p class="text-xs font-bold text-muted-foreground uppercase">Cerrados</p>
+            <p class="text-2xl font-bold">{{ activityData.closed }}</p>
+          </div>
+          <div class="p-4 bg-muted/20 border rounded-xl">
+            <p class="text-xs font-bold text-muted-foreground uppercase">Abandonados</p>
+            <p class="text-2xl font-bold text-red-600">{{ activityData.abandoned }}</p>
+          </div>
+          <div class="p-4 bg-muted/20 border rounded-xl">
+            <p class="text-xs font-bold text-muted-foreground uppercase">Promedio Días</p>
+            <p class="text-2xl font-bold">{{ activityData.avgDaysToClose | number:'1.1-1' }}</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div class="bg-card border rounded-xl p-6">
+            <h3 class="text-sm font-bold mb-4 uppercase text-muted-foreground">Por Tipo de Trámite</h3>
+            <div class="space-y-4">
+              @for (item of activityData.byType | keyvalue; track item.key) {
+                <div class="space-y-1">
+                  <div class="flex justify-between text-xs">
+                    <span class="font-medium">{{ item.key }}</span>
+                    <span>{{ item.value.closed }}/{{ item.value.received }}</span>
+                  </div>
+                  <div class="h-2 bg-muted rounded-full overflow-hidden">
+                    <div class="h-full bg-primary" [style.width.%]="(item.value.closed / (item.value.received || 1)) * 100"></div>
+                  </div>
+                </div>
+              }
             </div>
-          } @empty {
-            <p style="text-align:center; padding:2rem; color:hsl(var(--muted-foreground))">Sin datos</p>
-          }
-        </div>
-      }
+          </div>
 
-      <!-- Type summary -->
-      @if (activeTab === 'types') {
-        <div class="table-container">
-          <table class="report-table">
-            <thead>
-              <tr>
-                <th>Tipo de Trámite</th>
-                <th>Total</th>
-                <th>Activos</th>
-                <th>Cerrados</th>
-                <th>Promedio Días</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (t of typeData; track t.procedureType) {
-                <tr>
-                  <td>{{ t.procedureType }}</td>
-                  <td><strong>{{ t.total }}</strong></td>
-                  <td>{{ t.active }}</td>
-                  <td>{{ t.closed }}</td>
-                  <td>{{ t.avgDays | number:'1.0-0' }} días</td>
-                </tr>
-              } @empty {
-                <tr><td colspan="5" style="text-align:center; padding:2rem; color:hsl(var(--muted-foreground))">Sin datos</td></tr>
+          <div class="bg-card border rounded-xl p-6">
+            <h3 class="text-sm font-bold mb-4 uppercase text-muted-foreground">Rendimiento Inspectores</h3>
+            <div class="space-y-4">
+              @for (item of activityData.byInspector | keyvalue; track item.key) {
+                <div class="flex items-center justify-between text-xs border-b pb-2 last:border-0">
+                  <span class="font-medium">{{ item.key }}</span>
+                  <div class="flex gap-4">
+                    <span class="text-emerald-600">✓ {{ item.value.closed }}</span>
+                    <span class="text-red-600">✗ {{ item.value.abandoned }}</span>
+                  </div>
+                </div>
               }
-            </tbody>
-          </table>
-        </div>
-      }
-
-      <!-- Inspector report -->
-      @if (activeTab === 'inspectors') {
-        <div class="table-container">
-          <table class="report-table">
-            <thead>
-              <tr>
-                <th>Inspector</th>
-                <th>Asignados</th>
-                <th>Cerrados</th>
-                <th>Vencidos</th>
-                <th>Promedio Días</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (i of inspectorData; track i.inspectorId) {
-                <tr>
-                  <td>{{ i.inspectorName }}</td>
-                  <td><strong>{{ i.assigned }}</strong></td>
-                  <td>{{ i.closed }}</td>
-                  <td>
-                    {{ i.overdue }}
-                    @if (i.overdue > 0) {
-                      <span class="overdue-tag">{{ i.overdue }}</span>
-                    }
-                  </td>
-                  <td>{{ i.avgDays | number:'1.0-0' }} días</td>
-                </tr>
-              } @empty {
-                <tr><td colspan="5" style="text-align:center; padding:2rem; color:hsl(var(--muted-foreground))">Sin datos</td></tr>
-              }
-            </tbody>
-          </table>
+            </div>
+          </div>
         </div>
       }
 
     }
   </div>
+</div>
 </div>

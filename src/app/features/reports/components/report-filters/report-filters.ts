@@ -21,7 +21,7 @@ import { ReportFilters } from '../../services/reports.service';
       @if (showStatus) {
         <div class="filter-group">
           <label>Estado</label>
-          <select [(ngModel)]="filters.status" (ngModelChange)="onApply()">
+          <select [(ngModel)]="filters.currentStatus" (ngModelChange)="onApply()">
             <option [ngValue]="undefined">Todos</option>
             @for (s of statuses; track s) {
               <option [value]="s">{{ statusLabel(s) }}</option>
@@ -32,7 +32,7 @@ import { ReportFilters } from '../../services/reports.service';
       @if (showType) {
         <div class="filter-group">
           <label>Tipo</label>
-          <select [(ngModel)]="filters.procedureType" (ngModelChange)="onApply()">
+          <select [(ngModel)]="filters.procedureTypeCode" (ngModelChange)="onApply()">
             <option [ngValue]="undefined">Todos</option>
             @for (t of types; track t) {
               <option [value]="t">{{ t }}</option>
