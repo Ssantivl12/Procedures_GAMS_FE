@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { ApiClient } from '../../../api/api-client';
 import { PaginatedResponse } from '../../../shared/models';
 
-// ── Sub-interfaces ────────────────────────────────────────────────────────────
+// Sub-interfaces
 
 export interface RawMaterial {
   name:     string;
@@ -15,7 +15,7 @@ export interface FinalProduct {
   unit:     string;
 }
 
-// ── Option constants (mirror of backend) ─────────────────────────────────────
+// Option constants 
 
 export const DISTRICTS = [
   'DISTRITO 1', 'DISTRITO 2', 'DISTRITO 3', 'DISTRITO 4',
@@ -40,7 +40,7 @@ export const WATER_SUPPLY_OPTIONS = [
   'EMAPAS', 'POZO+COOPERATIVA', 'OTROS',
 ] as const;
 
-// ── Main interface ────────────────────────────────────────────────────────────
+// Main interface 
 
 export interface Company {
   id:        string;

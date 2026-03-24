@@ -77,33 +77,54 @@
           <!-- STEP 1: Identificación -->
           <div *ngIf="currentStep === 1" class="flex flex-col gap-4 pt-2">
 
+            <!-- Unidad Industrial -->
             <div class="form-group">
-              <label>Unidad Industrial *</label>
+              <label>
+                Unidad Industrial
+                <span class="required-star">*</span>
+              </label>
               <input type="text" formControlName="legalName"
                 placeholder="Ej: INDUSTRIAS DEL VALLE S.A."
-                [class.is-invalid]="submitted && f['legalName'].invalid">
-              <div *ngIf="submitted && f['legalName'].errors?.['required']" class="invalid-feedback">
-                La Unidad Industrial es obligatoria (mín. 3 caracteres)
+                [class.is-invalid]="isInvalid('legalName')">
+              <div *ngIf="isInvalid('legalName')" class="field-error">
+                <svg class="error-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>La Unidad Industrial es obligatoria.</span>
               </div>
             </div>
 
             <!-- CAEB -->
             <div class="form-group">
-              <label>Código(s) CAEB *</label>
+              <label>
+                Código(s) CAEB
+                <span class="required-star">*</span>
+              </label>
               <div class="flex gap-2">
                 <input type="text" [(ngModel)]="caebInput" [ngModelOptions]="{standalone: true}"
-                  placeholder="Ej: 12345" minlength="5" maxlength="10" (keyup.enter)="addCaeb()" class="flex-1">
+                  placeholder="Ej: 12345" maxlength="10"
+                  (keyup.enter)="addCaeb()"
+                  [class.is-invalid]="caebInvalid || !!caebError"
+                  class="flex-1">
                 <button type="button" (click)="addCaeb()"
-                  class="cursor-pointer px-4 py-2 bg-accent rounded-xl text-xs font-bold hover:bg-accent/80 transition-colors">
+                  class="cursor-pointer px-4 py-2 bg-accent rounded-xl text-xs font-bold hover:bg-accent/80 transition-colors shrink-0">
                   Agregar
                 </button>
               </div>
+              <!-- Input-level CAEB error -->
+              <div *ngIf="caebError" class="field-error">
+                <svg class="error-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>{{ caebError }}</span>
+              </div>
+              <!-- Submit-level CAEB error -->
+              <div *ngIf="caebInvalid && !caebError" class="field-error">
+                <svg class="error-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>Debe agregar al menos un código CAEB (5–10 dígitos).</span>
+              </div>
               <div class="flex flex-wrap gap-2 mt-2">
                 <div *ngFor="let code of caebList; let i = index"
-                  class="flex items-center gap-1.5 bg-primary/10 text-primary text-xs font-bold px-3 py-1.5 rounded-lg border border-primary/20">
+                  class="caeb-chip">
                   {{ code }}
-                  <button type="button" (click)="removeCaeb(i)" class="hover:text-destructive transition-colors">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                  <button type="button" (click)="removeCaeb(i)" class="caeb-chip__remove" title="Eliminar">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
                       <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/>
                     </svg>
                   </button>
@@ -119,15 +140,19 @@
                   placeholder="Descripción de actividad">
               </div>
               <div class="form-group">
-                <label>Categoría Unidad Industrial *</label>
+                <label>
+                  Categoría Unidad Industrial
+                  <span class="required-star">*</span>
+                </label>
                 <select formControlName="category"
-                  [class.is-invalid]="submitted && f['category'].invalid">
+                  [class.is-invalid]="isInvalid('category')">
                   <option value="">Seleccionar Categoría</option>
                   <option value="C3">Categoría 3 (C3)</option>
                   <option value="C4">Categoría 4 (C4)</option>
                 </select>
-                <div *ngIf="submitted && f['category'].errors?.['required']" class="invalid-feedback">
-                  Seleccione una categoría
+                <div *ngIf="isInvalid('category')" class="field-error">
+                  <svg class="error-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <span>Seleccione una categoría (C3 o C4).</span>
                 </div>
               </div>
             </div>
@@ -137,17 +162,19 @@
               <div class="form-group">
                 <label>NIT</label>
                 <input type="text" formControlName="nit" placeholder="7–13 dígitos"
-                  [class.is-invalid]="submitted && f['nit'].invalid">
-                <div *ngIf="submitted && f['nit'].errors?.['pattern']" class="invalid-feedback">
-                  Debe tener entre 7 y 13 dígitos
+                  [class.is-invalid]="isInvalid('nit')">
+                <div *ngIf="isInvalid('nit')" class="field-error">
+                  <svg class="error-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <span>Debe tener entre 7 y 13 dígitos.</span>
                 </div>
               </div>
               <div class="form-group">
                 <label>RAI</label>
                 <input type="text" formControlName="raiNumber" placeholder="Ej: 123456789"
-                  [class.is-invalid]="submitted && f['raiNumber'].invalid">
-                <div *ngIf="submitted && f['raiNumber'].errors?.['pattern']" class="invalid-feedback">
-                  Debe tener exactamente 9 dígitos
+                  [class.is-invalid]="isInvalid('raiNumber')">
+                <div *ngIf="isInvalid('raiNumber')" class="field-error">
+                  <svg class="error-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <span>Debe tener exactamente 9 dígitos.</span>
                 </div>
               </div>
             </div>
@@ -160,7 +187,12 @@
               </div>
               <div class="form-group">
                 <label>CI Representante</label>
-                <input type="text" formControlName="legalRepCi" placeholder="Número de documento">
+                <input type="text" formControlName="legalRepCi" placeholder="Letras y números"
+                  [class.is-invalid]="isInvalid('legalRepCi')">
+                <div *ngIf="isInvalid('legalRepCi')" class="field-error">
+                  <svg class="error-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <span>Solo se permiten letras y números (sin espacios ni símbolos).</span>
+                </div>
               </div>
             </div>
 
@@ -169,12 +201,22 @@
               <div class="form-group">
                 <label>Contacto U.I</label>
                 <input type="text" formControlName="phone"
-                  placeholder="Varios teléfonos separados por coma">
+                  placeholder="Ej: 4123456, 70012345"
+                  [class.is-invalid]="isInvalid('phone')">
+                <div *ngIf="isInvalid('phone')" class="field-error">
+                  <svg class="error-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <span>Solo se permiten números separados por comas (sin letras).</span>
+                </div>
+                <p class="field-hint">Varios números separados por coma.</p>
               </div>
               <div class="form-group">
                 <label>Correo Electrónico</label>
                 <input type="email" formControlName="email" placeholder="empresa@ejemplo.com"
-                  [class.is-invalid]="submitted && f['email'].invalid">
+                  [class.is-invalid]="isInvalid('email')">
+                <div *ngIf="isInvalid('email')" class="field-error">
+                  <svg class="error-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <span>Ingrese un correo electrónico válido.</span>
+                </div>
               </div>
             </div>
 
@@ -203,27 +245,48 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="form-group">
-                <label>Distrito *</label>
-                <select formControlName="district">
-                  <option value="">Seleccione...</option>
+                <label>
+                  Distrito
+                  <span class="required-star">*</span>
+                </label>
+                <select formControlName="district"
+                  [class.is-invalid]="isInvalid('district')">
+                  <option value="">Seleccione un distrito...</option>
                   <option *ngFor="let d of districts" [value]="d">{{ d }}</option>
                 </select>
+                <div *ngIf="isInvalid('district')" class="field-error">
+                  <svg class="error-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <span>Debe seleccionar un distrito.</span>
+                </div>
               </div>
               <div class="form-group">
-                <label>Zona *</label>
-                <select formControlName="geoZone">
-                  <option value="">Seleccione...</option>
+                <label>
+                  Zona
+                  <span class="required-star">*</span>
+                </label>
+                <select formControlName="geoZone"
+                  [class.is-invalid]="isInvalid('geoZone')">
+                  <option value="">Seleccione una zona...</option>
                   <option *ngFor="let z of geoZones" [value]="z">{{ z }}</option>
                 </select>
+                <div *ngIf="isInvalid('geoZone')" class="field-error">
+                  <svg class="error-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <span>Seleccione Urbano o Rural.</span>
+                </div>
               </div>
             </div>
 
-            <!-- Coordenadas + botón Mapa -->
+            <!-- Coordenadas -->
             <div class="form-group">
-              <label>Ubicación / Coordenadas *</label>
+              <label>
+                Ubicación / Coordenadas
+                <span class="required-star">*</span>
+              </label>
               <div class="flex gap-2">
                 <input type="text" formControlName="coordinates"
-                  placeholder="Ej: 17°23'45''S  66°09'12''W" class="flex-1">
+                  placeholder="Ej: -17.12345, -66.54321 o 17°23'45''S 66°09'12''W"
+                  [class.is-invalid]="isInvalid('coordinates')"
+                  class="flex-1">
                 <button type="button"
                   class="px-4 py-2 bg-muted border border-border rounded-xl text-xs font-bold text-muted-foreground flex items-center gap-1.5 hover:bg-accent transition-colors"
                   title="Próximamente: seleccionar en mapa" disabled>
@@ -234,6 +297,12 @@
                   Mapa
                 </button>
               </div>
+              <div *ngIf="isInvalid('coordinates')" class="field-error">
+                <svg class="error-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span *ngIf="f['coordinates'].errors?.['required']">Las coordenadas son obligatorias.</span>
+                <span *ngIf="f['coordinates'].errors?.['coordinatesInvalid']">Ingrese coordenadas válidas (ej: -17.123, -66.543).</span>
+              </div>
+              <p class="field-hint">Formato decimal (lat, lon) o grados sexagesimales.</p>
             </div>
 
             <div class="form-group">
@@ -267,43 +336,50 @@
             </div>
 
             <!-- Sustancias peligrosas -->
-            <div class="p-4 bg-muted/30 rounded-xl border border-border/50 flex flex-col gap-3">
+            <div class="radio-card">
               <div class="flex items-center justify-between">
-                <label class="text-sm font-semibold text-foreground">Uso de Sustancias Peligrosas</label>
-                <div class="flex gap-3">
-                  <label class="flex items-center gap-1.5 cursor-pointer text-sm font-medium">
-                    <input type="radio" formControlName="useHazardousSubstances" [value]="true"
-                      class="text-primary focus:ring-primary/30">
-                    Sí
+                <label class="radio-card__label">Uso de Sustancias Peligrosas</label>
+                <div class="radio-group">
+                  <label class="radio-option">
+                    <input type="radio" formControlName="useHazardousSubstances" [value]="true">
+                    <span>Sí</span>
                   </label>
-                  <label class="flex items-center gap-1.5 cursor-pointer text-sm font-medium">
-                    <input type="radio" formControlName="useHazardousSubstances" [value]="false"
-                      class="text-primary focus:ring-primary/30">
-                    No
+                  <label class="radio-option">
+                    <input type="radio" formControlName="useHazardousSubstances" [value]="false">
+                    <span>No</span>
                   </label>
                 </div>
               </div>
-              <div *ngIf="usesHazardous" class="form-group">
-                <label>Descripción de Sustancias Peligrosas</label>
+              <!-- Conditional description -->
+              <div *ngIf="usesHazardous" class="form-group mt-3">
+                <label>
+                  Descripción de Sustancias Peligrosas
+                  <span class="required-star">*</span>
+                </label>
                 <textarea formControlName="hazardousSubstancesDescription" rows="2"
-                  placeholder="Describa las sustancias utilizadas"></textarea>
+                  placeholder="Describa las sustancias utilizadas"
+                  [class.is-invalid]="isInvalid('hazardousSubstancesDescription')"></textarea>
+                <div *ngIf="isInvalid('hazardousSubstancesDescription')" class="field-error">
+                  <svg class="error-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  <span>Debe describir las sustancias peligrosas utilizadas.</span>
+                </div>
               </div>
             </div>
 
             <!-- Mercurio -->
-            <div class="p-4 bg-muted/30 rounded-xl border border-border/50 flex items-center justify-between">
-              <label class="text-sm font-semibold text-foreground">Uso de Mercurio</label>
-              <div class="flex gap-3">
-                <label class="flex items-center gap-1.5 cursor-pointer text-sm font-medium">
-                  <input type="radio" formControlName="usesMercury" [value]="true"
-                    class="text-primary focus:ring-primary/30">
-                  Sí
-                </label>
-                <label class="flex items-center gap-1.5 cursor-pointer text-sm font-medium">
-                  <input type="radio" formControlName="usesMercury" [value]="false"
-                    class="text-primary focus:ring-primary/30">
-                  No
-                </label>
+            <div class="radio-card">
+              <div class="flex items-center justify-between">
+                <label class="radio-card__label">Uso de Mercurio</label>
+                <div class="radio-group">
+                  <label class="radio-option">
+                    <input type="radio" formControlName="usesMercury" [value]="true">
+                    <span>Sí</span>
+                  </label>
+                  <label class="radio-option">
+                    <input type="radio" formControlName="usesMercury" [value]="false">
+                    <span>No</span>
+                  </label>
+                </div>
               </div>
             </div>
 
@@ -416,7 +492,7 @@
               </div>
             </div>
 
-            <!-- Agua -->
+            <!-- Agua y Potencia -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="form-group">
                 <label>Abastecimiento de Agua</label>

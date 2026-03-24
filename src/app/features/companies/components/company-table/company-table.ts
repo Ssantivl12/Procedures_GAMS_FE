@@ -256,7 +256,7 @@ export class CompanyTableComponent implements OnInit {
       category:     this.activeFilters.category,
       hasRaiNumber: this.activeFilters.hasRaiNumber,
       isActive:     this.activeFilters.isActive,
-      // zona: this.activeFilters.zona, // activar cuando el backend lo soporte
+      //zona: this.activeFilters.zona, // activar cuando el backend lo soporte
     };
 
     Object.keys(params).forEach(k => {

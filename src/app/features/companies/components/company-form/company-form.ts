@@ -4,15 +4,82 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
-  FormBuilder, FormGroup, Validators,
-  ReactiveFormsModule, FormsModule,
+  FormBuilder, FormGroup, Validators, AbstractControl,
+  ReactiveFormsModule, FormsModule, ValidationErrors,
 } from '@angular/forms';
 import {
   CompanyService, Company, RawMaterial, FinalProduct,
-  DISTRICTS, GEO_ZONES, UTM_ZONES,
-  EFFLUENT_DISPOSAL_OPTIONS, SOLID_WASTE_DISPOSAL_OPTIONS,
-  WATER_SUPPLY_OPTIONS,
 } from '../../services/company.service';
+
+// ── Constants ──────────────────────────────────────────────────────────────────
+
+export const DISTRICTS = [
+  'DISTRITO 1',
+  'DISTRITO 2',
+  'DISTRITO 3',
+  'DISTRITO 4',
+  'DISTRITO 5',
+  'DISTRITO 6',
+  'DISTRITO 7',
+  'DISTRITO LAVA LAVA',
+  'DISTRITO CHIÑATA',
+] as const;
+
+export const GEO_ZONES = ['Urbano', 'Rural'] as const;
+
+export const UTM_ZONES = ['19K', '20K'] as const;
+
+export const EFFLUENT_DISPOSAL_OPTIONS = [
+  'PTAR',
+  'PTAR+ALCANTARILLADO',
+  'ALCANTARILLADO COOPERATIVA',
+  'POZO SEPTICO',
+  'OTRO',
+] as const;
+
+export const SOLID_WASTE_DISPOSAL_OPTIONS = [
+  'GERES',
+  'TERCIARIZACIÓN',
+  'GERES+TERCIARIZACIÓN',
+  'OTRO',
+] as const;
+
+export const WATER_SUPPLY_OPTIONS = [
+  'POZO DE AGUA',
+  'RED DE AGUA (COOPERATIVA)',
+  'CISTERNA',
+  'EMAPAS',
+  'POZO+COOPERATIVA',
+  'OTROS',
+] as const;
+
+// ── Custom validators ──────────────────────────────────────────────────────────
+
+function phoneValidator(control: AbstractControl): ValidationErrors | null {
+  const val: string = control.value || '';
+  if (!val) return null; // optional
+  // only digits and commas
+  if (!/^[\d,\s]+$/.test(val)) {
+    return { phoneInvalid: true };
+  }
+  return null;
+}
+
+function coordinatesValidator(control: AbstractControl): ValidationErrors | null {
+  const val: string = (control.value || '').trim();
+  if (!val) return { required: true };
+  // Accept common coordinate formats: decimal or DMS
+  // Decimal: -17.12345, -66.54321  or  17.12345 S 66.54321 W
+  // DMS: 17°23'45''S  66°09'12''W  or variants
+  const decimalPattern = /^-?\d{1,3}(\.\d+)?[,\s]+-?\d{1,3}(\.\d+)?$/;
+  const dmsPattern = /\d+[°º]\s*\d+[''′]\s*\d+[""″'']\s*[NSns]/i;
+  if (decimalPattern.test(val) || dmsPattern.test(val)) return null;
+  // Allow any non-empty value containing a digit (loose fallback)
+  if (/\d/.test(val)) return null;
+  return { coordinatesInvalid: true };
+}
+
+// ── Component ─────────────────────────────────────────────────────────────────
 
 @Component({
   selector: 'app-company-form',
@@ -30,7 +97,7 @@ export class CompanyFormComponent implements OnInit {
   private cdr            = inject(ChangeDetectorRef);
   private fb             = inject(FormBuilder);
 
-  // Select options 
+  // Select options
   readonly districts               = DISTRICTS;
   readonly geoZones                = GEO_ZONES;
   readonly utmZones                = UTM_ZONES;
@@ -48,21 +115,22 @@ export class CompanyFormComponent implements OnInit {
     { number: 4, label: 'Producción'     },
   ];
 
-  // Form state 
+  // Form state
   submitted     = false;
   isLoading     = false;
   showSuccess   = false;
   conflictError: string | null = null;
 
-  // Dynamic lists 
+  // Dynamic lists
   caebInput   = '';
   caebList:   string[]      = [];
+  caebError   = '';
 
   rawMaterials: RawMaterial[]  = [];
-  rmName       = ''; rmQty = '';
+  rmName = ''; rmQty = '';
 
   finalProducts: FinalProduct[] = [];
-  fpName        = ''; fpQty = ''; fpUnit = '';
+  fpName = ''; fpQty = ''; fpUnit = '';
 
   // Reactive form
   form!: FormGroup;
@@ -72,36 +140,36 @@ export class CompanyFormComponent implements OnInit {
     if (this.companyToEdit) this.patchForm(this.companyToEdit);
   }
 
-  // Build
+  // ── Build ──────────────────────────────────────────────────────────────────
 
   private buildForm() {
     this.form = this.fb.group({
       // Step 1 — Identificación
-      legalName:     ['', [Validators.required, Validators.minLength(3), Validators.maxLength(255)]],
+      legalName:     ['', [Validators.required, Validators.minLength(1)]],
       nit:           ['', [Validators.pattern(/^\d{7,13}$/)]],
       raiNumber:     ['', [Validators.pattern(/^\d{9}$/)]],
       category:      ['', [Validators.required]],
       businessClass: [''],
       legalRepName:  [''],
-      legalRepCi:    [''],
-      phone:         [''],   
+      legalRepCi:    ['', [Validators.pattern(/^[a-zA-Z0-9]*$/)]],
+      phone:         ['', [phoneValidator]],
       email:         ['', [Validators.email]],
       observations:  [''],
 
       // Step 2 — Ubicación
       municipality:  [''],
       address:       [''],
-      district:      [''],
-      geoZone:       [''],
-      coordinates:   [''],
+      district:      ['', [Validators.required]],
+      geoZone:       ['', [Validators.required]],
+      coordinates:   ['', [coordinatesValidator]],
       utmZone:       [''],
 
       // Step 3 — Residuos y sustancias
       effluentDisposal:              [''],
       solidWasteDisposal:            [''],
-      useHazardousSubstances:        [false],
+      useHazardousSubstances:        [null],
       hazardousSubstancesDescription:[''],
-      usesMercury:                   [false],
+      usesMercury:                   [null],
 
       // Step 4 — Producción y agua
       economicActivity: [''],
@@ -109,6 +177,17 @@ export class CompanyFormComponent implements OnInit {
       areaUnit:         [''],
       waterSupply:      [''],
       installedPower:   [null],
+    });
+
+    // Conditional validator: hazardousSubstancesDescription required when useHazardousSubstances = true
+    this.form.get('useHazardousSubstances')?.valueChanges.subscribe(val => {
+      const desc = this.form.get('hazardousSubstancesDescription')!;
+      if (val === true) {
+        desc.setValidators([Validators.required, Validators.minLength(1)]);
+      } else {
+        desc.clearValidators();
+      }
+      desc.updateValueAndValidity();
     });
   }
 
@@ -132,9 +211,9 @@ export class CompanyFormComponent implements OnInit {
       utmZone:       c.utmZone       || '',
       effluentDisposal:              c.effluentDisposal              || '',
       solidWasteDisposal:            c.solidWasteDisposal            || '',
-      useHazardousSubstances:        c.useHazardousSubstances        ?? false,
+      useHazardousSubstances:        c.useHazardousSubstances        ?? null,
       hazardousSubstancesDescription:c.hazardousSubstancesDescription|| '',
-      usesMercury:                   c.usesMercury                   ?? false,
+      usesMercury:                   c.usesMercury                   ?? null,
       economicActivity: c.economicActivity || '',
       usedArea:         c.usedArea         ?? null,
       areaUnit:         c.areaUnit         || '',
@@ -146,14 +225,26 @@ export class CompanyFormComponent implements OnInit {
     this.finalProducts = [...(c.finalProducts || [])];
   }
 
-  // Getters
+  // ── Getters ────────────────────────────────────────────────────────────────
 
   get f() { return this.form.controls; }
+
   get usesHazardous(): boolean {
     return this.form.get('useHazardousSubstances')?.value === true;
   }
 
-  // Step navigation
+  /** Returns true if the field should show error styling */
+  isInvalid(field: string): boolean {
+    const ctrl = this.form.get(field);
+    return !!(ctrl && ctrl.invalid && (ctrl.touched || this.submitted));
+  }
+
+  /** Returns true for CAEB section error */
+  get caebInvalid(): boolean {
+    return this.submitted && this.caebList.length === 0;
+  }
+
+  // ── Step navigation ────────────────────────────────────────────────────────
 
   nextStep() {
     if (this.validateStep(this.currentStep) && this.currentStep < this.totalSteps) {
@@ -179,53 +270,100 @@ export class CompanyFormComponent implements OnInit {
   private validateStep(step: number): boolean {
     const required: Record<number, string[]> = {
       1: ['legalName', 'category'],
-      2: [], 3: [], 4: [],
+      2: ['district', 'geoZone', 'coordinates'],
+      3: [],
+      4: [],
     };
+
+    // Step 1 also needs at least one CAEB
+    if (step === 1 && this.caebList.length === 0) {
+      this.submitted = true;
+      (required[1] || []).forEach(k => this.form.get(k)?.markAsTouched());
+      return false;
+    }
+
     let valid = true;
     (required[step] || []).forEach(key => {
       const ctrl = this.form.get(key);
-      if (ctrl) { ctrl.markAsTouched(); if (ctrl.invalid) valid = false; }
+      if (ctrl) {
+        ctrl.markAsTouched();
+        if (ctrl.invalid) valid = false;
+      }
     });
+
+    // Step 3: hazardousSubstancesDescription when applicable
+    if (step === 3 && this.usesHazardous) {
+      const desc = this.form.get('hazardousSubstancesDescription');
+      desc?.markAsTouched();
+      if (desc?.invalid) valid = false;
+    }
+
     return valid;
   }
 
   isStepValid(step: number): boolean {
     const required: Record<number, string[]> = {
       1: ['legalName', 'category'],
-      2: [], 3: [], 4: [],
+      2: ['district', 'geoZone', 'coordinates'],
+      3: [],
+      4: [],
     };
-    return (required[step] || []).every(key => this.form.get(key)?.valid);
+    const caebOk = step !== 1 || this.caebList.length > 0;
+    return caebOk && (required[step] || []).every(key => this.form.get(key)?.valid);
   }
 
-  // Dynamic lists — CAEB
+  // ── Dynamic lists — CAEB ───────────────────────────────────────────────────
 
   addCaeb() {
     const code = this.caebInput.trim();
-    if (/^\d{5,10}$/.test(code) && this.caebList.length < 10 && !this.caebList.includes(code)) {
-      this.caebList.push(code);
-      this.caebInput = '';
+    this.caebError = '';
+
+    if (!/^\d+$/.test(code)) {
+      this.caebError = 'Solo se permiten números.';
+      return;
     }
+    if (code.length < 5) {
+      this.caebError = 'Mínimo 5 dígitos.';
+      return;
+    }
+    if (code.length > 10) {
+      this.caebError = 'Máximo 10 dígitos.';
+      return;
+    }
+    if (this.caebList.includes(code)) {
+      this.caebError = 'Este código ya fue agregado.';
+      return;
+    }
+    if (this.caebList.length >= 10) {
+      this.caebError = 'Máximo 10 códigos.';
+      return;
+    }
+
+    this.caebList.push(code);
+    this.caebInput = '';
   }
 
   removeCaeb(i: number) { this.caebList.splice(i, 1); }
 
-  // Dynamic lists — Raw Materials 
+  // ── Dynamic lists — Raw Materials ──────────────────────────────────────────
 
   addRawMaterial() {
-    if (this.rmName.trim() && this.rmQty.trim()) {
-      this.rawMaterials.push({ name: this.rmName.trim(), quantity: this.rmQty.trim() });
+    if (this.rmName.trim()) {
+      this.rawMaterials.push({ name: this.rmName.trim(), quantity: this.rmQty.trim() || '' });
       this.rmName = ''; this.rmQty = '';
     }
   }
 
   removeRawMaterial(i: number) { this.rawMaterials.splice(i, 1); }
 
-  // Dynamic lists — Final Products
+  // ── Dynamic lists — Final Products ────────────────────────────────────────
 
   addFinalProduct() {
-    if (this.fpName.trim() && this.fpQty.trim() && this.fpUnit.trim()) {
+    if (this.fpName.trim()) {
       this.finalProducts.push({
-        name: this.fpName.trim(), quantity: this.fpQty.trim(), unit: this.fpUnit.trim(),
+        name: this.fpName.trim(),
+        quantity: this.fpQty.trim() || '',
+        unit: this.fpUnit.trim() || '',
       });
       this.fpName = ''; this.fpQty = ''; this.fpUnit = '';
     }
@@ -233,15 +371,42 @@ export class CompanyFormComponent implements OnInit {
 
   removeFinalProduct(i: number) { this.finalProducts.splice(i, 1); }
 
-  // Submit
+  // ── Submit ─────────────────────────────────────────────────────────────────
 
   onSubmit() {
     this.submitted     = true;
     this.conflictError = null;
 
-    ['legalName', 'category'].forEach(k => this.form.get(k)?.markAsTouched());
-    if (this.form.get('legalName')?.invalid || this.form.get('category')?.invalid) {
+    // Mark all controls touched for full validation
+    this.form.markAllAsTouched();
+
+    // Check step 1 required fields + CAEB
+    const step1Valid = this.form.get('legalName')?.valid &&
+                       this.form.get('category')?.valid &&
+                       this.caebList.length > 0;
+
+    // Check step 2 required fields
+    const step2Valid = this.form.get('district')?.valid &&
+                       this.form.get('geoZone')?.valid &&
+                       this.form.get('coordinates')?.valid;
+
+    // Check step 3 conditional
+    const step3Valid = !this.usesHazardous ||
+                       this.form.get('hazardousSubstancesDescription')?.valid;
+
+    // Navigate to first invalid step
+    if (!step1Valid) {
       this.currentStep = 1;
+      this.cdr.detectChanges();
+      return;
+    }
+    if (!step2Valid) {
+      this.currentStep = 2;
+      this.cdr.detectChanges();
+      return;
+    }
+    if (!step3Valid) {
+      this.currentStep = 3;
       this.cdr.detectChanges();
       return;
     }
