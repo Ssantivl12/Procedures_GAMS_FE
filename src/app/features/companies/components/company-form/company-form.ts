@@ -30,7 +30,7 @@ export class CompanyFormComponent implements OnInit {
   private cdr            = inject(ChangeDetectorRef);
   private fb             = inject(FormBuilder);
 
-  // ── Select options ────────────────────────────────────────────────────────
+  // Select options 
   readonly districts               = DISTRICTS;
   readonly geoZones                = GEO_ZONES;
   readonly utmZones                = UTM_ZONES;
@@ -38,7 +38,7 @@ export class CompanyFormComponent implements OnInit {
   readonly solidWasteOptions       = SOLID_WASTE_DISPOSAL_OPTIONS;
   readonly waterSupplyOptions      = WATER_SUPPLY_OPTIONS;
 
-  // ── Step state ────────────────────────────────────────────────────────────
+  // Step state
   currentStep = 1;
   readonly totalSteps = 4;
   readonly steps = [
@@ -48,13 +48,13 @@ export class CompanyFormComponent implements OnInit {
     { number: 4, label: 'Producción'     },
   ];
 
-  // ── Form state ────────────────────────────────────────────────────────────
+  // Form state 
   submitted     = false;
   isLoading     = false;
   showSuccess   = false;
   conflictError: string | null = null;
 
-  // ── Dynamic lists ─────────────────────────────────────────────────────────
+  // Dynamic lists 
   caebInput   = '';
   caebList:   string[]      = [];
 
@@ -64,7 +64,7 @@ export class CompanyFormComponent implements OnInit {
   finalProducts: FinalProduct[] = [];
   fpName        = ''; fpQty = ''; fpUnit = '';
 
-  // ── Reactive form ─────────────────────────────────────────────────────────
+  // Reactive form
   form!: FormGroup;
 
   ngOnInit() {
@@ -72,7 +72,7 @@ export class CompanyFormComponent implements OnInit {
     if (this.companyToEdit) this.patchForm(this.companyToEdit);
   }
 
-  // ── Build ─────────────────────────────────────────────────────────────────
+  // Build
 
   private buildForm() {
     this.form = this.fb.group({
@@ -84,7 +84,7 @@ export class CompanyFormComponent implements OnInit {
       businessClass: [''],
       legalRepName:  [''],
       legalRepCi:    [''],
-      phone:         [''],   // no format restriction
+      phone:         [''],   
       email:         ['', [Validators.email]],
       observations:  [''],
 
@@ -146,14 +146,14 @@ export class CompanyFormComponent implements OnInit {
     this.finalProducts = [...(c.finalProducts || [])];
   }
 
-  // ── Getters ───────────────────────────────────────────────────────────────
+  // Getters
 
   get f() { return this.form.controls; }
   get usesHazardous(): boolean {
     return this.form.get('useHazardousSubstances')?.value === true;
   }
 
-  // ── Step navigation ───────────────────────────────────────────────────────
+  // Step navigation
 
   nextStep() {
     if (this.validateStep(this.currentStep) && this.currentStep < this.totalSteps) {
@@ -176,7 +176,6 @@ export class CompanyFormComponent implements OnInit {
     }
   }
 
-  /** Returns true if the step is valid (or has no required fields) */
   private validateStep(step: number): boolean {
     const required: Record<number, string[]> = {
       1: ['legalName', 'category'],
@@ -198,11 +197,11 @@ export class CompanyFormComponent implements OnInit {
     return (required[step] || []).every(key => this.form.get(key)?.valid);
   }
 
-  // ── Dynamic lists — CAEB ─────────────────────────────────────────────────
+  // Dynamic lists — CAEB
 
   addCaeb() {
     const code = this.caebInput.trim();
-    if (/^\d{5}$/.test(code) && this.caebList.length < 10 && !this.caebList.includes(code)) {
+    if (/^\d{5,10}$/.test(code) && this.caebList.length < 10 && !this.caebList.includes(code)) {
       this.caebList.push(code);
       this.caebInput = '';
     }
@@ -210,7 +209,7 @@ export class CompanyFormComponent implements OnInit {
 
   removeCaeb(i: number) { this.caebList.splice(i, 1); }
 
-  // ── Dynamic lists — Raw Materials ─────────────────────────────────────────
+  // Dynamic lists — Raw Materials 
 
   addRawMaterial() {
     if (this.rmName.trim() && this.rmQty.trim()) {
@@ -221,7 +220,7 @@ export class CompanyFormComponent implements OnInit {
 
   removeRawMaterial(i: number) { this.rawMaterials.splice(i, 1); }
 
-  // ── Dynamic lists — Final Products ───────────────────────────────────────
+  // Dynamic lists — Final Products
 
   addFinalProduct() {
     if (this.fpName.trim() && this.fpQty.trim() && this.fpUnit.trim()) {
@@ -234,13 +233,12 @@ export class CompanyFormComponent implements OnInit {
 
   removeFinalProduct(i: number) { this.finalProducts.splice(i, 1); }
 
-  // ── Submit ────────────────────────────────────────────────────────────────
+  // Submit
 
   onSubmit() {
     this.submitted     = true;
     this.conflictError = null;
 
-    // Mark required fields and jump back to step 1 if invalid
     ['legalName', 'category'].forEach(k => this.form.get(k)?.markAsTouched());
     if (this.form.get('legalName')?.invalid || this.form.get('category')?.invalid) {
       this.currentStep = 1;

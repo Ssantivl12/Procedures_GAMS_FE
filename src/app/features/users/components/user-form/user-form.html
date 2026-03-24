@@ -21,14 +21,14 @@
       <div class="space-y-4 animate-fade-in">
         <div class="grid grid-cols-2 gap-4">
           <div class="form-group col-span-2 sm:col-span-1">
-            <label for="nombres">Nombres</label>
+            <label for="nombres">Nombres *</label>
             <input type="text" id="nombres" formControlName="nombres" placeholder="Ej: Juan Pablo"
                    (keypress)="allowOnlyLetters($event)"
                    [class.is-invalid]="submitted && f['nombres'].errors">
             <div *ngIf="submitted && f['nombres'].errors" class="invalid-feedback">Nombres son requeridos y solo letras</div>
           </div>
           <div class="form-group col-span-2 sm:col-span-1">
-            <label for="apellidos">Apellidos</label>
+            <label for="apellidos">Apellidos *</label>
             <input type="text" id="apellidos" formControlName="apellidos" placeholder="Ej: Mamani"
                    (keypress)="allowOnlyLetters($event)"
                    [class.is-invalid]="submitted && f['apellidos'].errors">
@@ -37,14 +37,14 @@
         </div>
 
         <div class="form-group">
-          <label for="correo">Correo Electrónico Institucional</label>
+          <label for="correo">Correo Electrónico Institucional *</label>
           <input type="email" id="correo" formControlName="correo" placeholder="ejemplo@gams.gob.bo"
                  [class.is-invalid]="submitted && f['correo'].errors">
           <div *ngIf="submitted && f['correo'].errors" class="invalid-feedback">Correo válido es obligatorio</div>
         </div>
 
         <div class="form-group" *ngIf="!userToEdit">
-          <label for="password">Contraseña Temporal</label>
+          <label for="password">Contraseña Temporal *</label>
           <input type="password" id="password" formControlName="password" placeholder="Mínimo 8 caracteres"
                  [class.is-invalid]="submitted && f['password'].errors">
           <div *ngIf="submitted && f['password'].errors" class="invalid-feedback">
@@ -55,7 +55,7 @@
 
         <div class="grid grid-cols-2 gap-4">
           <div class="form-group col-span-2 sm:col-span-1">
-            <label for="rol">Rol / Cargo</label>
+            <label for="rol">Rol / Cargo *</label>
             <select id="rol" formControlName="rol" [class.is-invalid]="submitted && f['rol'].errors">
               <option value="">Seleccione...</option>
               <option value="ENCARGADO">Encargado</option>

@@ -1,7 +1,7 @@
 <div class="modal-overlay" (click)="!isLoading && !showSuccess && closeForm.emit()">
   <div class="modal-box" (click)="$event.stopPropagation()">
 
-    <!-- ══ SUCCESS ══════════════════════════════════════════════════════════ -->
+    <!-- SUCCESS -->
     <div *ngIf="showSuccess" class="p-8 text-center animate-fade-in">
       <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
         <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
@@ -18,7 +18,7 @@
       </button>
     </div>
 
-    <!-- ══ FORM ═════════════════════════════════════════════════════════════ -->
+    <!-- FORM -->
     <ng-container *ngIf="!showSuccess">
 
       <!-- Header -->
@@ -31,7 +31,7 @@
             Paso {{ currentStep }} de {{ totalSteps }} — {{ steps[currentStep - 1].label }}
           </p>
         </div>
-        <button type="button" class="close-btn" (click)="closeForm.emit()" [disabled]="isLoading">
+        <button type="button" class="close-btn cursor-pointer" (click)="closeForm.emit()" [disabled]="isLoading">
           <svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" width="20" height="20">
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
           </svg>
@@ -74,8 +74,8 @@
       <div class="modal-body py-4 overflow-y-auto max-h-[60vh]">
         <form [formGroup]="form">
 
-          <!-- ── STEP 1: Identificación ──────────────────────────────────── -->
-          <div *ngIf="currentStep === 1" class="flex flex-col gap-4">
+          <!-- STEP 1: Identificación -->
+          <div *ngIf="currentStep === 1" class="flex flex-col gap-4 pt-2">
 
             <div class="form-group">
               <label>Unidad Industrial *</label>
@@ -89,12 +89,12 @@
 
             <!-- CAEB -->
             <div class="form-group">
-              <label>Código(s) CAEB (5 dígitos, máx. 10)</label>
+              <label>Código(s) CAEB *</label>
               <div class="flex gap-2">
                 <input type="text" [(ngModel)]="caebInput" [ngModelOptions]="{standalone: true}"
-                  placeholder="Ej: 12345" maxlength="5" (keyup.enter)="addCaeb()" class="flex-1">
+                  placeholder="Ej: 12345" minlength="5" maxlength="10" (keyup.enter)="addCaeb()" class="flex-1">
                 <button type="button" (click)="addCaeb()"
-                  class="px-4 py-2 bg-accent rounded-xl text-xs font-bold hover:bg-accent/80 transition-colors">
+                  class="cursor-pointer px-4 py-2 bg-accent rounded-xl text-xs font-bold hover:bg-accent/80 transition-colors">
                   Agregar
                 </button>
               </div>
@@ -119,10 +119,10 @@
                   placeholder="Descripción de actividad">
               </div>
               <div class="form-group">
-                <label>Categoría GAMS *</label>
+                <label>Categoría Unidad Industrial *</label>
                 <select formControlName="category"
                   [class.is-invalid]="submitted && f['category'].invalid">
-                  <option value="">Seleccione...</option>
+                  <option value="">Seleccionar Categoría</option>
                   <option value="C3">Categoría 3 (C3)</option>
                   <option value="C4">Categoría 4 (C4)</option>
                 </select>
@@ -143,7 +143,7 @@
                 </div>
               </div>
               <div class="form-group">
-                <label>RAI (9 dígitos)</label>
+                <label>RAI</label>
                 <input type="text" formControlName="raiNumber" placeholder="Ej: 123456789"
                   [class.is-invalid]="submitted && f['raiNumber'].invalid">
                 <div *ngIf="submitted && f['raiNumber'].errors?.['pattern']" class="invalid-feedback">
@@ -186,8 +186,8 @@
 
           </div>
 
-          <!-- ── STEP 2: Ubicación ───────────────────────────────────────── -->
-          <div *ngIf="currentStep === 2" class="flex flex-col gap-4">
+          <!-- STEP 2: Ubicación -->
+          <div *ngIf="currentStep === 2" class="flex flex-col gap-4 pt-2">
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="form-group">
@@ -203,14 +203,14 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="form-group">
-                <label>Distrito</label>
+                <label>Distrito *</label>
                 <select formControlName="district">
                   <option value="">Seleccione...</option>
                   <option *ngFor="let d of districts" [value]="d">{{ d }}</option>
                 </select>
               </div>
               <div class="form-group">
-                <label>Zona</label>
+                <label>Zona *</label>
                 <select formControlName="geoZone">
                   <option value="">Seleccione...</option>
                   <option *ngFor="let z of geoZones" [value]="z">{{ z }}</option>
@@ -220,7 +220,7 @@
 
             <!-- Coordenadas + botón Mapa -->
             <div class="form-group">
-              <label>Ubicación / Coordenadas</label>
+              <label>Ubicación / Coordenadas *</label>
               <div class="flex gap-2">
                 <input type="text" formControlName="coordinates"
                   placeholder="Ej: 17°23'45''S  66°09'12''W" class="flex-1">
@@ -246,8 +246,8 @@
 
           </div>
 
-          <!-- ── STEP 3: Residuos y Sustancias ──────────────────────────── -->
-          <div *ngIf="currentStep === 3" class="flex flex-col gap-4">
+          <!-- STEP 3: Residuos y Sustancias -->
+          <div *ngIf="currentStep === 3" class="flex flex-col gap-4 pt-2">
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="form-group">
@@ -309,8 +309,8 @@
 
           </div>
 
-          <!-- ── STEP 4: Producción y Agua ──────────────────────────────── -->
-          <div *ngIf="currentStep === 4" class="flex flex-col gap-5">
+          <!-- STEP 4: Producción y Agua -->
+          <div *ngIf="currentStep === 4" class="flex flex-col gap-5 pt-2">
 
             <div class="form-group">
               <label>Actividad Económica</label>
@@ -327,7 +327,7 @@
                 <input type="text" [(ngModel)]="rmQty" [ngModelOptions]="{standalone: true}"
                   placeholder="Cantidad" class="w-28" (keyup.enter)="addRawMaterial()">
                 <button type="button" (click)="addRawMaterial()"
-                  class="px-3 py-2 bg-accent rounded-xl text-xs font-bold hover:bg-accent/80 transition-colors shrink-0">
+                  class="cursor-pointer px-3 py-2 bg-accent rounded-xl text-xs font-bold hover:bg-accent/80 transition-colors shrink-0">
                   Agregar
                 </button>
               </div>
@@ -369,7 +369,7 @@
                 <input type="text" [(ngModel)]="fpUnit" [ngModelOptions]="{standalone: true}"
                   placeholder="Unidad" class="w-20" (keyup.enter)="addFinalProduct()">
                 <button type="button" (click)="addFinalProduct()"
-                  class="px-3 py-2 bg-accent rounded-xl text-xs font-bold hover:bg-accent/80 transition-colors shrink-0">
+                  class="cursor-pointer px-3 py-2 bg-accent rounded-xl text-xs font-bold hover:bg-accent/80 transition-colors shrink-0">
                   Agregar
                 </button>
               </div>
@@ -444,7 +444,7 @@
           *ngIf="currentStep > 1"
           (click)="prevStep()"
           [disabled]="isLoading"
-          class="px-5 py-2.5 rounded-xl font-bold text-sm border border-border text-foreground hover:bg-accent transition-all flex items-center gap-1.5">
+          class="cursor-pointer px-5 py-2.5 rounded-xl font-bold text-sm border border-border text-foreground hover:bg-accent transition-all flex items-center gap-1.5">
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
           </svg>
@@ -455,7 +455,7 @@
           *ngIf="currentStep === 1"
           (click)="closeForm.emit()"
           [disabled]="isLoading"
-          class="px-5 py-2.5 rounded-xl font-bold text-sm text-muted-foreground hover:bg-accent transition-all">
+          class="cursor-pointer px-5 py-2.5 rounded-xl font-bold text-sm text-muted-foreground hover:bg-accent transition-all">
           Cancelar
         </button>
 
@@ -466,7 +466,7 @@
           <button type="button"
             (click)="nextStep()"
             [disabled]="isLoading"
-            class="px-6 py-2.5 rounded-xl font-bold text-sm bg-primary text-white shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all flex items-center gap-1.5">
+            class="cursor-pointer px-6 py-2.5 rounded-xl font-bold text-sm bg-primary text-white shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all flex items-center gap-1.5">
             Siguiente
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -478,7 +478,7 @@
           *ngIf="currentStep === totalSteps"
           (click)="onSubmit()"
           [disabled]="isLoading"
-          class="ml-auto px-8 py-2.5 rounded-xl font-bold text-sm bg-primary text-white shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all flex items-center gap-2">
+          class="cursor-pointer ml-auto px-8 py-2.5 rounded-xl font-bold text-sm bg-primary text-white shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all flex items-center gap-2">
           <span *ngIf="isLoading" class="spinner-sm"></span>
           {{ companyToEdit ? 'Actualizar Empresa' : 'Registrar Empresa' }}
         </button>
