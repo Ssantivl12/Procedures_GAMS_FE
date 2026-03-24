@@ -2,7 +2,7 @@ import { Component, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DashboardHeaderComponent } from '../../../dashboard/components/dashboard-header/dashboard-header';
 import { CompanyHeaderComponent } from '../../components/company-header/company-header';
-import { CompanyFiltersComponent } from '../../components/company-filters/company-filters';
+import { CompanyFiltersComponent, CompanyFilterState } from '../../components/company-filters/company-filters';
 import { CompanyTableComponent } from '../../components/company-table/company-table';
 import { CompanyFormComponent } from '../../components/company-form/company-form';
 import { CompanyService, Company } from '../../services/company.service';
@@ -11,11 +11,11 @@ import { CompanyService, Company } from '../../services/company.service';
   selector: 'app-companies-list',
   standalone: true,
   imports: [
-    CommonModule, 
-    DashboardHeaderComponent, 
-    CompanyHeaderComponent, 
-    CompanyFiltersComponent, 
-    CompanyTableComponent, 
+    CommonModule,
+    DashboardHeaderComponent,
+    CompanyHeaderComponent,
+    CompanyFiltersComponent,
+    CompanyTableComponent,
     CompanyFormComponent
   ],
   templateUrl: './companies-list.html',
@@ -25,14 +25,14 @@ export class CompaniesListComponent {
   private companyService = inject(CompanyService);
   @ViewChild(CompanyTableComponent) companyTable!: CompanyTableComponent;
 
-  isModalOpen = false;
+  isModalOpen    = false;
   selectedCompany: Company | null = null;
-  pageSize = 10;
+  pageSize       = 10;
 
   companyToDelete: Company | null = null;
   isDeleting = false;
 
-  onFiltersChanged(filters: any) {
+  onFiltersChanged(filters: CompanyFilterState) {
     this.companyTable.updateFilters(filters);
   }
 
@@ -45,6 +45,7 @@ export class CompaniesListComponent {
   onRefresh() {
     this.companyTable.refresh();
   }
+
 
   openCompanyModal(company: Company | null = null) {
     this.selectedCompany = company;
@@ -73,7 +74,7 @@ export class CompaniesListComponent {
   confirmDelete() {
     if (!this.companyToDelete) return;
     this.isDeleting = true;
-    
+
     this.companyService.deleteCompany(this.companyToDelete.id).subscribe({
       next: () => {
         this.isDeleting = false;
@@ -82,7 +83,7 @@ export class CompaniesListComponent {
       },
       error: (err) => {
         this.isDeleting = false;
-        console.error('Error deleting company:', err);
+        console.error('Error eliminando empresa:', err);
         alert('No se pudo eliminar la empresa. Intente de nuevo.');
         this.companyToDelete = null;
       }

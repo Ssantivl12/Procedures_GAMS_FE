@@ -17,7 +17,7 @@ import { AuthService, UserRole } from '../../../../core/auth/auth.service';
 
         <div class="flex items-center space-x-3 w-full sm:w-auto" *ngIf="canCreate">
             <button 
-                class="btn-primary-horus w-full sm:w-auto flex items-center justify-center gap-2"
+                class="cursor-pointer btn-primary-horus w-full sm:w-auto flex items-center justify-center gap-2"
                 (click)="onAddCompany()"
             >
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

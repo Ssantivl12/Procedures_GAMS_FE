@@ -3,6 +3,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService, UserRole } from '../../../../core/auth/auth.service';
 
+export interface CompanyFilterState {
+  search?: string;
+  sortBy: string;
+  category?: string;
+  zona?: string;
+  hasRaiNumber?: boolean;
+  isActive?: boolean | undefined;
+}
+
 @Component({
   selector: 'app-company-filters',
   standalone: true,
@@ -20,16 +29,22 @@ import { AuthService, UserRole } from '../../../../core/auth/auth.service';
                                 clip-rule="evenodd" />
                         </svg>
                     </div>
-                    <input type="text" [(ngModel)]="searchQuery" (input)="onFilterChange()"
+                    <input
+                        type="text"
+                        [(ngModel)]="searchQuery"
+                        (ngModelChange)="onFilterChange()"
                         placeholder="Buscar por nombre, NIT o RAI..."
-                        class="block w-full pl-9 pr-4 py-2 bg-muted/50 border border-transparent rounded-lg text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary focus:bg-background transition-all" />
+                        class="block w-full pl-9 pr-4 py-2 bg-muted/50 border border-transparent rounded-lg text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary focus:bg-background transition-all"
+                    />
                 </div>
 
                 <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
                     <!-- Sort By -->
                     <div class="flex items-center gap-2">
                         <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider whitespace-nowrap">Ordenar:</label>
-                        <select [(ngModel)]="sortBy" (change)="onFilterChange()"
+                        <select
+                            [(ngModel)]="sortBy"
+                            (ngModelChange)="onFilterChange()"
                             class="bg-background border border-input text-foreground text-sm rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary block p-2 outline-none transition-all cursor-pointer">
                             <option value="legalName-asc">Nombre (A-Z)</option>
                             <option value="legalName-desc">Nombre (Z-A)</option>
@@ -41,7 +56,9 @@ import { AuthService, UserRole } from '../../../../core/auth/auth.service';
                     <!-- Page Size -->
                     <div class="flex items-center gap-2">
                         <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider whitespace-nowrap">Ver:</label>
-                        <select [(ngModel)]="pageSize" (change)="onPageSizeChange()"
+                        <select
+                            [(ngModel)]="pageSize"
+                            (ngModelChange)="onPageSizeChange()"
                             class="bg-background border border-input text-foreground text-sm rounded-lg focus:ring-2 focus:ring-primary/30 focus:border-primary block p-2 outline-none transition-all cursor-pointer">
                             <option [value]="10">10</option>
                             <option [value]="25">25</option>
@@ -50,7 +67,8 @@ import { AuthService, UserRole } from '../../../../core/auth/auth.service';
                     </div>
 
                     <!-- Refresh -->
-                    <button (click)="onRefresh()"
+                    <button
+                        (click)="onRefresh()"
                         class="inline-flex items-center justify-center p-2 bg-muted/50 text-muted-foreground rounded-lg border border-transparent hover:bg-muted hover:text-primary transition-all cursor-pointer"
                         title="Actualizar">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -63,9 +81,13 @@ import { AuthService, UserRole } from '../../../../core/auth/auth.service';
 
             <!-- Advanced Filters -->
             <div class="flex flex-wrap items-center gap-4 pt-2 border-t border-border/50">
+
+                <!-- Categoría -->
                 <div class="flex items-center gap-2">
                     <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Categoría:</label>
-                    <select [(ngModel)]="category" (change)="onFilterChange()"
+                    <select
+                        [(ngModel)]="category"
+                        (ngModelChange)="onFilterChange()"
                         class="bg-muted/30 border-none text-foreground text-xs font-semibold rounded-lg p-1.5 outline-none cursor-pointer">
                         <option value="">Todas</option>
                         <option value="C3">C3</option>
@@ -73,75 +95,96 @@ import { AuthService, UserRole } from '../../../../core/auth/auth.service';
                     </select>
                 </div>
 
+                <!-- Zona -->
                 <div class="flex items-center gap-2">
-                    <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Municipio:</label>
-                    <select [(ngModel)]="municipality" (change)="onFilterChange()"
-                        class="bg-muted/30 border-none text-foreground text-xs font-semibold rounded-lg p-1.5 outline-none cursor-pointer">
-                        <option value="">Todos</option>
-                        <option value="Sacaba">Sacaba</option>
-                        <option value="Cochabamba">Cochabamba</option>
+                    <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Zona:</label>
+                    <select
+                        [(ngModel)]="zona"
+                        (ngModelChange)="onFilterChange()"
+                        class="bg-muted/30 border-none text-foreground text-xs font-semibold rounded-lg p-1.5 outline-none cursor-pointer opacity-60 cursor-not-allowed"
+                        disabled
+                        title="Disponible próximamente">
+                        <option value="">Todas</option>
+                        <option value="urbana">Urbana</option>
+                        <option value="rural">Rural</option>
                     </select>
                 </div>
 
+                <!-- Tiene RAI -->
                 <div class="flex items-center gap-2">
                     <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" [(ngModel)]="hasRaiNumber" (change)="onFilterChange()"
+                        <input
+                            type="checkbox"
+                            [checked]="hasRaiNumber"
+                            (click)="hasRaiNumber = !hasRaiNumber; onFilterChange()"
                             class="w-3.5 h-3.5 rounded border-gray-300 text-primary focus:ring-primary/30">
                         <span class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Tiene RAI</span>
                     </label>
                 </div>
 
+                <!-- Estado -->
                 <div class="flex items-center gap-2" *ngIf="canSeeInactive">
                     <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Estado:</label>
-                    <select [(ngModel)]="statusFilter" (change)="onFilterChange()"
+                    <select
+                        [(ngModel)]="statusFilter"
+                        (ngModelChange)="onFilterChange()"
                         class="bg-muted/30 border-none text-foreground text-xs font-semibold rounded-lg p-1.5 outline-none cursor-pointer">
                         <option value="active">Activas</option>
                         <option value="inactive">Inactivas</option>
                         <option value="all">Todas</option>
                     </select>
                 </div>
+
             </div>
         </div>
     </div>
   `
 })
 export class CompanyFiltersComponent implements OnInit {
-    private authService = inject(AuthService);
+  private authService = inject(AuthService);
 
-    @Input() searchQuery = '';
-    @Input() sortBy = 'legalName-asc';
-    @Input() pageSize = 10;
-    
-    category = '';
-    municipality = '';
-    hasRaiNumber = false;
-    statusFilter = 'active';
+  @Input() pageSize = 10;
 
-    @Output() filtersChanged = new EventEmitter<any>();
-    @Output() pageSizeChange = new EventEmitter<number>();
-    @Output() refresh = new EventEmitter<void>();
+  searchQuery = '';
+  sortBy = 'legalName-asc';
+  category = '';
+  zona = '';           
+  hasRaiNumber = false;
+  statusFilter = 'active';
 
-    canSeeInactive = false;
+  canSeeInactive = false;
 
-    ngOnInit() {
-        this.canSeeInactive = this.authService.hasRole([UserRole.SUPERADMIN, UserRole.ENCARGADO]);
-    }
+  @Output() filtersChanged = new EventEmitter<CompanyFilterState>();
+  @Output() pageSizeChange = new EventEmitter<number>();
+  @Output() refresh = new EventEmitter<void>();
 
-    onFilterChange() {
-        const isActive = this.statusFilter === 'all' 
-            ? undefined 
-            : (this.statusFilter === 'active' ? true : false);
+  ngOnInit() {
+    this.canSeeInactive = this.authService.hasRole([UserRole.SUPERADMIN, UserRole.ENCARGADO]);
+  }
 
-        this.filtersChanged.emit({
-            search: this.searchQuery,
-            sortBy: this.sortBy,
-            category: this.category || undefined,
-            municipality: this.municipality || undefined,
-            hasRaiNumber: this.hasRaiNumber || undefined,
-            isActive: isActive
-        });
-    }
+  onFilterChange() {
+    const isActive: boolean | undefined =
+      this.statusFilter === 'all'
+        ? undefined
+        : this.statusFilter === 'active'
+        ? true
+        : false;
 
-    onPageSizeChange() { this.pageSizeChange.emit(this.pageSize); }
-    onRefresh() { this.refresh.emit(); }
+    this.filtersChanged.emit({
+      search:       this.searchQuery.trim() || undefined,
+      sortBy:       this.sortBy,
+      category:     this.category || undefined,
+      zona:         this.zona || undefined,       
+      hasRaiNumber: this.hasRaiNumber || undefined,
+      isActive,
+    });
+  }
+
+  onPageSizeChange() {
+    this.pageSizeChange.emit(this.pageSize);
+  }
+
+  onRefresh() {
+    this.refresh.emit();
+  }
 }

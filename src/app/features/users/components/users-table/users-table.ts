@@ -104,16 +104,22 @@ import { finalize } from 'rxjs';
 
       <!-- Info Footer -->
       <div *ngIf="totalFiltered > 0" class="bg-white px-6 py-4 border-t border-border flex items-center justify-between">
-        <div class="text-sm text-slate-500 font-medium">
-          Mostrando {{ users.length }} de {{ totalFiltered }} registros
+        <div class="text-sm text-muted-foreground font-medium">
+          Mostrando 
+          <span class="font-semibold text-foreground">{{ users.length }}</span> 
+          de 
+          <span class="font-semibold text-foreground">{{ totalFiltered }}</span> 
+          registros
         </div>
 
         <div class="flex items-center gap-2">
           <button 
-            class="flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-full border border-slate-200 text-slate-600 hover:border-emerald-500 hover:text-emerald-600 hover:bg-emerald-50 disabled:opacity-30 disabled:border-slate-200 disabled:text-slate-400 transition-all"
+            class="flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-full border border-border text-muted-foreground hover:border-primary hover:text-primary hover:bg-primary/5 disabled:opacity-30 disabled:pointer-events-none transition-all"
             [disabled]="currentPage === 1"
             (click)="goToPage(currentPage - 1)">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
             Anterior
           </button>
 
@@ -122,18 +128,20 @@ import { finalize } from 'rxjs';
               *ngFor="let page of pageNumbers"
               (click)="goToPage(page)"
               [class]="currentPage === page 
-                ? 'w-10 h-10 flex items-center justify-center rounded-full bg-emerald-500 text-white font-bold shadow-md shadow-emerald-200' 
-                : 'w-10 h-10 flex items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 font-semibold transition-colors'">
+                ? 'w-10 h-10 flex items-center justify-center rounded-full bg-primary text-white font-bold shadow-md shadow-primary/20' 
+                : 'w-10 h-10 flex items-center justify-center rounded-full text-muted-foreground hover:bg-muted font-semibold transition-colors'">
               {{ page }}
             </button>
           </div>
 
           <button 
-            class="flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-full border border-emerald-500 text-emerald-600 hover:bg-emerald-500 hover:text-white disabled:opacity-30 disabled:border-slate-200 disabled:text-slate-400 transition-all"
+            class="flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-full border border-primary text-primary hover:bg-primary hover:text-white disabled:opacity-30 disabled:border-border disabled:text-muted-foreground disabled:pointer-events-none transition-all"
             [disabled]="currentPage === totalPages"
             (click)="goToPage(currentPage + 1)">
             Siguiente
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
           </button>
         </div>
       </div>
