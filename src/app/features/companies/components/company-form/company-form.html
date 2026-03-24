@@ -1,186 +1,490 @@
-<div class="modal-overlay" (click)="!isLoading && !showSuccessModal && closeForm.emit()">
-    <div class="modal-box" (click)="$event.stopPropagation()">
-        
-        <!-- Standard Form Header -->
-        <div class="modal-header" *ngIf="!showSuccessModal">
-            <div>
-                <h2 class="text-2xl font-extrabold text-foreground tracking-tight">
-                    {{ companyToEdit ? 'Editar Empresa' : 'Registrar Empresa' }}
-                </h2>
-                <p class="text-muted-foreground text-sm font-medium mt-1">
-                    {{ companyToEdit ? 'Modifique los datos de la institución' : 'Complete el registro para la nueva empresa' }}
-                </p>
-            </div>
-            <button type="button" class="close-btn" (click)="closeForm.emit()" [disabled]="isLoading">
-                <svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" width="20" height="20">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-            </button>
-        </div>
+<div class="modal-overlay" (click)="!isLoading && !showSuccess && closeForm.emit()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
 
-        <div class="modal-body py-4 overflow-y-auto max-h-[70vh]" *ngIf="!showSuccessModal">
-            <form [formGroup]="companyForm" class="flex flex-col gap-5">
-                
-                <!-- Razon Social -->
-                <div class="form-group">
-                    <label>Razón Social / Nombre Comercial *</label>
-                    <input type="text" formControlName="legalName" 
-                           placeholder="Ej: INDUSTRIAS DEL VALLE S.A."
-                           [class.is-invalid]="submitted && f['legalName'].invalid">
-                    <div *ngIf="submitted && f['legalName'].errors?.['required']" class="invalid-feedback mt-1">
-                        La razón social es obligatoria (mín. 3 caracteres)
-                    </div>
-                </div>
-
-                <!-- NIT y RAI -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="form-group">
-                        <label>NIT</label>
-                        <input type="text" formControlName="nit" 
-                               placeholder="7-13 dígitos"
-                               [class.is-invalid]="submitted && f['nit'].invalid">
-                        <div *ngIf="submitted && f['nit'].errors?.['pattern']" class="invalid-feedback mt-1">
-                            Debe tener entre 7 y 13 dígitos
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>RAI (9 dígitos)</label>
-                        <input type="text" formControlName="raiNumber" 
-                               placeholder="Ej: 123456789"
-                               [class.is-invalid]="(submitted && f['raiNumber'].invalid) || conflictError">
-                        <div *ngIf="submitted && f['raiNumber'].errors?.['pattern']" class="invalid-feedback mt-1">
-                            Debe tener exactamente 9 dígitos
-                        </div>
-                        <div *ngIf="conflictError" class="invalid-feedback mt-1">
-                            {{ conflictError }}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Categoria y Municipio -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="form-group">
-                        <label>Categoría GAMS *</label>
-                        <select formControlName="category" [class.is-invalid]="submitted && f['category'].invalid">
-                            <option value="">Seleccione...</option>
-                            <option value="C3">Categoría 3 (C3)</option>
-                            <option value="C4">Categoría 4 (C4)</option>
-                        </select>
-                        <div *ngIf="submitted && f['category'].errors?.['required']" class="invalid-feedback mt-1">
-                            Seleccione categoría
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Municipio</label>
-                        <input type="text" formControlName="municipality" readonly class="bg-accent/30 cursor-not-allowed">
-                    </div>
-                </div>
-
-                <!-- Direccion -->
-                <div class="form-group">
-                    <label>Dirección del Establecimiento</label>
-                    <input type="text" formControlName="address" 
-                           placeholder="Av./Calle, # de puerta, Zona">
-                </div>
-
-                <!-- Telefono y Email -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="form-group">
-                        <label>Teléfono (+591XXXXXXXX)</label>
-                        <input type="text" formControlName="phone" placeholder="+59170000000"
-                               [class.is-invalid]="submitted && f['phone'].invalid">
-                        <div *ngIf="submitted && f['phone'].errors?.['pattern']" class="invalid-feedback mt-1">
-                            Formato inválido: +591 seguido de 8 dígitos
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Correo Electrónico</label>
-                        <input type="email" formControlName="email" placeholder="empresa@ejemplo.com"
-                               [class.is-invalid]="submitted && f['email'].invalid">
-                    </div>
-                </div>
-
-                <!-- Representante Legal -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="form-group">
-                        <label>Representante Legal</label>
-                        <input type="text" formControlName="legalRepName" placeholder="Nombre completo">
-                    </div>
-                    <div class="form-group">
-                        <label>CI Representante</label>
-                        <input type="text" formControlName="legalRepCi" placeholder="Número de documento">
-                    </div>
-                </div>
-
-                <!-- Actividad Económica -->
-                <div class="form-group">
-                    <label>Actividad Económica</label>
-                    <textarea formControlName="economicActivity" rows="2" placeholder="Describa la actividad principal"></textarea>
-                </div>
-
-                <!-- CAEB Codes -->
-                <div class="form-group">
-                    <label>Códigos CAEB (5 dígitos, máx 10)</label>
-                    <div class="flex gap-2">
-                        <input type="text" [(ngModel)]="caebInput" [ngModelOptions]="{standalone: true}" 
-                               placeholder="Ej: 12345" 
-                               (keyup.enter)="addCaebCode()"
-                               maxlength="5"
-                               class="flex-1">
-                        <button type="button" (click)="addCaebCode()" 
-                                class="px-4 py-2 bg-accent rounded-xl text-xs font-bold hover:bg-accent/80 transition-colors">
-                            Agregar
-                        </button>
-                    </div>
-                    <div class="flex flex-wrap gap-2 mt-2">
-                        <div *ngFor="let code of caebList; let i = index" 
-                             class="flex items-center gap-2 bg-primary/10 text-primary text-xs font-bold px-3 py-1.5 rounded-lg border border-primary/20">
-                            {{ code }}
-                            <button type="button" (click)="removeCaebCode(i)" class="text-primary hover:text-red-500">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
-                                    <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Observaciones -->
-                <div class="form-group">
-                    <label>Observaciones</label>
-                    <textarea formControlName="observations" rows="2" placeholder="Notas adicionales"></textarea>
-                </div>
-
-            </form>
-        </div>
-
-        <!-- Footer for Form -->
-        <div class="modal-footer px-6 py-5 bg-accent/30 flex justify-end gap-3 mt-4" *ngIf="!showSuccessModal">
-            <button type="button" class="btn-secondary px-6 py-2.5 rounded-xl font-bold text-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-all" (click)="closeForm.emit()" [disabled]="isLoading">
-                Cancelar
-            </button>
-            <button type="button" class="btn-primary px-8 py-2.5 rounded-xl font-bold text-sm bg-primary text-white shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all flex items-center gap-2" 
-                (click)="onSubmit()" [disabled]="isLoading">
-                <div *ngIf="isLoading" class="spinner-sm"></div>
-                {{ companyToEdit ? 'Actualizar Empresa' : 'Registrar Empresa' }}
-            </button>
-        </div>
-
-        <!-- Success View -->
-        <div *ngIf="showSuccessModal" class="p-8 text-center animate-fade-in">
-            <div class="success-icon-container mb-4 mx-auto w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-            </div>
-            <h2 class="text-xl font-extrabold text-foreground mb-1">¡Operación Exitosa!</h2>
-            <p class="text-muted-foreground text-sm font-medium mb-6 px-4">
-                La empresa ha sido {{ companyToEdit ? 'actualizada' : 'registrada' }} correctamente.
-            </p>
-            <button (click)="onFinish()" class="btn-primary w-full py-3 rounded-xl font-bold bg-primary text-white hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/20">
-                Aceptar y Continuar
-            </button>
-        </div>
-
+    <!-- ══ SUCCESS ══════════════════════════════════════════════════════════ -->
+    <div *ngIf="showSuccess" class="p-8 text-center animate-fade-in">
+      <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <h2 class="text-xl font-extrabold text-foreground mb-1">¡Operación Exitosa!</h2>
+      <p class="text-muted-foreground text-sm mb-6">
+        La empresa ha sido {{ companyToEdit ? 'actualizada' : 'registrada' }} correctamente.
+      </p>
+      <button (click)="onFinish()"
+        class="w-full py-3 rounded-xl font-bold bg-primary text-white hover:opacity-90 transition-all shadow-lg shadow-primary/20">
+        Aceptar y Continuar
+      </button>
     </div>
+
+    <!-- ══ FORM ═════════════════════════════════════════════════════════════ -->
+    <ng-container *ngIf="!showSuccess">
+
+      <!-- Header -->
+      <div class="modal-header">
+        <div>
+          <h2 class="text-xl font-extrabold text-foreground tracking-tight">
+            {{ companyToEdit ? 'Editar Empresa' : 'Registrar Empresa' }}
+          </h2>
+          <p class="text-muted-foreground text-sm mt-0.5">
+            Paso {{ currentStep }} de {{ totalSteps }} — {{ steps[currentStep - 1].label }}
+          </p>
+        </div>
+        <button type="button" class="close-btn" (click)="closeForm.emit()" [disabled]="isLoading">
+          <svg fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" width="20" height="20">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Step indicators -->
+      <div class="px-6 pb-2">
+        <div class="flex items-center gap-1">
+          <ng-container *ngFor="let step of steps; let last = last">
+            <button type="button"
+              (click)="goToStep(step.number)"
+              class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+              [ngClass]="currentStep === step.number
+                ? 'bg-primary text-white shadow-sm shadow-primary/30'
+                : currentStep > step.number
+                  ? 'bg-emerald-100 text-emerald-700 cursor-pointer hover:bg-emerald-200'
+                  : 'bg-muted/50 text-muted-foreground cursor-default'">
+              <span class="w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold"
+                [ngClass]="currentStep === step.number ? 'bg-white/20' : ''">
+                {{ currentStep > step.number ? '✓' : step.number }}
+              </span>
+              {{ step.label }}
+            </button>
+            <div *ngIf="!last" class="flex-1 h-px bg-border mx-1"></div>
+          </ng-container>
+        </div>
+      </div>
+
+      <!-- Conflict error banner -->
+      <div *ngIf="conflictError"
+        class="mx-6 mt-3 p-3 bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-lg flex items-center gap-2">
+        <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        {{ conflictError }}
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body py-4 overflow-y-auto max-h-[60vh]">
+        <form [formGroup]="form">
+
+          <!-- ── STEP 1: Identificación ──────────────────────────────────── -->
+          <div *ngIf="currentStep === 1" class="flex flex-col gap-4">
+
+            <div class="form-group">
+              <label>Unidad Industrial *</label>
+              <input type="text" formControlName="legalName"
+                placeholder="Ej: INDUSTRIAS DEL VALLE S.A."
+                [class.is-invalid]="submitted && f['legalName'].invalid">
+              <div *ngIf="submitted && f['legalName'].errors?.['required']" class="invalid-feedback">
+                La Unidad Industrial es obligatoria (mín. 3 caracteres)
+              </div>
+            </div>
+
+            <!-- CAEB -->
+            <div class="form-group">
+              <label>Código(s) CAEB (5 dígitos, máx. 10)</label>
+              <div class="flex gap-2">
+                <input type="text" [(ngModel)]="caebInput" [ngModelOptions]="{standalone: true}"
+                  placeholder="Ej: 12345" maxlength="5" (keyup.enter)="addCaeb()" class="flex-1">
+                <button type="button" (click)="addCaeb()"
+                  class="px-4 py-2 bg-accent rounded-xl text-xs font-bold hover:bg-accent/80 transition-colors">
+                  Agregar
+                </button>
+              </div>
+              <div class="flex flex-wrap gap-2 mt-2">
+                <div *ngFor="let code of caebList; let i = index"
+                  class="flex items-center gap-1.5 bg-primary/10 text-primary text-xs font-bold px-3 py-1.5 rounded-lg border border-primary/20">
+                  {{ code }}
+                  <button type="button" (click)="removeCaeb(i)" class="hover:text-destructive transition-colors">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                      <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Clase y Categoría -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="form-group">
+                <label>Clase</label>
+                <input type="text" formControlName="businessClass"
+                  placeholder="Descripción de actividad">
+              </div>
+              <div class="form-group">
+                <label>Categoría GAMS *</label>
+                <select formControlName="category"
+                  [class.is-invalid]="submitted && f['category'].invalid">
+                  <option value="">Seleccione...</option>
+                  <option value="C3">Categoría 3 (C3)</option>
+                  <option value="C4">Categoría 4 (C4)</option>
+                </select>
+                <div *ngIf="submitted && f['category'].errors?.['required']" class="invalid-feedback">
+                  Seleccione una categoría
+                </div>
+              </div>
+            </div>
+
+            <!-- NIT y RAI -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="form-group">
+                <label>NIT</label>
+                <input type="text" formControlName="nit" placeholder="7–13 dígitos"
+                  [class.is-invalid]="submitted && f['nit'].invalid">
+                <div *ngIf="submitted && f['nit'].errors?.['pattern']" class="invalid-feedback">
+                  Debe tener entre 7 y 13 dígitos
+                </div>
+              </div>
+              <div class="form-group">
+                <label>RAI (9 dígitos)</label>
+                <input type="text" formControlName="raiNumber" placeholder="Ej: 123456789"
+                  [class.is-invalid]="submitted && f['raiNumber'].invalid">
+                <div *ngIf="submitted && f['raiNumber'].errors?.['pattern']" class="invalid-feedback">
+                  Debe tener exactamente 9 dígitos
+                </div>
+              </div>
+            </div>
+
+            <!-- Representante legal -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="form-group">
+                <label>Representante Legal</label>
+                <input type="text" formControlName="legalRepName" placeholder="Nombre completo">
+              </div>
+              <div class="form-group">
+                <label>CI Representante</label>
+                <input type="text" formControlName="legalRepCi" placeholder="Número de documento">
+              </div>
+            </div>
+
+            <!-- Contacto, Email -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="form-group">
+                <label>Contacto U.I</label>
+                <input type="text" formControlName="phone"
+                  placeholder="Varios teléfonos separados por coma">
+              </div>
+              <div class="form-group">
+                <label>Correo Electrónico</label>
+                <input type="email" formControlName="email" placeholder="empresa@ejemplo.com"
+                  [class.is-invalid]="submitted && f['email'].invalid">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Observaciones</label>
+              <textarea formControlName="observations" rows="2"
+                placeholder="Notas adicionales"></textarea>
+            </div>
+
+          </div>
+
+          <!-- ── STEP 2: Ubicación ───────────────────────────────────────── -->
+          <div *ngIf="currentStep === 2" class="flex flex-col gap-4">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="form-group">
+                <label>Municipio</label>
+                <input type="text" formControlName="municipality" placeholder="Ej: Sacaba">
+              </div>
+              <div class="form-group">
+                <label>Dirección</label>
+                <input type="text" formControlName="address"
+                  placeholder="Av./Calle, Nro., Zona">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="form-group">
+                <label>Distrito</label>
+                <select formControlName="district">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let d of districts" [value]="d">{{ d }}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Zona</label>
+                <select formControlName="geoZone">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let z of geoZones" [value]="z">{{ z }}</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Coordenadas + botón Mapa -->
+            <div class="form-group">
+              <label>Ubicación / Coordenadas</label>
+              <div class="flex gap-2">
+                <input type="text" formControlName="coordinates"
+                  placeholder="Ej: 17°23'45''S  66°09'12''W" class="flex-1">
+                <button type="button"
+                  class="px-4 py-2 bg-muted border border-border rounded-xl text-xs font-bold text-muted-foreground flex items-center gap-1.5 hover:bg-accent transition-colors"
+                  title="Próximamente: seleccionar en mapa" disabled>
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6-3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
+                  </svg>
+                  Mapa
+                </button>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Zona UTM</label>
+              <select formControlName="utmZone">
+                <option value="">Seleccione...</option>
+                <option *ngFor="let z of utmZones" [value]="z">{{ z }}</option>
+              </select>
+            </div>
+
+          </div>
+
+          <!-- ── STEP 3: Residuos y Sustancias ──────────────────────────── -->
+          <div *ngIf="currentStep === 3" class="flex flex-col gap-4">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="form-group">
+                <label>Disposición Final de Efluentes Industriales</label>
+                <select formControlName="effluentDisposal">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let o of effluentDisposalOptions" [value]="o">{{ o }}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Disposición de Residuos Sólidos</label>
+                <select formControlName="solidWasteDisposal">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let o of solidWasteOptions" [value]="o">{{ o }}</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Sustancias peligrosas -->
+            <div class="p-4 bg-muted/30 rounded-xl border border-border/50 flex flex-col gap-3">
+              <div class="flex items-center justify-between">
+                <label class="text-sm font-semibold text-foreground">Uso de Sustancias Peligrosas</label>
+                <div class="flex gap-3">
+                  <label class="flex items-center gap-1.5 cursor-pointer text-sm font-medium">
+                    <input type="radio" formControlName="useHazardousSubstances" [value]="true"
+                      class="text-primary focus:ring-primary/30">
+                    Sí
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer text-sm font-medium">
+                    <input type="radio" formControlName="useHazardousSubstances" [value]="false"
+                      class="text-primary focus:ring-primary/30">
+                    No
+                  </label>
+                </div>
+              </div>
+              <div *ngIf="usesHazardous" class="form-group">
+                <label>Descripción de Sustancias Peligrosas</label>
+                <textarea formControlName="hazardousSubstancesDescription" rows="2"
+                  placeholder="Describa las sustancias utilizadas"></textarea>
+              </div>
+            </div>
+
+            <!-- Mercurio -->
+            <div class="p-4 bg-muted/30 rounded-xl border border-border/50 flex items-center justify-between">
+              <label class="text-sm font-semibold text-foreground">Uso de Mercurio</label>
+              <div class="flex gap-3">
+                <label class="flex items-center gap-1.5 cursor-pointer text-sm font-medium">
+                  <input type="radio" formControlName="usesMercury" [value]="true"
+                    class="text-primary focus:ring-primary/30">
+                  Sí
+                </label>
+                <label class="flex items-center gap-1.5 cursor-pointer text-sm font-medium">
+                  <input type="radio" formControlName="usesMercury" [value]="false"
+                    class="text-primary focus:ring-primary/30">
+                  No
+                </label>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ── STEP 4: Producción y Agua ──────────────────────────────── -->
+          <div *ngIf="currentStep === 4" class="flex flex-col gap-5">
+
+            <div class="form-group">
+              <label>Actividad Económica</label>
+              <textarea formControlName="economicActivity" rows="2"
+                placeholder="Describa la actividad principal"></textarea>
+            </div>
+
+            <!-- Materias Primas -->
+            <div class="form-group">
+              <label>Materia Prima</label>
+              <div class="flex gap-2">
+                <input type="text" [(ngModel)]="rmName" [ngModelOptions]="{standalone: true}"
+                  placeholder="Nombre" class="flex-1" (keyup.enter)="addRawMaterial()">
+                <input type="text" [(ngModel)]="rmQty" [ngModelOptions]="{standalone: true}"
+                  placeholder="Cantidad" class="w-28" (keyup.enter)="addRawMaterial()">
+                <button type="button" (click)="addRawMaterial()"
+                  class="px-3 py-2 bg-accent rounded-xl text-xs font-bold hover:bg-accent/80 transition-colors shrink-0">
+                  Agregar
+                </button>
+              </div>
+              <div *ngIf="rawMaterials.length > 0" class="mt-2 border border-border rounded-lg overflow-hidden">
+                <table class="w-full text-xs">
+                  <thead class="bg-muted/50">
+                    <tr>
+                      <th class="px-3 py-2 text-left font-semibold text-muted-foreground">Nombre</th>
+                      <th class="px-3 py-2 text-left font-semibold text-muted-foreground">Cantidad</th>
+                      <th class="px-2 py-2 w-8"></th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-border">
+                    <tr *ngFor="let rm of rawMaterials; let i = index">
+                      <td class="px-3 py-2 font-medium">{{ rm.name }}</td>
+                      <td class="px-3 py-2 text-muted-foreground">{{ rm.quantity }}</td>
+                      <td class="px-2 py-2">
+                        <button type="button" (click)="removeRawMaterial(i)"
+                          class="text-muted-foreground hover:text-destructive transition-colors">
+                          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" d="M18 6L6 18M6 6l12 12"/>
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Productos Finales -->
+            <div class="form-group">
+              <label>Producto Final</label>
+              <div class="flex gap-2">
+                <input type="text" [(ngModel)]="fpName" [ngModelOptions]="{standalone: true}"
+                  placeholder="Nombre" class="flex-1" (keyup.enter)="addFinalProduct()">
+                <input type="text" [(ngModel)]="fpQty" [ngModelOptions]="{standalone: true}"
+                  placeholder="Cantidad" class="w-24" (keyup.enter)="addFinalProduct()">
+                <input type="text" [(ngModel)]="fpUnit" [ngModelOptions]="{standalone: true}"
+                  placeholder="Unidad" class="w-20" (keyup.enter)="addFinalProduct()">
+                <button type="button" (click)="addFinalProduct()"
+                  class="px-3 py-2 bg-accent rounded-xl text-xs font-bold hover:bg-accent/80 transition-colors shrink-0">
+                  Agregar
+                </button>
+              </div>
+              <div *ngIf="finalProducts.length > 0" class="mt-2 border border-border rounded-lg overflow-hidden">
+                <table class="w-full text-xs">
+                  <thead class="bg-muted/50">
+                    <tr>
+                      <th class="px-3 py-2 text-left font-semibold text-muted-foreground">Nombre</th>
+                      <th class="px-3 py-2 text-left font-semibold text-muted-foreground">Cantidad</th>
+                      <th class="px-3 py-2 text-left font-semibold text-muted-foreground">Unidad</th>
+                      <th class="px-2 py-2 w-8"></th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-border">
+                    <tr *ngFor="let fp of finalProducts; let i = index">
+                      <td class="px-3 py-2 font-medium">{{ fp.name }}</td>
+                      <td class="px-3 py-2 text-muted-foreground">{{ fp.quantity }}</td>
+                      <td class="px-3 py-2 text-muted-foreground">{{ fp.unit }}</td>
+                      <td class="px-2 py-2">
+                        <button type="button" (click)="removeFinalProduct(i)"
+                          class="text-muted-foreground hover:text-destructive transition-colors">
+                          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" d="M18 6L6 18M6 6l12 12"/>
+                          </svg>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Superficie -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="form-group">
+                <label>Superficie Utilizada</label>
+                <input type="number" formControlName="usedArea"
+                  placeholder="Ej: 1500" min="0">
+              </div>
+              <div class="form-group">
+                <label>Unidad de Superficie</label>
+                <input type="text" formControlName="areaUnit"
+                  placeholder="Ej: m², ha">
+              </div>
+            </div>
+
+            <!-- Agua -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="form-group">
+                <label>Abastecimiento de Agua</label>
+                <select formControlName="waterSupply">
+                  <option value="">Seleccione...</option>
+                  <option *ngFor="let o of waterSupplyOptions" [value]="o">{{ o }}</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Potencia Instalada</label>
+                <input type="number" formControlName="installedPower"
+                  placeholder="Ej: 250" min="0">
+              </div>
+            </div>
+
+          </div>
+
+        </form>
+      </div>
+
+      <!-- Footer -->
+      <div class="modal-footer px-6 py-4 bg-accent/30 flex justify-between items-center gap-3">
+
+        <button type="button"
+          *ngIf="currentStep > 1"
+          (click)="prevStep()"
+          [disabled]="isLoading"
+          class="px-5 py-2.5 rounded-xl font-bold text-sm border border-border text-foreground hover:bg-accent transition-all flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+          Anterior
+        </button>
+
+        <button type="button"
+          *ngIf="currentStep === 1"
+          (click)="closeForm.emit()"
+          [disabled]="isLoading"
+          class="px-5 py-2.5 rounded-xl font-bold text-sm text-muted-foreground hover:bg-accent transition-all">
+          Cancelar
+        </button>
+
+        <div class="flex items-center gap-1.5 ml-auto" *ngIf="currentStep < totalSteps">
+          <span class="text-xs text-muted-foreground font-medium">
+            {{ currentStep }}/{{ totalSteps }}
+          </span>
+          <button type="button"
+            (click)="nextStep()"
+            [disabled]="isLoading"
+            class="px-6 py-2.5 rounded-xl font-bold text-sm bg-primary text-white shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all flex items-center gap-1.5">
+            Siguiente
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </button>
+        </div>
+
+        <button type="button"
+          *ngIf="currentStep === totalSteps"
+          (click)="onSubmit()"
+          [disabled]="isLoading"
+          class="ml-auto px-8 py-2.5 rounded-xl font-bold text-sm bg-primary text-white shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all flex items-center gap-2">
+          <span *ngIf="isLoading" class="spinner-sm"></span>
+          {{ companyToEdit ? 'Actualizar Empresa' : 'Registrar Empresa' }}
+        </button>
+
+      </div>
+
+    </ng-container>
+  </div>
 </div>
