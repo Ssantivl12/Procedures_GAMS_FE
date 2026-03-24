@@ -1,25 +1,8 @@
 <div class="modal-overlay" (click)="!isLoading && !showSuccess && closeForm.emit()">
   <div class="modal-box" (click)="$event.stopPropagation()">
 
-    <!-- SUCCESS -->
-    <div *ngIf="showSuccess" class="p-8 text-center animate-fade-in">
-      <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-        <svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-          <polyline points="20 6 9 17 4 12"/>
-        </svg>
-      </div>
-      <h2 class="text-xl font-extrabold text-foreground mb-1">¡Operación Exitosa!</h2>
-      <p class="text-muted-foreground text-sm mb-6">
-        La empresa ha sido {{ companyToEdit ? 'actualizada' : 'registrada' }} correctamente.
-      </p>
-      <button (click)="onFinish()"
-        class="w-full py-3 rounded-xl font-bold bg-primary text-white hover:opacity-90 transition-all shadow-lg shadow-primary/20">
-        Aceptar y Continuar
-      </button>
-    </div>
-
     <!-- FORM -->
-    <ng-container *ngIf="!showSuccess">
+    <ng-container>
 
       <!-- Header -->
       <div class="modal-header">

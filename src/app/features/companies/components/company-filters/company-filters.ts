@@ -7,7 +7,7 @@ export interface CompanyFilterState {
   search?: string;
   sortBy: string;
   category?: string;
-  zona?: string;
+  geoZone?: string;
   hasRaiNumber?: boolean;
   isActive?: boolean | undefined;
 }
@@ -99,25 +99,23 @@ export interface CompanyFilterState {
                 <div class="flex items-center gap-2">
                     <label class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Zona:</label>
                     <select
-                        [(ngModel)]="zona"
+                        [(ngModel)]="geoZone"
                         (ngModelChange)="onFilterChange()"
-                        class="bg-muted/30 border-none text-foreground text-xs font-semibold rounded-lg p-1.5 outline-none cursor-pointer opacity-60 cursor-not-allowed"
-                        disabled
-                        title="Disponible próximamente">
+                        class="bg-muted/30 border-none text-foreground text-xs font-semibold rounded-lg p-1.5 outline-none cursor-pointer">
                         <option value="">Todas</option>
-                        <option value="urbana">Urbana</option>
-                        <option value="rural">Rural</option>
+                        <option value="Urbano">Urbano</option>
+                        <option value="Rural">Rural</option>
                     </select>
                 </div>
 
                 <!-- Tiene RAI -->
                 <div class="flex items-center gap-2">
-                    <label class="flex items-center gap-2 cursor-pointer">
+                    <label class="flex items-center gap-2">
                         <input
                             type="checkbox"
                             [checked]="hasRaiNumber"
                             (click)="hasRaiNumber = !hasRaiNumber; onFilterChange()"
-                            class="w-3.5 h-3.5 rounded border-gray-300 text-primary focus:ring-primary/30">
+                            class="cursor-pointer w-3.5 h-3.5 rounded border-gray-300 text-primary focus:ring-primary/30">
                         <span class="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Tiene RAI</span>
                     </label>
                 </div>
@@ -148,7 +146,7 @@ export class CompanyFiltersComponent implements OnInit {
   searchQuery = '';
   sortBy = 'legalName-asc';
   category = '';
-  zona = '';           
+  geoZone = '';           
   hasRaiNumber = false;
   statusFilter = 'active';
 
@@ -174,7 +172,7 @@ export class CompanyFiltersComponent implements OnInit {
       search:       this.searchQuery.trim() || undefined,
       sortBy:       this.sortBy,
       category:     this.category || undefined,
-      zona:         this.zona || undefined,       
+      geoZone:         this.geoZone || undefined,       
       hasRaiNumber: this.hasRaiNumber || undefined,
       isActive,
     });

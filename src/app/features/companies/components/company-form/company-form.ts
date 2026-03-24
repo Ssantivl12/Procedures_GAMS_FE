@@ -10,6 +10,7 @@ import {
 import {
   CompanyService, Company, RawMaterial, FinalProduct,
 } from '../../services/company.service';
+import { showToast } from '../../../../shared/utils/toast.utils';
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
@@ -463,9 +464,9 @@ export class CompanyFormComponent implements OnInit {
 
     request.subscribe({
       next: () => {
-        this.isLoading   = false;
-        this.showSuccess = true;
-        this.cdr.detectChanges();
+        this.isLoading = false;
+        showToast('success', this.companyToEdit ? 'Empresa actualizada correctamente' : 'Empresa registrada correctamente');
+        this.onFinish();
       },
       error: (err: any) => {
         this.isLoading = false;

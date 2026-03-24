@@ -91,6 +91,7 @@ export interface CompanyParams {
   isActive?:     boolean;
   sortBy?:       'legalName' | 'createdAt' | 'raiNumber';
   sortOrder?:    'asc' | 'desc';
+  geoZone?:      string; 
 }
 
 @Injectable({ providedIn: 'root' })
