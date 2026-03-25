@@ -6,46 +6,24 @@ import { RouterLink } from '@angular/router';
   selector: 'app-login-button',
   imports: [RouterLink],
   template: `
-    <a routerLink="/login" class="login-button">
+    <a routerLink="/login" 
+       class="group flex items-center gap-2 px-6 py-2.5 text-sm font-bold rounded-full 
+              bg-primary text-white shadow-md shadow-primary/20 
+              hover:bg-primary/90 hover:-translate-y-0.5 hover:shadow-lg 
+              transition-all duration-200 decoration-none">
+      
       Iniciar Sesión
-      <span class="arrow">→</span>
+      
+      <svg class="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" 
+           fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+      </svg>
     </a>
   `,
-  styles: [
-    `
-      .login-button {
-        background-color: var(--color-primary);
-        color: var(--color-primary-foreground);
-        padding: 10px 20px;
-        border-radius: var(--radius-lg);
-        font-weight: 700;
-        font-size: 0.9rem;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        text-decoration: none;
-        border: none;
-        cursor: pointer;
-        font-family: var(--font-sans);
-        box-shadow: var(--shadow-sm);
-      }
-
-      .login-button:hover {
-        background-color: var(--color-sidebar-primary);
-        transform: translateY(-1px);
-        box-shadow: var(--shadow-md);
-      }
-
-      .login-button .arrow {
-        font-size: 1.125rem;
-        transition: transform 0.2s;
-      }
-      
-      .login-button:hover .arrow {
-        transform: translateX(4px);
-      }
-    `,
-  ],
+  styles: [`
+    :host {
+      display: inline-block;
+    }
+  `]
 })
 export class LoginButtonComponent {}

@@ -1,96 +1,90 @@
-<div class="home-container">
-  <!-- Header -->
-  <app-gams-navbar>
-    <app-login-button></app-login-button>
-  </app-gams-navbar>
-
-  <!-- Hero Section -->
-  <section class="home-hero">
-    <div class="home-hero__container">
-      <div class="home-hero__content">
-        <!-- Text Content -->
-        <div class="home-hero__text">
-          <h1 class="hero-title">Gobierno Municipal de Sacaba</h1>
-          <h2 class="hero-subtitle">Departamento Ambiental</h2>
-          <p class="hero-description">
-            Sistema administrativo interno para la gestión de trámites
-            ambientales. Control de RAI, MAI/PMA, IAA y seguimiento de
-            empresas categorizadas.
-          </p>
-        </div>
-
-        <!-- Hero Image -->
-        <div class="home-hero__image">
-          <img
-            src="assets/img/BodyGams.png"
-            alt="Ilustración GAMS"
-            class="hero-image"
-          />
-        </div>
+<div class="home-wrapper">
+  
+  <!-- Modern Absolute Header -->
+  <header class="home-header animate-fade-in-down">
+    <div class="home-header__container">
+      <div class="home-header__logo">
+        <img src="assets/img/LogoGams.png" alt="Logo GAMS" class="logo-img" />
       </div>
+      <div class="home-header__actions">
+        <app-login-button></app-login-button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Stunning Hero Section with Full Background -->
+  <section class="home-hero">
+    <div class="hero-bg-overlay"></div>
+    <div class="home-hero__content animate-fade-in-up">
+      <div class="hero-badge">Portal Oficial</div>
+      <h1 class="hero-title">
+        Gobierno Autónomo<br/>
+        <span class="text-gradient">Municipal de Sacaba</span>
+      </h1>
+      <h2 class="hero-subtitle">Departamento de Medio Ambiente</h2>
+      <p class="hero-description">
+        Plataforma administrativa integral para la gestión de trámites ambientales. 
+        Agiliza el control de RAI, MAI/PMA, e IAA, y supervisa fácilmente las empresas categorizadas con una experiencia digital moderna.
+      </p>
+      
+      <div class="hero-actions">
+        <button class="btn-primary-glow">
+          Conoce más
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" class="icon-sm inline-block ml-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Overlapping Glassmorphism Feature Cards -->
+  <section class="home-features">
+    <div class="features-container">
+      
+      <!-- Card 1 -->
+      <div class="feature-card animate-slide-up" style="animation-delay: 0.1s;">
+        <div class="feature-icon-wrapper">
+          <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+          </svg>
+        </div>
+        <h3 class="feature-title">Gestión de Trámites</h3>
+        <p class="feature-desc">Control estructurado de RAI, MAI-PMA e IAA con un seguimiento completo del historial.</p>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="feature-card animate-slide-up" style="animation-delay: 0.2s;">
+        <div class="feature-icon-wrapper">
+          <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+          </svg>
+        </div>
+        <h3 class="feature-title">Registro Empresarial</h3>
+        <p class="feature-desc">Administración inteligente y rápida de empresas de Categoría 3 y Categoría 4.</p>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="feature-card animate-slide-up" style="animation-delay: 0.3s;">
+        <div class="feature-icon-wrapper">
+          <svg class="feature-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+          </svg>
+        </div>
+        <h3 class="feature-title">Control de Plazos</h3>
+        <p class="feature-desc">Seguimiento en tiempo real de tareas, pendientes y expiración de documentación.</p>
+      </div>
+
     </div>
   </section>
 
   <!-- Footer -->
   <footer class="home-footer">
-    <div class="home-footer__container">
-      <!-- Cards de características -->
-      <div class="home-footer__cards">
-        <!-- Card 1: Gestión de Trámites -->
-        <div class="home-footer__card">
-          <div class="card-icon">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-              />
-            </svg>
-          </div>
-          <h3 class="card-title">Gestión de Trámites</h3>
-          <p class="card-description">
-            Control de RAI, MAI-PMA e IAA con seguimiento completo
-          </p>
-        </div>
-
-        <!-- Card 2: Registro de Empresas -->
-        <div class="home-footer__card">
-          <div class="card-icon">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-              />
-            </svg>
-          </div>
-          <h3 class="card-title">Registro de Empresas</h3>
-          <p class="card-description">
-            Administración de empresas Cat.3 y Cat.4
-          </p>
-        </div>
-
-        <!-- Card 3: Control de Pendientes -->
-        <div class="home-footer__card">
-          <div class="card-icon">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
-              />
-            </svg>
-          </div>
-          <h3 class="card-title">Control de Pendientes</h3>
-          <p class="card-description">Seguimiento de tareas y plazos</p>
-        </div>
-      </div>
-
-      <p class="home-footer__credits">Desarrollado por Horus Software</p>
+    <div class="footer-content">
+      <img src="assets/img/LogoGams.png" alt="GAMS" class="footer-logo" />
+      <p class="footer-text">2026 Gobierno Autónomo Municipal de Sacaba. Desarrollado por Horus Software.</p>
     </div>
   </footer>
+
 </div>
 
