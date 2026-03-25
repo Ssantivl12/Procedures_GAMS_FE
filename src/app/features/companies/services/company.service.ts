@@ -123,4 +123,8 @@ export class CompanyService {
   deleteCompany(id: string) {
     return this.api.delete<void>(`${this.basePath}/${id}`);
   }
+
+  reactivateCompany(id: string) {
+    return this.api.patch<void>(`${this.basePath}/${id}/reactivate`, {});
+  }
 }

@@ -130,6 +130,15 @@ import { finalize } from 'rxjs';
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-4v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
                   </button>
+                  <button
+                    *ngIf="canReactivate && !company.isActive"
+                    (click)="onReactivate(company)"
+                    class="cursor-pointer p-2 text-muted-foreground hover:text-emerald-500 hover:bg-emerald-500/10 rounded-lg transition-all"
+                    title="Reactivar">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-4 h-4" fill="currentColor">
+                      <path d="M256 512a256 256 0 1 1 0-512 256 256 0 1 1 0 512zm0-464a208 208 0 1 0 0 416 208 208 0 1 0 0-416zm70.7 121.9c7.8-10.7 22.8-13.1 33.5-5.3 10.7 7.8 13.1 22.8 5.3 33.5L243.4 366.1c-4.1 5.7-10.5 9.3-17.5 9.8-7 .5-13.9-2-18.8-6.9l-55.9-55.9c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l36 36 105.6-145.2z"/>
+                    </svg>
+                  </button>
                 </div>
               </td>
             </tr>
@@ -152,7 +161,7 @@ import { finalize } from 'rxjs';
 
         <div *ngIf="totalPages > 1" class="flex items-center gap-2">
           <button
-            class="flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-full border border-border text-muted-foreground hover:border-primary hover:text-primary hover:bg-primary/5 disabled:opacity-30 disabled:pointer-events-none transition-all"
+            class="cursor-pointer flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-full border border-border text-muted-foreground hover:border-primary hover:text-primary hover:bg-primary/5 disabled:opacity-30 disabled:pointer-events-none transition-all"
             [disabled]="currentPage === 1"
             (click)="changePage(currentPage - 1)">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -166,14 +175,14 @@ import { finalize } from 'rxjs';
               *ngFor="let page of pageNumbers"
               (click)="changePage(page)"
               [class]="currentPage === page
-                ? 'w-10 h-10 flex items-center justify-center rounded-full bg-primary text-white font-bold shadow-md shadow-primary/20'
-                : 'w-10 h-10 flex items-center justify-center rounded-full text-muted-foreground hover:bg-muted font-semibold transition-colors'">
+                ? 'w-10 h-10 flex items-center justify-center rounded-full bg-primary text-white font-bold shadow-md shadow-primary/20 cursor-pointer'
+                : 'w-10 h-10 flex items-center justify-center rounded-full text-muted-foreground hover:bg-muted font-semibold transition-colors cursor-pointer'">
               {{ page }}
             </button>
           </div>
 
           <button
-            class="flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-full border border-primary text-primary hover:bg-primary hover:text-white disabled:opacity-30 disabled:border-border disabled:text-muted-foreground disabled:pointer-events-none transition-all"
+            class="cursor-pointer flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-full border border-primary text-primary hover:bg-primary hover:text-white disabled:opacity-30 disabled:border-border disabled:text-muted-foreground disabled:pointer-events-none transition-all"
             [disabled]="currentPage === totalPages"
             (click)="changePage(currentPage + 1)">
             Siguiente
@@ -195,6 +204,7 @@ export class CompanyTableComponent implements OnInit {
 
   @Output() edit   = new EventEmitter<Company>();
   @Output() delete = new EventEmitter<Company>();
+  @Output() reactivate = new EventEmitter<Company>();
 
   companies: Company[] = [];
   isLoading  = true;
@@ -204,6 +214,7 @@ export class CompanyTableComponent implements OnInit {
 
   canEdit   = false;
   canDelete = false;
+  canReactivate = false;
 
   private activeFilters: CompanyFilterState = { sortBy: 'legalName-asc', isActive: true };
 
@@ -235,6 +246,7 @@ export class CompanyTableComponent implements OnInit {
   private checkPermissions() {
     this.canEdit   = !this.authService.hasRole(UserRole.INSPECTOR);
     this.canDelete = this.authService.hasRole([UserRole.SUPERADMIN, UserRole.ENCARGADO]);
+    this.canReactivate = this.authService.hasRole([UserRole.SUPERADMIN]);
   }
 
   loadCompanies() {
@@ -299,6 +311,7 @@ export class CompanyTableComponent implements OnInit {
 
   onEdit(company: Company)   { this.edit.emit(company); }
   onDelete(company: Company) { this.delete.emit(company); }
+  onReactivate(company: Company) { this.reactivate.emit(company); }
 
   private parseSortBy(sortBy: string): [string, string] {
     const lastDash = sortBy.lastIndexOf('-');

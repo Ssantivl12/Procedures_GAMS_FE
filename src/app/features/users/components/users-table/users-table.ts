@@ -114,7 +114,7 @@ import { finalize } from 'rxjs';
 
         <div class="flex items-center gap-2">
           <button 
-            class="flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-full border border-border text-muted-foreground hover:border-primary hover:text-primary hover:bg-primary/5 disabled:opacity-30 disabled:pointer-events-none transition-all"
+            class="cursor-pointer flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-full border border-border text-muted-foreground hover:border-primary hover:text-primary hover:bg-primary/5 disabled:opacity-30 disabled:pointer-events-none transition-all"
             [disabled]="currentPage === 1"
             (click)="goToPage(currentPage - 1)">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -128,14 +128,14 @@ import { finalize } from 'rxjs';
               *ngFor="let page of pageNumbers"
               (click)="goToPage(page)"
               [class]="currentPage === page 
-                ? 'w-10 h-10 flex items-center justify-center rounded-full bg-primary text-white font-bold shadow-md shadow-primary/20' 
-                : 'w-10 h-10 flex items-center justify-center rounded-full text-muted-foreground hover:bg-muted font-semibold transition-colors'">
+                ? 'w-10 h-10 flex items-center justify-center rounded-full bg-primary text-white font-bold shadow-md shadow-primary/20 cursor-pointer' 
+                : 'w-10 h-10 flex items-center justify-center rounded-full text-muted-foreground hover:bg-muted font-semibold transition-colors cursor-pointer'">
               {{ page }}
             </button>
           </div>
 
           <button 
-            class="flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-full border border-primary text-primary hover:bg-primary hover:text-white disabled:opacity-30 disabled:border-border disabled:text-muted-foreground disabled:pointer-events-none transition-all"
+            class="cursor-pointer flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-full border border-primary text-primary hover:bg-primary hover:text-white disabled:opacity-30 disabled:border-border disabled:text-muted-foreground disabled:pointer-events-none transition-all"
             [disabled]="currentPage === totalPages"
             (click)="goToPage(currentPage + 1)">
             Siguiente
