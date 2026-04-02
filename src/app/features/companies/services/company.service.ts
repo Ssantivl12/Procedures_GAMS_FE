@@ -15,6 +15,12 @@ export interface FinalProduct {
   unit:     string;
 }
 
+export interface LegalRepresentative {
+  name:  string;
+  ci?:   string;
+  phone?: string;
+}
+
 export enum District {
   DISTRITO_1 = 'DISTRITO_1',
   DISTRITO_2 = 'DISTRITO_2',
@@ -96,6 +102,7 @@ export interface Company {
   usesMercury?:                    boolean;
   rawMaterials?:                   RawMaterial[];
   finalProducts?:                  FinalProduct[];
+  legalRepresentatives?:           LegalRepresentative[];
   usedArea?:                       number;
   areaUnit?:                       string;
   waterSupply?:                    WaterSupply;

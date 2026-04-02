@@ -82,10 +82,25 @@ import { finalize } from 'rxjs';
               </td>
               <td class="px-6 py-4">
                 <div class="flex flex-col">
-                  <span class="text-sm text-foreground font-medium">{{ company.legalRepName || 'N/A' }}</span>
-                  <span class="text-[10px] text-muted-foreground italic mt-0.5" *ngIf="company.phone">
-                    {{ company.phone }}
-                  </span>
+                  <ng-container *ngIf="company.legalRepresentatives && company.legalRepresentatives.length > 0; else oldRep">
+                    <div class="flex items-center gap-1.5">
+                      <span class="text-sm text-foreground font-medium line-clamp-1">{{ company.legalRepresentatives[0].name }}</span>
+                      <span *ngIf="company.legalRepresentatives.length > 1" 
+                        class="px-1.5 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold shrink-0"
+                        [title]="'Y ' + (company.legalRepresentatives.length - 1) + ' más'">
+                        +{{ company.legalRepresentatives.length - 1 }}
+                      </span>
+                    </div>
+                    <span class="text-[10px] text-muted-foreground italic mt-0.5" *ngIf="company.legalRepresentatives[0].phone">
+                      {{ company.legalRepresentatives[0].phone }}
+                    </span>
+                  </ng-container>
+                  <ng-template #oldRep>
+                    <span class="text-sm text-foreground font-medium">{{ company.legalRepName || 'N/A' }}</span>
+                    <span class="text-[10px] text-muted-foreground italic mt-0.5" *ngIf="company.phone">
+                      {{ company.phone }}
+                    </span>
+                  </ng-template>
                 </div>
               </td>
               <td class="px-6 py-4">

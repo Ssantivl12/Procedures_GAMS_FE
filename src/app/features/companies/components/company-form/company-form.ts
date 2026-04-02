@@ -8,7 +8,7 @@ import {
   ReactiveFormsModule, FormsModule, ValidationErrors,
 } from '@angular/forms';
 import {
-  CompanyService, Company, RawMaterial, FinalProduct,
+  CompanyService, Company, RawMaterial, FinalProduct, LegalRepresentative,
   District, GeoZone, UtmZone, EffluentDisposal, SolidWasteDisposal, WaterSupply
 } from '../../services/company.service';
 import { showToast } from '../../../../shared/utils/toast.utils';
@@ -147,6 +147,9 @@ export class CompanyFormComponent implements OnInit {
   finalProducts: FinalProduct[] = [];
   fpName = ''; fpQty = ''; fpUnit = '';
 
+  legalRepresentatives: LegalRepresentative[] = [];
+  lrName = ''; lrCi = ''; lrPhone = '';
+
   // Reactive form
   form!: FormGroup;
 
@@ -167,7 +170,7 @@ export class CompanyFormComponent implements OnInit {
       businessClass: [''],
       legalRepName:  [''],
       legalRepCi:    ['', [Validators.pattern(/^[a-zA-Z0-9]*$/)]],
-      phone:         ['', [phoneValidator]],
+      phone:         ['', [phoneValidator]], // Mantener para compatibilidad si es necesario, pero usaremos el array
       email:         ['', [Validators.email]],
       observations:  [''],
 
@@ -238,6 +241,7 @@ export class CompanyFormComponent implements OnInit {
     this.caebList     = [...(c.caebCodes    || [])];
     this.rawMaterials  = [...(c.rawMaterials  || [])];
     this.finalProducts = [...(c.finalProducts || [])];
+    this.legalRepresentatives = [...(c.legalRepresentatives || [])];
   }
 
   // ── Getters ────────────────────────────────────────────────────────────────
@@ -290,8 +294,8 @@ export class CompanyFormComponent implements OnInit {
       4: [],
     };
 
-    // Step 1 also needs at least one CAEB
-    if (step === 1 && this.caebList.length === 0) {
+    // Step 1 also needs at least one CAEB and at least one Legal Representative
+    if (step === 1 && (this.caebList.length === 0 || this.legalRepresentatives.length === 0)) {
       this.submitted = true;
       (required[1] || []).forEach(k => this.form.get(k)?.markAsTouched());
       return false;
@@ -324,7 +328,8 @@ export class CompanyFormComponent implements OnInit {
       4: [],
     };
     const caebOk = step !== 1 || this.caebList.length > 0;
-    return caebOk && (required[step] || []).every(key => this.form.get(key)?.valid);
+    const repsOk = step !== 1 || this.legalRepresentatives.length > 0;
+    return caebOk && repsOk && (required[step] || []).every(key => this.form.get(key)?.valid);
   }
 
   // ── Dynamic lists — CAEB ───────────────────────────────────────────────────
@@ -386,6 +391,24 @@ export class CompanyFormComponent implements OnInit {
 
   removeFinalProduct(i: number) { this.finalProducts.splice(i, 1); }
 
+  // ── Dynamic lists — Legal Representatives ───────────────────────────────────
+
+  addLegalRepresentative() {
+    const name = this.lrName.trim();
+    if (name) {
+      this.legalRepresentatives.push({
+        name,
+        ci: this.lrCi.trim() || undefined,
+        phone: this.lrPhone.trim() || undefined
+      });
+      this.lrName = ''; this.lrCi = ''; this.lrPhone = '';
+    }
+  }
+
+  removeLegalRepresentative(i: number) {
+    this.legalRepresentatives.splice(i, 1);
+  }
+
   // ── Submit ─────────────────────────────────────────────────────────────────
 
   onSubmit() {
@@ -398,7 +421,8 @@ export class CompanyFormComponent implements OnInit {
     // Check step 1 required fields + CAEB
     const step1Valid = this.form.get('legalName')?.valid &&
                        this.form.get('category')?.valid &&
-                       this.caebList.length > 0;
+                       this.caebList.length > 0 &&
+                       this.legalRepresentatives.length > 0;
 
     // Check step 2 required fields
     const step2Valid = this.form.get('district')?.valid &&
@@ -444,6 +468,7 @@ export class CompanyFormComponent implements OnInit {
       email:         v.email         || undefined,
       observations:  v.observations  || undefined,
       caebCodes:     this.caebList,
+      legalRepresentatives: this.legalRepresentatives.length ? this.legalRepresentatives : undefined,
 
       // Step 2
       municipality:  v.municipality  || undefined,
