@@ -2,12 +2,13 @@ import { Component, EventEmitter, Input, Output, OnInit, inject } from '@angular
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService, UserRole } from '../../../../core/auth/auth.service';
+import { GeoZone } from '../../services/company.service';
 
 export interface CompanyFilterState {
   search?: string;
   sortBy: string;
   category?: string;
-  geoZone?: string;
+  geoZone?: GeoZone;
   hasRaiNumber?: boolean;
   isActive?: boolean | undefined;
 }
@@ -146,7 +147,7 @@ export class CompanyFiltersComponent implements OnInit {
   searchQuery = '';
   sortBy = 'legalName-asc';
   category = '';
-  geoZone = '';           
+  geoZone: GeoZone | '' = '';           
   hasRaiNumber = false;
   statusFilter = 'active';
 
@@ -172,7 +173,7 @@ export class CompanyFiltersComponent implements OnInit {
       search:       this.searchQuery.trim() || undefined,
       sortBy:       this.sortBy,
       category:     this.category || undefined,
-      geoZone:         this.geoZone || undefined,       
+      geoZone:         (this.geoZone as GeoZone) || undefined,       
       hasRaiNumber: this.hasRaiNumber || undefined,
       isActive,
     });

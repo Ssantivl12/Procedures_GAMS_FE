@@ -235,7 +235,7 @@
                 <select formControlName="district"
                   [class.is-invalid]="isInvalid('district')">
                   <option value="">Seleccione un distrito...</option>
-                  <option *ngFor="let d of districts" [value]="d">{{ d }}</option>
+                  <option *ngFor="let d of districts" [value]="d.value">{{ d.label }}</option>
                 </select>
                 <div *ngIf="isInvalid('district')" class="field-error">
                   <svg class="error-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -250,7 +250,7 @@
                 <select formControlName="geoZone"
                   [class.is-invalid]="isInvalid('geoZone')">
                   <option value="">Seleccione una zona...</option>
-                  <option *ngFor="let z of geoZones" [value]="z">{{ z }}</option>
+                  <option *ngFor="let z of geoZones" [value]="z.value">{{ z.label }}</option>
                 </select>
                 <div *ngIf="isInvalid('geoZone')" class="field-error">
                   <svg class="error-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -292,7 +292,7 @@
               <label>Zona UTM</label>
               <select formControlName="utmZone">
                 <option value="">Seleccione...</option>
-                <option *ngFor="let z of utmZones" [value]="z">{{ z }}</option>
+                <option *ngFor="let z of utmZones" [value]="z.value">{{ z.label }}</option>
               </select>
             </div>
 
@@ -306,14 +306,14 @@
                 <label>Disposición Final de Efluentes Industriales</label>
                 <select formControlName="effluentDisposal">
                   <option value="">Seleccione...</option>
-                  <option *ngFor="let o of effluentDisposalOptions" [value]="o">{{ o }}</option>
+                  <option *ngFor="let o of effluentDisposalOptions" [value]="o.value">{{ o.label }}</option>
                 </select>
               </div>
               <div class="form-group">
                 <label>Disposición de Residuos Sólidos</label>
                 <select formControlName="solidWasteDisposal">
                   <option value="">Seleccione...</option>
-                  <option *ngFor="let o of solidWasteOptions" [value]="o">{{ o }}</option>
+                  <option *ngFor="let o of solidWasteOptions" [value]="o.value">{{ o.label }}</option>
                 </select>
               </div>
             </div>
@@ -481,7 +481,7 @@
                 <label>Abastecimiento de Agua</label>
                 <select formControlName="waterSupply">
                   <option value="">Seleccione...</option>
-                  <option *ngFor="let o of waterSupplyOptions" [value]="o">{{ o }}</option>
+                  <option *ngFor="let o of waterSupplyOptions" [value]="o.value">{{ o.label }}</option>
                 </select>
               </div>
               <div class="form-group">

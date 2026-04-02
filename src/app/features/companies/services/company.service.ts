@@ -15,30 +15,51 @@ export interface FinalProduct {
   unit:     string;
 }
 
-// Option constants 
+export enum District {
+  DISTRITO_1 = 'DISTRITO_1',
+  DISTRITO_2 = 'DISTRITO_2',
+  DISTRITO_3 = 'DISTRITO_3',
+  DISTRITO_4 = 'DISTRITO_4',
+  DISTRITO_5 = 'DISTRITO_5',
+  DISTRITO_6 = 'DISTRITO_6',
+  DISTRITO_7 = 'DISTRITO_7',
+  DISTRITO_LAVA_LAVA = 'DISTRITO_LAVA_LAVA',
+  DISTRITO_CHINATA = 'DISTRITO_CHINATA',
+}
 
-export const DISTRICTS = [
-  'DISTRITO 1', 'DISTRITO 2', 'DISTRITO 3', 'DISTRITO 4',
-  'DISTRITO 5', 'DISTRITO 6', 'DISTRITO 7',
-  'DISTRITO LAVA LAVA', 'DISTRITO CHIÑATA',
-] as const;
+export enum GeoZone {
+  Urbano = 'Urbano',
+  Rural = 'Rural',
+}
 
-export const GEO_ZONES = ['Urbano', 'Rural'] as const;
-export const UTM_ZONES = ['19K', '20K']      as const;
+export enum UtmZone {
+  ZONE_19K = 'ZONE_19K',
+  ZONE_20K = 'ZONE_20K',
+}
 
-export const EFFLUENT_DISPOSAL_OPTIONS = [
-  'PTAR', 'PTAR+ALCANTARILLADO', 'ALCANTARILLADO COOPERATIVA',
-  'POZO SEPTICO', 'OTRO',
-] as const;
+export enum EffluentDisposal {
+  PTAR = 'PTAR',
+  PTAR_ALCANTARILLADO = 'PTAR_ALCANTARILLADO',
+  ALCANTARILLADO_COOPERATIVA = 'ALCANTARILLADO_COOPERATIVA',
+  POZO_SEPTICO = 'POZO_SEPTICO',
+  OTRO = 'OTRO',
+}
 
-export const SOLID_WASTE_DISPOSAL_OPTIONS = [
-  'GERES', 'TERCIARIZACIÓN', 'GERES+TERCIARIZACIÓN', 'OTRO',
-] as const;
+export enum SolidWasteDisposal {
+  GERES = 'GERES',
+  TERCIARIZACION = 'TERCIARIZACION',
+  GERES_TERCIARIZACION = 'GERES_TERCIARIZACION',
+  OTRO = 'OTRO',
+}
 
-export const WATER_SUPPLY_OPTIONS = [
-  'POZO DE AGUA', 'RED DE AGUA(COOPERATIVA)', 'CISTERNA',
-  'EMAPAS', 'POZO+COOPERATIVA', 'OTROS',
-] as const;
+export enum WaterSupply {
+  POZO_DE_AGUA = 'POZO_DE_AGUA',
+  RED_DE_AGUA_COOPERATIVA = 'RED_DE_AGUA_COOPERATIVA',
+  CISTERNA = 'CISTERNA',
+  EMAPAS = 'EMAPAS',
+  POZO_COOPERATIVA = 'POZO_COOPERATIVA',
+  OTROS = 'OTROS',
+}
 
 // Main interface 
 
@@ -64,12 +85,12 @@ export interface Company {
 
   // New fields
   businessClass?:                  string;
-  district?:                       string;
-  geoZone?:                        string;
-  utmZone?:                        string;
+  district?:                       District;
+  geoZone?:                        GeoZone;
+  utmZone?:                        UtmZone;
   coordinates?:                    string;
-  effluentDisposal?:               string;
-  solidWasteDisposal?:             string;
+  effluentDisposal?:               EffluentDisposal;
+  solidWasteDisposal?:             SolidWasteDisposal;
   useHazardousSubstances?:         boolean;
   hazardousSubstancesDescription?: string;
   usesMercury?:                    boolean;
@@ -77,7 +98,7 @@ export interface Company {
   finalProducts?:                  FinalProduct[];
   usedArea?:                       number;
   areaUnit?:                       string;
-  waterSupply?:                    string;
+  waterSupply?:                    WaterSupply;
   installedPower?:                 number;
 }
 
@@ -91,7 +112,7 @@ export interface CompanyParams {
   isActive?:     boolean;
   sortBy?:       'legalName' | 'createdAt' | 'raiNumber';
   sortOrder?:    'asc' | 'desc';
-  geoZone?:      string; 
+  geoZone?:      GeoZone; 
 }
 
 @Injectable({ providedIn: 'root' })

@@ -9,50 +9,57 @@ import {
 } from '@angular/forms';
 import {
   CompanyService, Company, RawMaterial, FinalProduct,
+  District, GeoZone, UtmZone, EffluentDisposal, SolidWasteDisposal, WaterSupply
 } from '../../services/company.service';
 import { showToast } from '../../../../shared/utils/toast.utils';
 
-// ── Constants ──────────────────────────────────────────────────────────────────
+// ── Constants / Enum Labels ──────────────────────────────────────────────────
 
-export const DISTRICTS = [
-  'DISTRITO 1',
-  'DISTRITO 2',
-  'DISTRITO 3',
-  'DISTRITO 4',
-  'DISTRITO 5',
-  'DISTRITO 6',
-  'DISTRITO 7',
-  'DISTRITO LAVA LAVA',
-  'DISTRITO CHIÑATA',
-] as const;
+export const districtLabels: Record<string, string> = {
+  [District.DISTRITO_1]: 'DISTRITO 1',
+  [District.DISTRITO_2]: 'DISTRITO 2',
+  [District.DISTRITO_3]: 'DISTRITO 3',
+  [District.DISTRITO_4]: 'DISTRITO 4',
+  [District.DISTRITO_5]: 'DISTRITO 5',
+  [District.DISTRITO_6]: 'DISTRITO 6',
+  [District.DISTRITO_7]: 'DISTRITO 7',
+  [District.DISTRITO_LAVA_LAVA]: 'DISTRITO LAVA LAVA',
+  [District.DISTRITO_CHINATA]: 'DISTRITO CHIÑATA',
+};
 
-export const GEO_ZONES = ['Urbano', 'Rural'] as const;
+export const geoZoneLabels: Record<string, string> = {
+  [GeoZone.Urbano]: 'Urbano',
+  [GeoZone.Rural]: 'Rural',
+};
 
-export const UTM_ZONES = ['19K', '20K'] as const;
+export const utmZoneLabels: Record<string, string> = {
+  [UtmZone.ZONE_19K]: '19K',
+  [UtmZone.ZONE_20K]: '20K',
+};
 
-export const EFFLUENT_DISPOSAL_OPTIONS = [
-  'PTAR',
-  'PTAR+ALCANTARILLADO',
-  'ALCANTARILLADO COOPERATIVA',
-  'POZO SEPTICO',
-  'OTRO',
-] as const;
+export const effluentDisposalLabels: Record<string, string> = {
+  [EffluentDisposal.PTAR]: 'PTAR',
+  [EffluentDisposal.PTAR_ALCANTARILLADO]: 'PTAR+ALCANTARILLADO',
+  [EffluentDisposal.ALCANTARILLADO_COOPERATIVA]: 'ALCANTARILLADO COOPERATIVA',
+  [EffluentDisposal.POZO_SEPTICO]: 'POZO SEPTICO',
+  [EffluentDisposal.OTRO]: 'OTRO',
+};
 
-export const SOLID_WASTE_DISPOSAL_OPTIONS = [
-  'GERES',
-  'TERCIARIZACIÓN',
-  'GERES+TERCIARIZACIÓN',
-  'OTRO',
-] as const;
+export const solidWasteLabels: Record<string, string> = {
+  [SolidWasteDisposal.GERES]: 'GERES',
+  [SolidWasteDisposal.TERCIARIZACION]: 'TERCIARIZACIÓN',
+  [SolidWasteDisposal.GERES_TERCIARIZACION]: 'GERES+TERCIARIZACIÓN',
+  [SolidWasteDisposal.OTRO]: 'OTRO',
+};
 
-export const WATER_SUPPLY_OPTIONS = [
-  'POZO DE AGUA',
-  'RED DE AGUA (COOPERATIVA)',
-  'CISTERNA',
-  'EMAPAS',
-  'POZO+COOPERATIVA',
-  'OTROS',
-] as const;
+export const waterSupplyLabels: Record<string, string> = {
+  [WaterSupply.POZO_DE_AGUA]: 'POZO DE AGUA',
+  [WaterSupply.RED_DE_AGUA_COOPERATIVA]: 'RED DE AGUA (COOPERATIVA)',
+  [WaterSupply.CISTERNA]: 'CISTERNA',
+  [WaterSupply.EMAPAS]: 'EMAPAS',
+  [WaterSupply.POZO_COOPERATIVA]: 'POZO+COOPERATIVA',
+  [WaterSupply.OTROS]: 'OTROS',
+};
 
 // ── Custom validators ──────────────────────────────────────────────────────────
 
@@ -98,13 +105,20 @@ export class CompanyFormComponent implements OnInit {
   private cdr            = inject(ChangeDetectorRef);
   private fb             = inject(FormBuilder);
 
+  getEnumOptions(enumObj: any, labelsMap: Record<string, string>) {
+    return Object.values(enumObj).map(val => ({
+      value: val,
+      label: labelsMap[val as string] || val
+    }));
+  }
+
   // Select options
-  readonly districts               = DISTRICTS;
-  readonly geoZones                = GEO_ZONES;
-  readonly utmZones                = UTM_ZONES;
-  readonly effluentDisposalOptions = EFFLUENT_DISPOSAL_OPTIONS;
-  readonly solidWasteOptions       = SOLID_WASTE_DISPOSAL_OPTIONS;
-  readonly waterSupplyOptions      = WATER_SUPPLY_OPTIONS;
+  readonly districts               = this.getEnumOptions(District, districtLabels);
+  readonly geoZones                = this.getEnumOptions(GeoZone, geoZoneLabels);
+  readonly utmZones                = this.getEnumOptions(UtmZone, utmZoneLabels);
+  readonly effluentDisposalOptions = this.getEnumOptions(EffluentDisposal, effluentDisposalLabels);
+  readonly solidWasteOptions       = this.getEnumOptions(SolidWasteDisposal, solidWasteLabels);
+  readonly waterSupplyOptions      = this.getEnumOptions(WaterSupply, waterSupplyLabels);
 
   // Step state
   currentStep = 1;
