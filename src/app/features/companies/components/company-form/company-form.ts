@@ -15,7 +15,7 @@ import { showToast } from '../../../../shared/utils/toast.utils';
 import * as L from 'leaflet';
 import 'leaflet.utm';
 
-// ── Constants / Enum Labels ──────────────────────────────────────────────────
+// Constants / Enum Labels
 
 export const districtLabels: Record<string, string> = {
   [District.DISTRITO_1]: 'DISTRITO 1',
@@ -66,12 +66,11 @@ export const waterSupplyLabels: Record<string, string> = {
   [WaterSupply.OTROS]: 'OTROS',
 };
 
-// ── Custom validators ──────────────────────────────────────────────────────────
+// Custom validators
 
 function phoneValidator(control: AbstractControl): ValidationErrors | null {
   const val: string = control.value || '';
   if (!val) return null; // optional
-  // only digits and commas
   if (!/^[\d,\s]+$/.test(val)) {
     return { phoneInvalid: true };
   }
@@ -81,18 +80,14 @@ function phoneValidator(control: AbstractControl): ValidationErrors | null {
 function coordinatesValidator(control: AbstractControl): ValidationErrors | null {
   const val: string = (control.value || '').trim();
   if (!val) return { required: true };
-  // Accept common coordinate formats: decimal or DMS
-  // Decimal: -17.12345, -66.54321  or  17.12345 S 66.54321 W
-  // DMS: 17°23'45''S  66°09'12''W  or variants
   const decimalPattern = /^-?\d{1,3}(\.\d+)?[,\s]+-?\d{1,3}(\.\d+)?$/;
   const dmsPattern = /\d+[°º]\s*\d+[''′]\s*\d+[""″'']\s*[NSns]/i;
   if (decimalPattern.test(val) || dmsPattern.test(val)) return null;
-  // Allow any non-empty value containing a digit (loose fallback)
   if (/\d/.test(val)) return null;
   return { coordinatesInvalid: true };
 }
 
-// ── Component ─────────────────────────────────────────────────────────────────
+// Component 
 
 @Component({
   selector: 'app-company-form',
@@ -155,6 +150,8 @@ export class CompanyFormComponent implements OnInit {
   legalRepresentatives: LegalRepresentative[] = [];
   lrName = ''; lrCi = ''; lrPhone = '';
 
+  lrErrors: { name?: string; ci?: string; phone?: string } = {};
+
   // Reactive form
   form!: FormGroup;
 
@@ -168,7 +165,7 @@ export class CompanyFormComponent implements OnInit {
     if (this.companyToEdit) this.patchForm(this.companyToEdit);
   }
 
-  // ── Build ──────────────────────────────────────────────────────────────────
+  // Build 
 
   private buildForm() {
     this.form = this.fb.group({
@@ -180,7 +177,7 @@ export class CompanyFormComponent implements OnInit {
       businessClass: [''],
       legalRepName:  [''],
       legalRepCi:    ['', [Validators.pattern(/^[a-zA-Z0-9]*$/)]],
-      phone:         ['', [phoneValidator]], // Mantener para compatibilidad si es necesario, pero usaremos el array
+      phone:         ['', [phoneValidator]],
       email:         ['', [Validators.email]],
       observations:  [''],
 
@@ -207,7 +204,6 @@ export class CompanyFormComponent implements OnInit {
       installedPower:   [null],
     });
 
-    // Conditional validator: hazardousSubstancesDescription required when useHazardousSubstances = true
     this.form.get('useHazardousSubstances')?.valueChanges.subscribe(val => {
       const desc = this.form.get('hazardousSubstancesDescription')!;
       if (val === true) {
@@ -254,7 +250,7 @@ export class CompanyFormComponent implements OnInit {
     this.legalRepresentatives = [...(c.legalRepresentatives || [])];
   }
 
-  // ── Getters ────────────────────────────────────────────────────────────────
+  // Getters
 
   get f() { return this.form.controls; }
 
@@ -262,18 +258,16 @@ export class CompanyFormComponent implements OnInit {
     return this.form.get('useHazardousSubstances')?.value === true;
   }
 
-  /** Returns true if the field should show error styling */
   isInvalid(field: string): boolean {
     const ctrl = this.form.get(field);
     return !!(ctrl && ctrl.invalid && (ctrl.touched || this.submitted));
   }
 
-  /** Returns true for CAEB section error */
   get caebInvalid(): boolean {
     return this.submitted && this.caebList.length === 0;
   }
 
-  // ── Step navigation ────────────────────────────────────────────────────────
+  // Step navigation
 
   nextStep() {
     if (this.validateStep(this.currentStep) && this.currentStep < this.totalSteps) {
@@ -304,7 +298,6 @@ export class CompanyFormComponent implements OnInit {
       4: [],
     };
 
-    // Step 1 also needs at least one CAEB and at least one Legal Representative
     if (step === 1 && (this.caebList.length === 0 || this.legalRepresentatives.length === 0)) {
       this.submitted = true;
       (required[1] || []).forEach(k => this.form.get(k)?.markAsTouched());
@@ -320,7 +313,6 @@ export class CompanyFormComponent implements OnInit {
       }
     });
 
-    // Step 3: hazardousSubstancesDescription when applicable
     if (step === 3 && this.usesHazardous) {
       const desc = this.form.get('hazardousSubstancesDescription');
       desc?.markAsTouched();
@@ -342,7 +334,7 @@ export class CompanyFormComponent implements OnInit {
     return caebOk && repsOk && (required[step] || []).every(key => this.form.get(key)?.valid);
   }
 
-  // ── Dynamic lists — CAEB ───────────────────────────────────────────────────
+  // Dynamic lists — CAEB 
 
   addCaeb() {
     const code = this.caebInput.trim();
@@ -375,12 +367,12 @@ export class CompanyFormComponent implements OnInit {
 
   removeCaeb(i: number) { this.caebList.splice(i, 1); }
 
-  // ── Dynamic lists — Raw Materials ──────────────────────────────────────────
+  // Dynamic lists — Raw Materials 
 
   addRawMaterial() {
     if (this.rmName.trim()) {
-      this.rawMaterials.push({ 
-        name: this.rmName.trim(), 
+      this.rawMaterials.push({
+        name: this.rmName.trim(),
         quantity: this.rmQty.trim() || '',
         unit: this.rmUnit.trim() || ''
       });
@@ -390,7 +382,7 @@ export class CompanyFormComponent implements OnInit {
 
   removeRawMaterial(i: number) { this.rawMaterials.splice(i, 1); }
 
-  // ── Dynamic lists — Final Products ────────────────────────────────────────
+  // Dynamic lists — Final Products 
 
   addFinalProduct() {
     if (this.fpName.trim()) {
@@ -405,49 +397,75 @@ export class CompanyFormComponent implements OnInit {
 
   removeFinalProduct(i: number) { this.finalProducts.splice(i, 1); }
 
-  // ── Dynamic lists — Legal Representatives ───────────────────────────────────
+  // Dynamic lists — Legal Representatives 
 
   addLegalRepresentative() {
-    const name = this.lrName.trim();
-    if (name) {
-      this.legalRepresentatives.push({
-        name,
-        ci: this.lrCi.trim() || undefined,
-        phone: this.lrPhone.trim() || undefined
-      });
-      this.lrName = ''; this.lrCi = ''; this.lrPhone = '';
+    this.lrErrors = {};
+    const name  = this.lrName.trim();
+    const ci    = this.lrCi.trim();
+    const phone = this.lrPhone.trim();
+
+    // Validar nombre: requerido, solo letras y espacios
+    if (!name) {
+      this.lrErrors.name = 'El nombre es obligatorio.';
+    } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑüÜ\s]+$/.test(name)) {
+      this.lrErrors.name = 'Solo se permiten letras.';
     }
+
+    // Validar CI: opcional, alfanumérico, máx 15 caracteres
+    if (ci) {
+      if (!/^[a-zA-Z0-9\s]+$/.test(ci)) {
+        this.lrErrors.ci = 'Solo letras y números.';
+      } else if (ci.length > 15) {
+        this.lrErrors.ci = 'Máximo 15 caracteres.';
+      }
+    }
+
+    // Validar teléfono: opcional, solo dígitos, máx 8
+    if (phone) {
+      if (!/^\d+$/.test(phone)) {
+        this.lrErrors.phone = 'Solo se permiten números.';
+      } else if (phone.length > 8) {
+        this.lrErrors.phone = 'Máximo 8 dígitos.';
+      }
+    }
+
+    // Si hay algún error no agregar
+    if (Object.keys(this.lrErrors).length > 0) return;
+
+    this.legalRepresentatives.push({
+      name,
+      ci:    ci    || undefined,
+      phone: phone || undefined,
+    });
+    this.lrName = ''; this.lrCi = ''; this.lrPhone = '';
+    this.lrErrors = {};
   }
 
   removeLegalRepresentative(i: number) {
     this.legalRepresentatives.splice(i, 1);
   }
 
-  // ── Submit ─────────────────────────────────────────────────────────────────
+  // Submit
 
   onSubmit() {
     this.submitted     = true;
     this.conflictError = null;
 
-    // Mark all controls touched for full validation
     this.form.markAllAsTouched();
 
-    // Check step 1 required fields + CAEB
     const step1Valid = this.form.get('legalName')?.valid &&
                        this.form.get('category')?.valid &&
                        this.caebList.length > 0 &&
                        this.legalRepresentatives.length > 0;
 
-    // Check step 2 required fields
     const step2Valid = this.form.get('district')?.valid &&
                        this.form.get('geoZone')?.valid &&
                        this.form.get('coordinates')?.valid;
 
-    // Check step 3 conditional
     const step3Valid = !this.usesHazardous ||
                        this.form.get('hazardousSubstancesDescription')?.valid;
 
-    // Navigate to first invalid step
     if (!step1Valid) {
       this.currentStep = 1;
       this.cdr.detectChanges();
@@ -470,7 +488,6 @@ export class CompanyFormComponent implements OnInit {
     const v = this.form.value;
 
     const payload: Partial<Company> = {
-      // Step 1
       legalName:     v.legalName,
       nit:           v.nit           || undefined,
       raiNumber:     v.raiNumber     || undefined,
@@ -484,7 +501,6 @@ export class CompanyFormComponent implements OnInit {
       caebCodes:     this.caebList,
       legalRepresentatives: this.legalRepresentatives.length ? this.legalRepresentatives : undefined,
 
-      // Step 2
       municipality:  'Sacaba',
       address:       v.address       || undefined,
       district:      v.district      || undefined,
@@ -492,7 +508,6 @@ export class CompanyFormComponent implements OnInit {
       coordinates:   v.coordinates   || undefined,
       utmZone:       v.utmZone       || undefined,
 
-      // Step 3
       effluentDisposal:              v.effluentDisposal   || undefined,
       solidWasteDisposal:            v.solidWasteDisposal || undefined,
       useHazardousSubstances:        v.useHazardousSubstances,
@@ -501,7 +516,6 @@ export class CompanyFormComponent implements OnInit {
         : undefined,
       usesMercury: v.usesMercury,
 
-      // Step 4
       economicActivity: v.economicActivity || undefined,
       rawMaterials:     this.rawMaterials.length  ? this.rawMaterials  : undefined,
       finalProducts:    this.finalProducts.length ? this.finalProducts : undefined,
@@ -539,7 +553,7 @@ export class CompanyFormComponent implements OnInit {
     this.closeForm.emit();
   }
 
-  // ── Map Logic ──────────────────────────────────────────────────────────────
+  // Map Logic 
 
   openMap() {
     this.showMapModal = true;
@@ -551,14 +565,25 @@ export class CompanyFormComponent implements OnInit {
     this.showMapModal = false;
     if (this.map) {
       this.map.remove();
-      this.map = undefined;
+      this.map    = undefined;
+      this.marker = undefined; 
     }
   }
 
   private initMap() {
     if (this.map) return;
 
-    // Default center: Sacaba (-17.4042, -66.0408)
+    const defaultIcon = L.icon({
+      iconUrl:       'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+      iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+      shadowUrl:     'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+      iconSize:    [25, 41],
+      iconAnchor:  [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize:  [41, 41],
+    });
+    L.Marker.prototype.options.icon = defaultIcon;
+
     const lat = -17.4042;
     const lng = -66.0408;
 
@@ -568,15 +593,13 @@ export class CompanyFormComponent implements OnInit {
       attribution: '© OpenStreetMap'
     }).addTo(this.map);
 
-    // Initial marker if coordinates contain latitude/longitude or UTM
     const coordsStr = this.form.get('coordinates')?.value || '';
-    
-    // Simple extraction for Lat/Lon if they are decimal
     const decimalMatch = coordsStr.match(/(-?\d+\.\d+),\s*(-?\d+\.\d+)/);
     if (decimalMatch) {
       const latlng = L.latLng(parseFloat(decimalMatch[1]), parseFloat(decimalMatch[2]));
       this.marker = L.marker(latlng, { draggable: true }).addTo(this.map);
       this.map.setView(latlng, 16);
+      this.attachDragEnd();
     }
 
     this.map.on('click', (e: L.LeafletMouseEvent) => {
@@ -586,37 +609,41 @@ export class CompanyFormComponent implements OnInit {
 
   private setMarker(latlng: L.LatLng) {
     if (this.marker) {
+      this.marker.off('dragend');
       this.marker.setLatLng(latlng);
     } else {
       this.marker = L.marker(latlng, { draggable: true }).addTo(this.map!);
     }
+
     this.updateCoordsFromLatLng(latlng);
-    
+    this.attachDragEnd();
+  }
+
+  private attachDragEnd() {
+    if (!this.marker) return;
+    this.marker.off('dragend'); 
     this.marker.on('dragend', () => {
       this.updateCoordsFromLatLng(this.marker!.getLatLng());
     });
   }
 
   private updateCoordsFromLatLng(latlng: L.LatLng) {
-    // Convert to UTM
     // @ts-ignore
     const utm = latlng.utm();
-    
+
     const x = Math.round(utm.x * 100) / 100;
     const y = Math.round(utm.y * 100) / 100;
     const zoneStr = utm.zone === 20 ? '20K' : '19K';
-    
+
     this.form.patchValue({
       utmZone: utm.zone === 20 ? UtmZone.ZONE_20K : UtmZone.ZONE_19K,
       coordinates: `X: ${x}, Y: ${y}, Z: cargando... (${zoneStr})`
     });
 
-    // Fetch Elevation (Z)
     this.fetchElevation(latlng.lat, latlng.lng);
   }
 
   private fetchElevation(lat: number, lng: number) {
-    // Open-Elevation API (Free)
     const url = `https://api.open-elevation.com/api/v1/lookup?locations=${lat},${lng}`;
     fetch(url)
       .then(res => res.json())
@@ -624,7 +651,7 @@ export class CompanyFormComponent implements OnInit {
         if (data.results && data.results[0]) {
           const z = data.results[0].elevation;
           const current = this.form.get('coordinates')?.value || '';
-          this.form.patchValue({ 
+          this.form.patchValue({
             coordinates: current.replace('cargando...', Math.round(z).toString())
           });
         }
