@@ -29,11 +29,11 @@ export class CaseFileService {
   }
 
   closeCaseFile(id: string) {
-    return this.api.patch<CaseFile>(`${this.basePath}/${id}/close`, {});
+    return this.api.patch<CaseFile>(`${this.basePath}/${id}/close`, null);
   }
 
   reopenCaseFile(id: string) {
-    return this.api.patch<CaseFile>(`${this.basePath}/${id}/reopen`, {});
+    return this.api.patch<CaseFile>(`${this.basePath}/${id}/reopen`, null);
   }
 
   deleteCaseFile(id: string) {

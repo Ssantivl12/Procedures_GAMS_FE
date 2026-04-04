@@ -88,6 +88,13 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'case-files/:id',
+        loadComponent: () =>
+          import('./features/case-files/pages/case-file-detail/case-file-detail').then(
+            (m) => m.CaseFileDetailComponent
+          ),
+      },
+      {
         path: 'procedures',
         loadComponent: () =>
           import('./features/procedures/pages/procedures-list/procedures-list').then(

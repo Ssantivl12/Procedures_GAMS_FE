@@ -8,8 +8,6 @@ export interface CaseFile {
   openedAt: string;
   closedAt: string | null;
   isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
   company?: Company;
   raiStatus?: 'VIGENTE' | 'POR_VENCER' | 'VENCIDO' | null;
   proceduresSummary?: {

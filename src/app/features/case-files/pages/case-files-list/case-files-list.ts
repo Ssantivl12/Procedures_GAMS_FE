@@ -24,12 +24,14 @@ import { finalize } from 'rxjs';
         <app-case-file-header (addCaseFile)="openCreateModal()"></app-case-file-header>
         
         <app-case-file-filters
+          [pageSize]="pageSize"
           (filtersChanged)="onFiltersChanged($event)"
+          (pageSizeChange)="handlePageSizeChange($event)"
           (refresh)="caseFileTable.refresh()">
         </app-case-file-filters>
 
         <app-case-file-table 
-          (edit)="openEditModal($event)"
+          [pageSize]="pageSize"
           (close)="openCloseModal($event)"
           (reopen)="openReopenModal($event)"
           (delete)="openDeleteModal($event)">
@@ -154,18 +156,19 @@ export class CaseFilesListComponent {
   
   isProcessing = false;
   actionError: string | null = null;
-
+  pageSize = 10;
+ 
   onFiltersChanged(filters: any) {
     this.caseFileTable?.updateFilters(filters);
   }
 
-  openCreateModal() {
-    this.selectedCaseFile = null;
-    this.isModalOpen = true;
+  handlePageSizeChange(size: number) {
+    this.pageSize = size;
+    this.cdr.detectChanges();
   }
 
-  openEditModal(cf: CaseFile) {
-    this.selectedCaseFile = cf;
+  openCreateModal() {
+    this.selectedCaseFile = null;
     this.isModalOpen = true;
   }
 
@@ -200,12 +203,15 @@ export class CaseFilesListComponent {
   confirmReopen() {
     if (!this.caseFileToReopen) return;
     this.isProcessing = true;
+    this.actionError = null;
     
     this.caseFileService.reopenCaseFile(this.caseFileToReopen.id)
       .pipe(finalize(() => { this.isProcessing = false; this.cdr.detectChanges(); }))
       .subscribe({
         next: () => { this.caseFileToReopen = null; this.caseFileTable.refresh(); },
-        error: (err) => console.error('Error reopening:', err)
+        error: (err) => {
+          this.actionError = err.error?.message || 'Error al reabrir el expediente. Es posible que existan conflictos con otros trámites.';
+        }
       });
   }
 
