@@ -83,7 +83,7 @@
               </label>
               <div class="flex gap-2">
                 <input type="text" [(ngModel)]="caebInput" [ngModelOptions]="{standalone: true}"
-                  placeholder="Ej: 12345" maxlength="10"
+                  placeholder="Ej: 12345" maxlength="5"
                   (keyup.enter)="addCaeb()"
                   [class.is-invalid]="caebInvalid || !!caebError"
                   class="flex-1">
@@ -100,7 +100,7 @@
               <!-- Submit-level CAEB error -->
               <div *ngIf="caebInvalid && !caebError" class="field-error">
                 <svg class="error-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <span>Debe agregar al menos un código CAEB (5–10 dígitos).</span>
+                <span>Debe agregar al menos un código CAEB (5 dígitos).</span>
               </div>
               <div class="flex flex-wrap gap-2 mt-2">
                 <div *ngFor="let code of caebList; let i = index"

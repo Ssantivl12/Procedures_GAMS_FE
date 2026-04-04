@@ -348,10 +348,6 @@ export class CompanyFormComponent implements OnInit {
       this.caebError = 'Mínimo 5 dígitos.';
       return;
     }
-    if (code.length > 10) {
-      this.caebError = 'Máximo 10 dígitos.';
-      return;
-    }
     if (this.caebList.includes(code)) {
       this.caebError = 'Este código ya fue agregado.';
       return;
