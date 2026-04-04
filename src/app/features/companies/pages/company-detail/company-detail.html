@@ -79,8 +79,12 @@
               <div class="info-item"><span class="label">NIT:</span><span class="value font-medium">{{ company.nit || '—' }}</span></div>
               <div class="info-item"><span class="label">Categoría:</span><span class="value">{{ company.category }}</span></div>
               <div class="info-item"><span class="label">Actividad Económica:</span><span class="value">{{ company.economicActivity || '—' }}</span></div>
-              <div class="info-item"><span class="label">Municipio:</span><span class="value">{{ company.municipality || '—' }}</span></div>
+              <div class="info-item"><span class="label">Municipio:</span><span class="value">{{ company.municipality || 'Sacaba' }}</span></div>
+              <div class="info-item"><span class="label">Distrito:</span><span class="value">{{ company.district || '—' }}</span></div>
+              <div class="info-item"><span class="label">Zona:</span><span class="value">{{ company.geoZone || '—' }}</span></div>
               <div class="info-item dire-item"><span class="label">Dirección:</span><span class="value">{{ company.address || '—' }}</span></div>
+              <div class="info-item"><span class="label">Zona UTM:</span><span class="value">{{ company.utmZone || '—' }}</span></div>
+              <div class="info-item dire-item"><span class="label">Coordenadas (UTM):</span><span class="value font-mono text-xs">{{ company.coordinates || '—' }}</span></div>
               <div class="info-item"><span class="label">Fecha de Registro:</span><span class="value">{{ formatDate(company.createdAt) }}</span></div>
               @if (company.caebCodes && company.caebCodes.length > 0) {
                 <div class="info-item dire-item">
@@ -103,9 +107,24 @@
               Contacto y Representación Legal
             </h3>
             <div class="info-list">
-              <div class="info-item"><span class="label">Representante Legal:</span><span class="value">{{ company.legalRepName || '—' }}</span></div>
-              <div class="info-item"><span class="label">CI Representante:</span><span class="value">{{ company.legalRepCi || '—' }}</span></div>
-              <div class="info-item"><span class="label">Teléfono:</span><span class="value">{{ company.phone || '—' }}</span></div>
+              @if (company.legalRepresentatives && company.legalRepresentatives.length > 0) {
+                <div class="info-item dire-item">
+                  <span class="label mb-2">Representantes Legales:</span>
+                  <div class="space-y-2 mt-2">
+                    <div *ngFor="let rep of company.legalRepresentatives" class="p-2 bg-muted/40 rounded-lg border border-border/50">
+                      <div class="text-sm font-bold">{{ rep.name }}</div>
+                      <div class="flex gap-3 text-[10px] text-muted-foreground mt-0.5">
+                        <span *ngIf="rep.ci">CI: {{ rep.ci }}</span>
+                        <span *ngIf="rep.phone">Telf: {{ rep.phone }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              } @else {
+                <div class="info-item"><span class="label">Representante Legal:</span><span class="value">{{ company.legalRepName || '—' }}</span></div>
+                <div class="info-item"><span class="label">CI Representante:</span><span class="value">{{ company.legalRepCi || '—' }}</span></div>
+                <div class="info-item"><span class="label">Teléfono:</span><span class="value">{{ company.phone || '—' }}</span></div>
+              }
               <div class="info-item"><span class="label">Correo:</span><span class="value">{{ company.email || '—' }}</span></div>
               <div class="info-item"><span class="label">Nro. RAI:</span><span class="value">{{ company.raiNumber || '—' }}</span></div>
               @if (company.observations) {
@@ -114,6 +133,64 @@
                   <span class="value text-xs italic">{{ company.observations }}</span>
                 </div>
               }
+            </div>
+          </div>
+
+          <div class="detail-card full-width">
+            <h3 class="card-title">
+              <svg class="card-icon" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+              </svg>
+              Producción y Suministros
+            </h3>
+            <div class="info-grid-3">
+              <div class="info-item"><span class="label">Potencia Instalada (HP):</span><span class="value">{{ company.installedPower || '—' }}</span></div>
+              <div class="info-item"><span class="label">Superficie Utilizada:</span><span class="value">{{ company.usedArea || '—' }} {{ company.areaUnit }}</span></div>
+              <div class="info-item"><span class="label">Suministro de Agua:</span><span class="value">{{ company.waterSupply || '—' }}</span></div>
+            </div>
+            
+            <div class="lists-grid mt-4">
+              <div class="list-section">
+                <h4 class="list-title">Materias Primas</h4>
+                <div class="list-container">
+                  <table class="simple-table">
+                    <thead>
+                      <tr><th>Nombre</th><th>Cantidad</th><th>Unidad</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of company.rawMaterials">
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.unit }}</td>
+                      </tr>
+                      <tr *ngIf="!company.rawMaterials?.length">
+                        <td colspan="3" class="text-center text-muted-foreground py-4">No registradas</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div class="list-section">
+                <h4 class="list-title">Productos Finales</h4>
+                <div class="list-container">
+                  <table class="simple-table">
+                    <thead>
+                      <tr><th>Nombre</th><th>Cantidad</th><th>Unidad</th></tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let item of company.finalProducts">
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.unit }}</td>
+                      </tr>
+                      <tr *ngIf="!company.finalProducts?.length">
+                        <td colspan="3" class="text-center text-muted-foreground py-4">No registrados</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           </div>
         </div>

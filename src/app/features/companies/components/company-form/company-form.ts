@@ -12,6 +12,8 @@ import {
   District, GeoZone, UtmZone, EffluentDisposal, SolidWasteDisposal, WaterSupply
 } from '../../services/company.service';
 import { showToast } from '../../../../shared/utils/toast.utils';
+import * as L from 'leaflet';
+import 'leaflet.utm';
 
 // ── Constants / Enum Labels ──────────────────────────────────────────────────
 
@@ -25,6 +27,9 @@ export const districtLabels: Record<string, string> = {
   [District.DISTRITO_7]: 'DISTRITO 7',
   [District.DISTRITO_LAVA_LAVA]: 'DISTRITO LAVA LAVA',
   [District.DISTRITO_CHINATA]: 'DISTRITO CHIÑATA',
+  [District.DISTRITO_PALCA]: 'DISTRITO PALCA',
+  [District.DISTRITO_AGUIRRE]: 'DISTRITO AGUIRRE',
+  [District.DISTRITO_UCUCHI]: 'DISTRITO UCUCHI',
 };
 
 export const geoZoneLabels: Record<string, string> = {
@@ -141,8 +146,8 @@ export class CompanyFormComponent implements OnInit {
   caebList:   string[]      = [];
   caebError   = '';
 
-  rawMaterials: RawMaterial[]  = [];
-  rmName = ''; rmQty = '';
+  rawMaterials: RawMaterial[] = [];
+  rmName = ''; rmQty = ''; rmUnit = '';
 
   finalProducts: FinalProduct[] = [];
   fpName = ''; fpQty = ''; fpUnit = '';
@@ -152,6 +157,11 @@ export class CompanyFormComponent implements OnInit {
 
   // Reactive form
   form!: FormGroup;
+
+  // Map state
+  showMapModal = false;
+  private map?: L.Map;
+  private marker?: L.Marker;
 
   ngOnInit() {
     this.buildForm();
@@ -175,7 +185,7 @@ export class CompanyFormComponent implements OnInit {
       observations:  [''],
 
       // Step 2 — Ubicación
-      municipality:  [''],
+      municipality:  [{ value: 'Sacaba', disabled: true }, [Validators.required]],
       address:       [''],
       district:      ['', [Validators.required]],
       geoZone:       ['', [Validators.required]],
@@ -221,7 +231,7 @@ export class CompanyFormComponent implements OnInit {
       phone:         c.phone         || '',
       email:         c.email         || '',
       observations:  c.observations  || '',
-      municipality:  c.municipality  || '',
+      municipality:  'Sacaba',
       address:       c.address       || '',
       district:      c.district      || '',
       geoZone:       c.geoZone       || '',
@@ -369,8 +379,12 @@ export class CompanyFormComponent implements OnInit {
 
   addRawMaterial() {
     if (this.rmName.trim()) {
-      this.rawMaterials.push({ name: this.rmName.trim(), quantity: this.rmQty.trim() || '' });
-      this.rmName = ''; this.rmQty = '';
+      this.rawMaterials.push({ 
+        name: this.rmName.trim(), 
+        quantity: this.rmQty.trim() || '',
+        unit: this.rmUnit.trim() || ''
+      });
+      this.rmName = ''; this.rmQty = ''; this.rmUnit = '';
     }
   }
 
@@ -471,7 +485,7 @@ export class CompanyFormComponent implements OnInit {
       legalRepresentatives: this.legalRepresentatives.length ? this.legalRepresentatives : undefined,
 
       // Step 2
-      municipality:  v.municipality  || undefined,
+      municipality:  'Sacaba',
       address:       v.address       || undefined,
       district:      v.district      || undefined,
       geoZone:       v.geoZone       || undefined,
@@ -523,5 +537,98 @@ export class CompanyFormComponent implements OnInit {
   onFinish() {
     this.companyRegistered.emit();
     this.closeForm.emit();
+  }
+
+  // ── Map Logic ──────────────────────────────────────────────────────────────
+
+  openMap() {
+    this.showMapModal = true;
+    this.cdr.detectChanges();
+    setTimeout(() => this.initMap(), 100);
+  }
+
+  closeMap() {
+    this.showMapModal = false;
+    if (this.map) {
+      this.map.remove();
+      this.map = undefined;
+    }
+  }
+
+  private initMap() {
+    if (this.map) return;
+
+    // Default center: Sacaba (-17.4042, -66.0408)
+    const lat = -17.4042;
+    const lng = -66.0408;
+
+    this.map = L.map('map-container').setView([lat, lng], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(this.map);
+
+    // Initial marker if coordinates contain latitude/longitude or UTM
+    const coordsStr = this.form.get('coordinates')?.value || '';
+    
+    // Simple extraction for Lat/Lon if they are decimal
+    const decimalMatch = coordsStr.match(/(-?\d+\.\d+),\s*(-?\d+\.\d+)/);
+    if (decimalMatch) {
+      const latlng = L.latLng(parseFloat(decimalMatch[1]), parseFloat(decimalMatch[2]));
+      this.marker = L.marker(latlng, { draggable: true }).addTo(this.map);
+      this.map.setView(latlng, 16);
+    }
+
+    this.map.on('click', (e: L.LeafletMouseEvent) => {
+      this.setMarker(e.latlng);
+    });
+  }
+
+  private setMarker(latlng: L.LatLng) {
+    if (this.marker) {
+      this.marker.setLatLng(latlng);
+    } else {
+      this.marker = L.marker(latlng, { draggable: true }).addTo(this.map!);
+    }
+    this.updateCoordsFromLatLng(latlng);
+    
+    this.marker.on('dragend', () => {
+      this.updateCoordsFromLatLng(this.marker!.getLatLng());
+    });
+  }
+
+  private updateCoordsFromLatLng(latlng: L.LatLng) {
+    // Convert to UTM
+    // @ts-ignore
+    const utm = latlng.utm();
+    
+    const x = Math.round(utm.x * 100) / 100;
+    const y = Math.round(utm.y * 100) / 100;
+    const zoneStr = utm.zone === 20 ? '20K' : '19K';
+    
+    this.form.patchValue({
+      utmZone: utm.zone === 20 ? UtmZone.ZONE_20K : UtmZone.ZONE_19K,
+      coordinates: `X: ${x}, Y: ${y}, Z: cargando... (${zoneStr})`
+    });
+
+    // Fetch Elevation (Z)
+    this.fetchElevation(latlng.lat, latlng.lng);
+  }
+
+  private fetchElevation(lat: number, lng: number) {
+    // Open-Elevation API (Free)
+    const url = `https://api.open-elevation.com/api/v1/lookup?locations=${lat},${lng}`;
+    fetch(url)
+      .then(res => res.json())
+      .then(data => {
+        if (data.results && data.results[0]) {
+          const z = data.results[0].elevation;
+          const current = this.form.get('coordinates')?.value || '';
+          this.form.patchValue({ 
+            coordinates: current.replace('cargando...', Math.round(z).toString())
+          });
+        }
+      })
+      .catch(err => console.warn('Elevation API failed', err));
   }
 }

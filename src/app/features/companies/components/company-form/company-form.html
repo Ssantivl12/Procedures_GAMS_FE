@@ -302,17 +302,17 @@
             <!-- Coordenadas -->
             <div class="form-group">
               <label>
-                Ubicación / Coordenadas
+                Ubicación / Coordenadas (UTM)
                 <span class="required-star">*</span>
               </label>
+              
               <div class="flex gap-2">
                 <input type="text" formControlName="coordinates"
-                  placeholder="Ej: -17.12345, -66.54321 o 17°23'45''S 66°09'12''W"
+                  placeholder="X: ..., Y: ..., Z: ..."
                   [class.is-invalid]="isInvalid('coordinates')"
                   class="flex-1">
-                <button type="button"
-                  class="px-4 py-2 bg-muted border border-border rounded-xl text-xs font-bold text-muted-foreground flex items-center gap-1.5 hover:bg-accent transition-colors"
-                  title="Próximamente: seleccionar en mapa" disabled>
+                <button type="button" (click)="openMap()"
+                  class="map-btn shrink-0">
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                       d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6-3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
@@ -320,12 +320,11 @@
                   Mapa
                 </button>
               </div>
+
               <div *ngIf="isInvalid('coordinates')" class="field-error">
                 <svg class="error-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <span *ngIf="f['coordinates'].errors?.['required']">Las coordenadas son obligatorias.</span>
-                <span *ngIf="f['coordinates'].errors?.['coordinatesInvalid']">Ingrese coordenadas válidas (ej: -17.123, -66.543).</span>
+                <span>Las coordenadas son requeridas (Formato X, Y, Z).</span>
               </div>
-              <p class="field-hint">Formato decimal (lat, lon) o grados sexagesimales.</p>
             </div>
 
             <div class="form-group">
@@ -424,7 +423,9 @@
                 <input type="text" [(ngModel)]="rmName" [ngModelOptions]="{standalone: true}"
                   placeholder="Nombre" class="flex-1" (keyup.enter)="addRawMaterial()">
                 <input type="text" [(ngModel)]="rmQty" [ngModelOptions]="{standalone: true}"
-                  placeholder="Cantidad" class="w-28" (keyup.enter)="addRawMaterial()">
+                  placeholder="Cantidad" class="w-24" (keyup.enter)="addRawMaterial()">
+                <input type="text" [(ngModel)]="rmUnit" [ngModelOptions]="{standalone: true}"
+                  placeholder="Unidad" class="w-20" (keyup.enter)="addRawMaterial()">
                 <button type="button" (click)="addRawMaterial()"
                   class="cursor-pointer px-3 py-2 bg-accent rounded-xl text-xs font-bold hover:bg-accent/80 transition-colors shrink-0">
                   Agregar
@@ -436,6 +437,7 @@
                     <tr>
                       <th class="px-3 py-2 text-left font-semibold text-muted-foreground">Nombre</th>
                       <th class="px-3 py-2 text-left font-semibold text-muted-foreground">Cantidad</th>
+                      <th class="px-3 py-2 text-left font-semibold text-muted-foreground">Unidad</th>
                       <th class="px-2 py-2 w-8"></th>
                     </tr>
                   </thead>
@@ -443,6 +445,7 @@
                     <tr *ngFor="let rm of rawMaterials; let i = index">
                       <td class="px-3 py-2 font-medium">{{ rm.name }}</td>
                       <td class="px-3 py-2 text-muted-foreground">{{ rm.quantity }}</td>
+                      <td class="px-3 py-2 text-muted-foreground">{{ rm.unit }}</td>
                       <td class="px-2 py-2">
                         <button type="button" (click)="removeRawMaterial(i)"
                           class="text-muted-foreground hover:text-destructive transition-colors">
@@ -585,5 +588,29 @@
       </div>
 
     </ng-container>
+
+    <!-- Map Modal Overlay -->
+    <div *ngIf="showMapModal" class="map-modal-overlay" (click)="closeMap()">
+      <div class="map-modal-box" (click)="$event.stopPropagation()">
+        <div class="map-modal-header">
+          <h3 class="text-lg font-bold text-foreground">Seleccionar Ubicación</h3>
+          <button type="button" (click)="closeMap()" class="p-2 hover:bg-accent rounded-lg">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        <div class="map-modal-body">
+          <div id="map-container"></div>
+        </div>
+        <div class="map-modal-footer">
+          <button type="button" (click)="closeMap()"
+            class="px-6 py-2 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:opacity-90 transition-all">
+            Confirmar Ubicación
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>

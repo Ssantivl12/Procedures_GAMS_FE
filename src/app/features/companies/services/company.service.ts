@@ -7,6 +7,7 @@ import { PaginatedResponse } from '../../../shared/models';
 export interface RawMaterial {
   name:     string;
   quantity: string;
+  unit:     string;
 }
 
 export interface FinalProduct {
@@ -31,6 +32,9 @@ export enum District {
   DISTRITO_7 = 'DISTRITO_7',
   DISTRITO_LAVA_LAVA = 'DISTRITO_LAVA_LAVA',
   DISTRITO_CHINATA = 'DISTRITO_CHINATA',
+  DISTRITO_PALCA = 'DISTRITO_PALCA',
+  DISTRITO_AGUIRRE = 'DISTRITO_AGUIRRE',
+  DISTRITO_UCUCHI = 'DISTRITO_UCUCHI',
 }
 
 export enum GeoZone {
