@@ -220,7 +220,6 @@
             </div>
             <div class="info-list">
               <div class="info-item"><span class="label">Código:</span><span class="value font-medium">{{ caseFile.code || '—' }}</span></div>
-              <div class="info-item"><span class="label">Nro. Expediente Físico:</span><span class="value">{{ caseFile.fileNumber || '—' }}</span></div>
               <div class="info-item"><span class="label">Fecha de Apertura:</span><span class="value">{{ formatDate(caseFile.openedAt) }}</span></div>
               @if (caseFile.closedAt) {
                 <div class="info-item"><span class="label">Fecha de Cierre:</span><span class="value">{{ formatDate(caseFile.closedAt) }}</span></div>

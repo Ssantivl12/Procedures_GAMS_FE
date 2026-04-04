@@ -126,8 +126,8 @@ import { finalize } from 'rxjs';
                 }
 
                 <div class="flex items-center justify-end gap-3 mt-6">
-                    <button type="button" class="px-4 py-2 text-sm font-semibold text-foreground hover:bg-accent rounded-lg transition-colors" (click)="caseFileToDelete = null; actionError = null">Cancelar</button>
-                    <button type="button" class="px-4 py-2 text-sm font-semibold bg-destructive hover:bg-destructive/90 text-white rounded-lg transition-colors flex items-center gap-2" [disabled]="isProcessing" (click)="confirmDelete()">
+                    <button type="button" class="cursor-pointer px-4 py-2 text-sm font-semibold text-foreground hover:bg-accent rounded-lg transition-colors" (click)="caseFileToDelete = null; actionError = null">Cancelar</button>
+                    <button type="button" class="cursor-pointer px-4 py-2 text-sm font-semibold bg-destructive hover:bg-destructive/90 text-white rounded-lg transition-colors flex items-center gap-2" [disabled]="isProcessing" (click)="confirmDelete()">
                         <span *ngIf="isProcessing" class="inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
                         Eliminar Permanente
                     </button>

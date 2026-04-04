@@ -21,7 +21,7 @@ export class ConfigService {
     return this.api.get<ProcedureType[]>('/config/procedure-types');
   }
 
-  // Deadline Config
+  // Deadline Config Corrected Paths
   getDeadlineConfigs(): Observable<DeadlineConfig[]> {
     return this.api.get<DeadlineConfig[]>('/config/deadline-config');
   }
@@ -39,8 +39,8 @@ export class ConfigService {
     return this.api.post<NonWorkingDay>('/config/non-working-days', dto);
   }
 
-  bulkCreateNonWorkingDays(dto: BulkCreateNonWorkingDaysDto): Observable<{ count: number }> {
-    return this.api.post<{ count: number }>('/config/non-working-days/bulk', dto);
+  bulkCreateNonWorkingDays(dto: BulkCreateNonWorkingDaysDto): Observable<{ inserted: number, skipped: number }> {
+    return this.api.post<{ inserted: number, skipped: number }>('/config/non-working-days/bulk', dto);
   }
 
   deleteNonWorkingDay(id: string): Observable<void> {

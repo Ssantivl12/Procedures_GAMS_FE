@@ -6,6 +6,7 @@ import { ConfigService } from '../../services/config.service';
 import { DeadlineConfig } from '../../models/config.model';
 import { finalize } from 'rxjs';
 import { AuthService, UserRole } from '../../../../core/auth/auth.service';
+import { showToast } from '../../../../shared/utils/toast.utils';
 
 @Component({
   selector: 'app-deadlines-config',
@@ -22,11 +23,6 @@ import { AuthService, UserRole } from '../../../../core/auth/auth.service';
             <span class="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></span>
             <span class="text-xs font-bold uppercase tracking-wider">Guardando...</span>
         </div>
-        <div *ngIf="feedbackMessage()" 
-             [class]="feedbackType() === 'success' ? 'text-emerald-500' : 'text-destructive'"
-             class="text-xs font-bold uppercase tracking-wider animate-bounce">
-            {{ feedbackMessage() }}
-        </div>
       </div>
       
       <div class="overflow-x-auto">
@@ -34,7 +30,7 @@ import { AuthService, UserRole } from '../../../../core/auth/auth.service';
           <thead>
             <tr class="bg-muted/50 text-[10px] uppercase tracking-widest text-muted-foreground font-bold border-b border-border">
               <th class="px-6 py-4">Trámite</th>
-              <th class="px-6 py-4 text-center">Ciclo</th>
+              <th class="px-6 py-4 text-center">Ciclo / Etapa</th>
               <th class="px-6 py-4 text-center">Días Hábiles</th>
               <th class="px-6 py-4 text-right pr-10" *ngIf="!isReadOnly">Edición Directa</th>
             </tr>
@@ -44,23 +40,24 @@ import { AuthService, UserRole } from '../../../../core/auth/auth.service';
               <tr class="hover:bg-muted/20 transition-colors group">
                 <td class="px-6 py-4">
                   <div class="flex flex-col">
-                    <span class="text-sm font-bold text-foreground">{{ config.procedureTypeData?.name || config.procedureType }}</span>
-                    <span class="text-[10px] font-mono text-muted-foreground">{{ config.procedureType }}</span>
+                    <span class="text-sm font-bold text-foreground uppercase tracking-wider">{{ config.procedureType }}</span>
+                    <span class="text-[10px] text-muted-foreground line-clamp-1 italic">{{ config.description || 'Sin descripción' }}</span>
                   </div>
                 </td>
                 <td class="px-6 py-4 text-center">
-                  <span class="text-xs font-bold" [class]="config.cycleNumber === 1 ? 'text-primary' : 'text-orange-600'">
-                    Ciclo {{ config.cycleNumber }}
+                  <span class="text-[10px] font-bold px-2 py-1 rounded-full border" 
+                        [class]="config.cycleNumber === 0 ? 'bg-indigo-100 text-indigo-700 border-indigo-200' : 'bg-amber-100 text-amber-700 border-amber-200'">
+                    {{ config.cycleNumber === 0 ? 'Primera Revisión' : 'Reingresos' }}
                   </span>
                 </td>
                 <td class="px-6 py-4 text-center">
-                    <span class="text-sm font-mono font-bold">{{ config.workingDays }} d</span>
+                    <span class="text-sm font-mono font-bold">{{ config.deadlineDays }} d</span>
                 </td>
                 <td class="px-6 py-4 text-right pr-10" *ngIf="!isReadOnly">
                     <div class="flex items-center justify-end gap-2 group-hover:opacity-100 transition-opacity" 
                          [class.opacity-30]="!isSuperAdmin">
                         <input type="number" 
-                               [(ngModel)]="config.workingDays" 
+                               [(ngModel)]="config.deadlineDays" 
                                (blur)="updateDays(config)"
                                (keyup.enter)="updateDays(config)"
                                min="1" max="90"
@@ -90,31 +87,35 @@ export class DeadlinesConfigComponent implements OnInit {
   
   readonly deadlineConfigs = this.configCache.deadlineConfigs;
   readonly isUpdating = signal(false);
-  readonly feedbackMessage = signal<string | null>(null);
-  readonly feedbackType = signal<'success' | 'error'>('success');
   
   isSuperAdmin = false;
   private originalValues = new Map<string, number>();
 
   ngOnInit(): void {
     this.isSuperAdmin = this.authService.hasRole([UserRole.SUPERADMIN]);
+    
+    // Initialize original values for change detection
+    const configs = this.deadlineConfigs();
+    if (configs) {
+      configs.forEach(c => this.originalValues.set(c.id, c.deadlineDays));
+    }
   }
 
   updateDays(config: DeadlineConfig) {
     if (this.isReadOnly || this.isUpdating()) return;
     
-    const newValue = config.workingDays;
-    const originalValue = this.originalValues.get(config.id) ?? config.deadlineDays ?? config.workingDays;
+    const newValue = config.deadlineDays;
+    const originalValue = this.originalValues.get(config.id) ?? config.deadlineDays;
 
     if (newValue === originalValue) return;
 
     this.isUpdating.set(true);
-    this.feedbackMessage.set(null);
 
     this.configService.updateDeadlineConfig({ 
       procedureType: config.procedureType,
       cycleNumber: Number(config.cycleNumber),
-      deadlineDays: Number(newValue)
+      deadlineDays: Number(newValue),
+      description: config.description || undefined
     }).pipe(
       finalize(() => {
         this.isUpdating.set(false);
@@ -122,20 +123,14 @@ export class DeadlinesConfigComponent implements OnInit {
     ).subscribe({
       next: () => {
         this.originalValues.set(config.id, newValue);
-        this.showFeedback('¡Guardado!', 'success');
+        showToast('success', 'Plazo actualizado correctamente');
         this.configCache.refreshDeadlineConfigs();
       },
       error: (err) => {
         console.error('Error updating deadline:', err);
-        config.workingDays = originalValue; // Revert
-        this.showFeedback('Error al guardar', 'error');
+        config.deadlineDays = originalValue; // Revert
+        showToast('error', 'Error al actualizar el plazo');
       }
     });
-  }
-
-  private showFeedback(message: string, type: 'success' | 'error') {
-    this.feedbackMessage.set(message);
-    this.feedbackType.set(type);
-    setTimeout(() => this.feedbackMessage.set(null), 3000);
   }
 }

@@ -39,7 +39,7 @@ import { DashboardHeaderComponent } from '../../../dashboard/components/dashboar
             <button 
               (click)="activeTab = 'types'"
               [class]="activeTab === 'types' ? 'bg-card text-foreground shadow-md' : 'text-muted-foreground hover:text-foreground hover:bg-muted'"
-              class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200">
+              class="cursor-pointer flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200">
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" /><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z" /></svg>
               Tipos de Trámite
             </button>
@@ -47,7 +47,7 @@ import { DashboardHeaderComponent } from '../../../dashboard/components/dashboar
             <button 
               (click)="activeTab = 'deadlines'"
               [class]="activeTab === 'deadlines' ? 'bg-card text-foreground shadow-md' : 'text-muted-foreground hover:text-foreground hover:bg-muted'"
-              class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200">
+              class="cursor-pointer flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200">
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
               Configuración de Plazos
             </button>
@@ -55,7 +55,7 @@ import { DashboardHeaderComponent } from '../../../dashboard/components/dashboar
             <button 
               (click)="activeTab = 'holidays'"
               [class]="activeTab === 'holidays' ? 'bg-card text-foreground shadow-md' : 'text-muted-foreground hover:text-foreground hover:bg-muted'"
-              class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200">
+              class="cursor-pointer flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-200">
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" /></svg>
               Días No Laborables
             </button>
