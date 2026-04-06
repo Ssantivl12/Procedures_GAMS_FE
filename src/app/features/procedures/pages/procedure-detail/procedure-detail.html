@@ -74,6 +74,14 @@
     </app-status-change-dialog>
   }
 
+  @if (showReentryDialog && procedure) {
+    <app-reentry-dialog
+      [procedureId]="procedure.id"
+      (closeDialog)="showReentryDialog = false"
+      (reentryCompleted)="onReentryCompleted()">
+    </app-reentry-dialog>
+  }
+
   @if (showAssignDialog && procedure) {
     <app-assign-inspector-dialog
       [procedureId]="procedure.id"

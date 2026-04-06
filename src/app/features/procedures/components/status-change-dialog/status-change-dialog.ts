@@ -126,7 +126,7 @@ export class StatusChangeDialogComponent {
   @Input({ required: true }) procedureId!: string;
   @Input({ required: true }) currentStatus!: ProcedureStatus;
   @Input() procedureTypeCode: ProcedureTypeCode = ProcedureTypeCode.RAI;
-  @Input() action: 'advance' | 'pickup' | 'reentry' | 'close' | 'abandon' | 'reverse-abandon' = 'advance';
+  @Input() action: 'advance' | 'pickup' | 'close' | 'abandon' | 'reverse-abandon' = 'advance';
   @Output() closeDialog = new EventEmitter<void>();
   @Output() statusChanged = new EventEmitter<void>();
 
@@ -147,7 +147,6 @@ export class StatusChangeDialogComponent {
     switch (this.action) {
       case 'advance': return this.currentStatus === ProcedureStatus.RECIBIDO ? 'Iniciar Revisión' : 'Avanzar Estado';
       case 'pickup': return 'Registrar Recojo';
-      case 'reentry': return 'Registrar Reingreso';
       case 'close': return 'Cerrar / Aprobar Trámite';
       case 'abandon': return 'Marcar como Abandonado';
       case 'reverse-abandon': return 'Revertir Abandono';
@@ -159,7 +158,6 @@ export class StatusChangeDialogComponent {
     switch (this.action) {
       case 'advance': return 'Iniciar Revisión';
       case 'pickup': return 'Registrar Recojo';
-      case 'reentry': return 'Registrar Reingreso';
       case 'close': return 'Cerrar Trámite';
       case 'abandon': return 'Confirmar Abandono';
       case 'reverse-abandon': return 'Revertir Abandono';
@@ -173,7 +171,6 @@ export class StatusChangeDialogComponent {
         return this.currentStatus === ProcedureStatus.RECIBIDO
           ? ProcedureStatus.EN_REVISION : ProcedureStatus.CERRADO;
       case 'pickup': return ProcedureStatus.SUBSANACION_PENDIENTE_REINGRESO;
-      case 'reentry': return ProcedureStatus.EN_REVISION;
       case 'close': return ProcedureStatus.CERRADO;
       case 'abandon': return ProcedureStatus.ABANDONADO;
       case 'reverse-abandon': return this.currentStatus; // Backend handles previous state

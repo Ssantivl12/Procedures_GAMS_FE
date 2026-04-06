@@ -142,8 +142,10 @@ export class ProcedureActionsComponent {
   }
 
   get canReentry(): boolean {
-    return this.currentStatus === ProcedureStatus.SUBSANACION_PENDIENTE_REINGRESO
-      && (this.isSuperadminOrEncargado || this.isInspector);
+    return (
+      this.currentStatus === ProcedureStatus.SUBSANACION_PENDIENTE_REINGRESO &&
+      (this.isSuperadminOrEncargado || this.isSecretaria)
+    );
   }
 
   get canAssign(): boolean {

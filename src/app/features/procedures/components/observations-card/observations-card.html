@@ -42,7 +42,6 @@
                 @for (obs of group.observations; track obs.id) {
                   <app-observation-item
                     [observation]="obs"
-                    [activeCycleId]="activeCycleId"
                     (resolve)="onResolve($event)"
                     (reopen)="onReopen($event)">
                   </app-observation-item>

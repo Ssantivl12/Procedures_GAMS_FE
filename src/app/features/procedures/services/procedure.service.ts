@@ -8,6 +8,7 @@ import {
   CreateProcedurePayload,
   PaginatedResponse,
   ProcedureCycle,
+  CreateCyclePayload,
 } from '../../../shared/models';
 
 @Injectable({ providedIn: 'root' })
@@ -61,5 +62,9 @@ export class ProcedureService {
 
   getCycle(procedureId: string, cycleId: string) {
     return this.api.get<ProcedureCycle>(`${this.basePath}/${procedureId}/cycles/${cycleId}`);
+  }
+
+  createCycle(procedureId: string, data: CreateCyclePayload) {
+    return this.api.post<ProcedureCycle>(`${this.basePath}/${procedureId}/cycles`, data);
   }
 }

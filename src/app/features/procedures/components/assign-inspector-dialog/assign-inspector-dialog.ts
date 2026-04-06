@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ChangeDetectorRef } from '@angular/core';
 import { ProcedureService } from '../../services/procedure.service';
 import { UserService, User } from '../../../users/services/user.service';
+import { AuthService, UserRole } from '../../../../core/auth/auth.service';
 
 @Component({
   selector: 'app-assign-inspector-dialog',
@@ -96,7 +97,11 @@ export class AssignInspectorDialogComponent implements OnInit {
         const all = Array.isArray(inspectors) ? inspectors : [];
         this.inspectors = all.filter((u: any) => {
           const roles: string[] = Array.isArray(u.roles) ? u.roles : [];
-          return roles.some(r => r?.toUpperCase() === 'INSPECTOR');
+          return roles.some(r => [
+            UserRole.INSPECTOR as string,
+            UserRole.ENCARGADO as string,
+            UserRole.SUPERADMIN as string
+          ].includes(r?.toUpperCase()));
         });
         this.isLoading = false;
         this.cdr.detectChanges();

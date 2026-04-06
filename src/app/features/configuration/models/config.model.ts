@@ -8,7 +8,7 @@ export interface ProcedureType {
 }
 
 export interface DeadlineConfig {
-  id: string;
+  id: number;
   procedureType: string;
   cycleNumber: number;
   deadlineDays: number;
@@ -20,7 +20,7 @@ export interface DeadlineConfig {
 export interface NonWorkingDay {
   id: string;
   date: string;
-  description: string;
+  description: string | null;
   type: string;
   isActive: boolean;
   createdAt: string;
@@ -29,7 +29,7 @@ export interface NonWorkingDay {
 
 export interface CreateNonWorkingDayDto {
   date: string;
-  description: string;
+  description: string | null;
   type: string;
 }
 
@@ -41,5 +41,11 @@ export interface UpdateDeadlineConfigDto {
   procedureType: string;
   cycleNumber: number;
   deadlineDays: number;
-  description?: string;
+  description?: string | null;
+}
+
+export interface UpdateNonWorkingDayDto {
+  date?: string;
+  description?: string | null;
+  type?: string;
 }

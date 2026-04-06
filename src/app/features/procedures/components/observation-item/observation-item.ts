@@ -53,7 +53,7 @@ import { PriorityBadgeComponent } from '../../../../shared/ui/priority-badge/pri
         }
       </div>
       <div class="flex items-center gap-1 flex-shrink-0">
-        @if (!observation.isResolved && canResolve && canResolveDueToCycle) {
+        @if (!observation.isResolved && canResolve) {
           <button class="px-2.5 py-1 text-xs font-medium text-emerald-700 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors"
                   (click)="resolve.emit(observation)">
             Resolver
@@ -73,18 +73,11 @@ export class ObservationItemComponent {
   private readonly auth = inject(AuthService);
 
   @Input({ required: true }) observation!: Observation;
-  @Input() activeCycleId: string | null = null;
   @Output() resolve = new EventEmitter<Observation>();
   @Output() reopen = new EventEmitter<Observation>();
 
   get canResolve(): boolean {
     return this.auth.hasRole([UserRole.SUPERADMIN, UserRole.ENCARGADO, UserRole.INSPECTOR]);
-  }
-
-  get canResolveDueToCycle(): boolean {
-    // Solo se pueden resolver observaciones de CICLOS ANTERIORES.
-    // Si la observación pertenece al ciclo activo, NO se puede resolver (según contrato).
-    return this.observation.cycleId !== this.activeCycleId;
   }
 
   get canReopen(): boolean {

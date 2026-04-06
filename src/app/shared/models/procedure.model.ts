@@ -75,3 +75,10 @@ export interface CreateProcedurePayload {
   internalFileNumber?: string;
   generalNotes?: string;
 }
+
+export interface CreateCyclePayload {
+  reentryDate: string;
+  reviewStartDate: string;
+  autoTransition: boolean;
+  note?: string;
+}

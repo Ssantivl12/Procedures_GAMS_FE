@@ -89,7 +89,7 @@ export class DeadlinesConfigComponent implements OnInit {
   readonly isUpdating = signal(false);
   
   isSuperAdmin = false;
-  private originalValues = new Map<string, number>();
+  private originalValues = new Map<number, number>();
 
   ngOnInit(): void {
     this.isSuperAdmin = this.authService.hasRole([UserRole.SUPERADMIN]);

@@ -12,6 +12,7 @@ import { DocumentsCardComponent } from '../../components/documents-card/document
 import { StatusChangeDialogComponent } from '../../components/status-change-dialog/status-change-dialog';
 import { AssignInspectorDialogComponent } from '../../components/assign-inspector-dialog/assign-inspector-dialog';
 import { ObservationFormComponent } from '../../components/observation-form/observation-form';
+import { ReentryDialogComponent } from '../../components/reentry-dialog/reentry-dialog';
 import { StatusBadgeComponent } from '../../../../shared/ui/status-badge/status-badge';
 import { TypeBadgeComponent } from '../../../../shared/ui/type-badge/type-badge';
 import { ProcedureService } from '../../services/procedure.service';
@@ -26,7 +27,7 @@ import { Procedure, ProcedureAudit, ProcedureStatus, ProcedureTypeCode } from '.
     ProcedureActionsComponent, ProcedureAuditTimelineComponent,
     ObservationsCardComponent, DocumentsCardComponent,
     StatusChangeDialogComponent, AssignInspectorDialogComponent, ObservationFormComponent,
-    StatusBadgeComponent, TypeBadgeComponent,
+    ReentryDialogComponent, StatusBadgeComponent, TypeBadgeComponent,
   ],
   templateUrl: './procedure-detail.html',
   styleUrl: './procedure-detail.css',
@@ -43,7 +44,8 @@ export class ProcedureDetailComponent implements OnInit {
   procedureId = '';
 
   showStatusDialog = false;
-  statusDialogAction: 'advance' | 'pickup' | 'reentry' | 'close' | 'abandon' | 'reverse-abandon' = 'advance';
+  statusDialogAction: 'advance' | 'pickup' | 'close' | 'abandon' | 'reverse-abandon' = 'advance';
+  showReentryDialog = false;
   showAssignDialog = false;
   showObservationForm = false;
 
@@ -99,8 +101,7 @@ export class ProcedureDetailComponent implements OnInit {
         this.showStatusDialog = true;
         break;
       case 'reentry':
-        this.statusDialogAction = 'reentry';
-        this.showStatusDialog = true;
+        this.showReentryDialog = true;
         break;
       case 'abandon':
         this.statusDialogAction = 'abandon';
@@ -118,6 +119,11 @@ export class ProcedureDetailComponent implements OnInit {
 
   onStatusChanged(): void {
     this.showStatusDialog = false;
+    this.loadProcedure();
+  }
+
+  onReentryCompleted(): void {
+    this.showReentryDialog = false;
     this.loadProcedure();
   }
 
