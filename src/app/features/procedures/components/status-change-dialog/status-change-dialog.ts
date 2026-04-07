@@ -61,8 +61,11 @@ import { showToast } from '../../../../shared/utils/toast.utils';
               }
             </div>
             <div>
-              <label class="block text-sm font-medium text-foreground mb-1.5">Certificado de Aprobación *</label>
-              <input formControlName="approvalCertificate" type="text" placeholder="Nro. certificado"
+              <label class="block text-sm font-medium text-foreground mb-1.5">
+                {{ procedureTypeCode === 'RAI' ? 'Nro. de Certificado RAI *' : 'Nro. de Resolución Administrativa *' }}
+              </label>
+              <input formControlName="approvalCertificate" type="text"
+                     [placeholder]="procedureTypeCode === 'RAI' ? 'Nro. certificado RAI' : 'Nro. de resolución'"
                      class="w-full px-3 py-2 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/30"
                      [class.border-red-400]="submitted && (form.get('approvalCertificate')?.invalid || !form.get('approvalCertificate')?.value)" />
               @if (submitted && !form.get('approvalCertificate')?.value) {
