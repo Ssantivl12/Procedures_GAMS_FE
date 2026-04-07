@@ -6,6 +6,7 @@ import { CaseFileService } from '../../services/case-file.service';
 import { CompanyService, Company } from '../../../companies/services/company.service';
 import { CaseFile, CreateCaseFileDto, UpdateCaseFileDto } from '../../../../shared/models/case-file.model';
 import { debounceTime, distinctUntilChanged, finalize, switchMap, of } from 'rxjs';
+import { showToast } from '../../../../shared/utils/toast.utils';
 
 @Component({
   selector: 'app-case-file-form',
@@ -14,20 +15,9 @@ import { debounceTime, distinctUntilChanged, finalize, switchMap, of } from 'rxj
   template: `
     <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" (click)="onClose()">
       <div class="bg-card rounded-2xl shadow-xl border border-border w-full max-w-md mx-4 animate-slide-up" (click)="$event.stopPropagation()">
-        @if (showSuccess) {
-          <div class="flex flex-col items-center justify-center py-8 px-6">
-            <div class="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mb-4">
-              <svg class="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-              </svg>
-            </div>
-            <h3 class="text-lg font-semibold text-foreground">{{ isEditing ? 'Expediente Actualizado' : 'Expediente Creado' }}</h3>
-            <p class="text-sm text-muted-foreground mt-1">La operación se ha realizado exitosamente.</p>
-          </div>
-        } @else {
           <div class="flex items-center justify-between p-6 border-b border-border">
-            <h2 class="text-lg font-semibold text-foreground">{{ isEditing ? 'Editar Expediente' : 'Crear Expediente' }}</h2>
-            <button class="cursor-pointer p-1.5 rounded-lg hover:bg-muted transition-colors" (click)="onClose()">
+            <h2 class="text-lg font-bold text-foreground">{{ isEditing ? 'Editar Expediente' : 'Crear Expediente' }}</h2>
+            <button class="cursor-pointer p-1.5 rounded-lg hover:bg-black/5 transition-colors" (click)="onClose()">
               <svg class="w-5 h-5 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -97,7 +87,6 @@ import { debounceTime, distinctUntilChanged, finalize, switchMap, of } from 'rxj
               </button>
             </div>
           </form>
-        }
       </div>
     </div>
   `,
@@ -121,7 +110,6 @@ export class CaseFileFormComponent implements OnInit {
 
   isLoading = false;
   submitted = false;
-  showSuccess = false;
   errorMessage: string | null = null;
   
   isEditing = false;
@@ -226,9 +214,8 @@ export class CaseFileFormComponent implements OnInit {
   }
 
   private handleSuccess() {
-    this.showSuccess = true;
-    this.cdr.detectChanges();
-    setTimeout(() => this.caseFileSaved.emit(), 1500);
+    showToast('success', this.isEditing ? 'Expediente actualizado' : 'Expediente creado');
+    this.caseFileSaved.emit();
   }
 
   private handleError(err: any) {

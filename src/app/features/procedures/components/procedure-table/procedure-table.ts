@@ -44,10 +44,16 @@ import { EmptyStateComponent } from '../../../../shared/ui/empty-state/empty-sta
                 <tr class="hover:bg-muted/30 transition-colors group">
                   <td class="px-6 py-4">
                     <div class="text-sm font-medium text-foreground">{{ proc.routeSheetNumber || '—' }}</div>
-                    <div class="text-xs text-muted-foreground">{{ proc.internalFileNumber || '—' }}</div>
+                    <div class="text-xs text-primary font-bold">{{ proc.caseFile?.code || '—' }}</div>
                   </td>
                   <td class="px-6 py-4">
                     <div class="text-sm text-foreground">{{ proc.caseFile?.company?.legalName || '—' }}</div>
+                    <div class="text-xs text-muted-foreground">
+                      {{ proc.companyStatus === 'OPERACION' ? 'Operación' : 
+                         proc.companyStatus === 'PROYECTO' ? 'Proyecto' : 
+                         proc.companyStatus === 'AMPLIACION' ? 'Ampliación' : 
+                         proc.companyStatus === 'DIVERSIFICACION' ? 'Diversificación' : proc.companyStatus || '—' }}
+                    </div>
                   </td>
                   <td class="px-6 py-4">
                     @if (proc.procedureType) {

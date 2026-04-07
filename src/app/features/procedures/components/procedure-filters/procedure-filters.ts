@@ -23,7 +23,7 @@ import { ProcedureStatus, ProcedureTypeCode } from '../../../../shared/models';
       <select
         [ngModel]="statusFilter"
         (ngModelChange)="statusChange.emit($event)"
-        class="px-3 py-2 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/30">
+        class="cursor-pointer px-3 py-2 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/30">
         <option value="">Todos los estados</option>
         <option [value]="ProcedureStatus.RECIBIDO">Recibido</option>
         <option [value]="ProcedureStatus.EN_REVISION">En Revisión</option>
@@ -35,7 +35,7 @@ import { ProcedureStatus, ProcedureTypeCode } from '../../../../shared/models';
       <select
         [ngModel]="typeFilter"
         (ngModelChange)="typeChange.emit($event)"
-        class="px-3 py-2 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/30">
+        class="cursor-pointer px-3 py-2 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/30">
         <option value="">Todos los tipos</option>
         <option [value]="ProcedureTypeCode.RAI">RAI</option>
         <option [value]="ProcedureTypeCode.MAI_PMA">MAI-PMA</option>
@@ -45,14 +45,14 @@ import { ProcedureStatus, ProcedureTypeCode } from '../../../../shared/models';
       <select
         [ngModel]="pageSize"
         (ngModelChange)="pageSizeChange.emit($event)"
-        class="px-3 py-2 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/30">
+        class="cursor-pointer px-3 py-2 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/30">
         <option [ngValue]="10">10 por página</option>
         <option [ngValue]="25">25 por página</option>
         <option [ngValue]="50">50 por página</option>
       </select>
       <button
         (click)="refresh.emit()"
-        class="p-2 rounded-xl border border-border bg-card hover:bg-muted transition-colors"
+        class="cursor-pointer p-2 rounded-xl border border-border bg-card hover:bg-muted transition-colors"
         title="Actualizar">
         <svg class="w-4 h-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182" />

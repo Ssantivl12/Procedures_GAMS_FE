@@ -10,7 +10,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
         <p class="text-sm text-muted-foreground mt-1">Seguimiento y gestión de trámites ambientales</p>
       </div>
       <button
-        class="inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground rounded-xl text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm"
+        class="cursor-pointer inline-flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground rounded-xl text-sm font-medium hover:bg-primary/90 transition-colors shadow-sm"
         (click)="addProcedure.emit()">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />

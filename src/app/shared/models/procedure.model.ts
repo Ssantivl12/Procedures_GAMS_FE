@@ -2,6 +2,13 @@ import { ProcedureStatus, ProcedureKind, ProcedureTypeCode } from './enums';
 import { CaseFile } from './case-file.model';
 import { ProcedureCycle } from './procedure-cycle.model';
 
+export enum CompanyStatus {
+  OPERACION = 'OPERACION',
+  PROYECTO = 'PROYECTO',
+  AMPLIACION = 'AMPLIACION',
+  DIVERSIFICACION = 'DIVERSIFICACION',
+}
+
 export interface ProcedureType {
   id: number;
   code: ProcedureTypeCode;
@@ -26,7 +33,7 @@ export interface Procedure {
   daysElapsed: number | null;
   isOverdue: boolean;
   routeSheetNumber: string | null;
-  internalFileNumber: string | null;
+  companyStatus: CompanyStatus | null;
   approvalDate: string | null;
   approvalCertificate: string | null;
   expirationDate: string | null;
@@ -72,7 +79,7 @@ export interface CreateProcedurePayload {
   procedureKind: ProcedureKind;
   receptionDate: string;
   routeSheetNumber?: string;
-  internalFileNumber?: string;
+  companyStatus?: CompanyStatus;
   generalNotes?: string;
 }
 
