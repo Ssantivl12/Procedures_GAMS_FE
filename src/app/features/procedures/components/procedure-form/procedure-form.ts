@@ -166,19 +166,19 @@ export class ProcedureFormComponent implements OnInit {
     
     if (!selectedType) return;
 
-    // --- Business Validations ---
+    // Business Validations
     const category = this.selectedCaseFile?.company?.category;
     const closedCodes = this.selectedCaseFile?.proceduresSummary?.closedProcedureCodes || [];
 
     // 1. Category 4: No MAI_PMA or IAA
     if (category === 'C4' && (selectedType.code === ProcedureTypeCode.MAI_PMA || selectedType.code === ProcedureTypeCode.IAA)) {
-      this.showFeedback('Error: Las empresas de Categoría 4 no pueden tramitar MAI-PMA o IAA.', 'error');
+      showToast('error', 'Las empresas de Categoría 4 no pueden tramitar MAI-PMA o IAA.');
       return;
     }
 
     // 2. MAI_PMA requires closed RAI
     if (selectedType.code === ProcedureTypeCode.MAI_PMA && !closedCodes.includes(ProcedureTypeCode.RAI)) {
-      this.showFeedback('Error: Se requiere un trámite RAI cerrado (aprobado) previo para este expediente.', 'error');
+      showToast('error', 'Se requiere un trámite RAI cerrado (aprobado) previo para este expediente.');
       return;
     }
 
@@ -187,7 +187,7 @@ export class ProcedureFormComponent implements OnInit {
       const hasRai = closedCodes.includes(ProcedureTypeCode.RAI);
       const hasMai = closedCodes.includes(ProcedureTypeCode.MAI_PMA);
       if (!hasRai || !hasMai) {
-        this.showFeedback('Error: El trámite IAA requiere que el RAI y el MAI-PMA estén cerrados (aprobados) previamente.', 'error');
+        showToast('error', 'El trámite IAA requiere que el RAI y el MAI-PMA estén cerrados previamente.');
         return;
       }
     }
@@ -210,9 +210,9 @@ export class ProcedureFormComponent implements OnInit {
       error: (err) => {
         this.isLoading = false;
         if (err.status === 409) {
-          this.showFeedback('Error: El trámite ya existe en este expediente o es inválido', 'error');
+          showToast('error', 'El trámite ya existe en este expediente o es inválido');
         } else {
-          this.showFeedback('Error al crear el trámite. Verifique los datos.', 'error');
+          showToast('error', 'Error al crear el trámite. Verifique los datos.');
         }
         this.cdr.detectChanges();
       },
