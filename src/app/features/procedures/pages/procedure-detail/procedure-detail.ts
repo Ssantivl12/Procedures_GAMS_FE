@@ -134,16 +134,18 @@ export class ProcedureDetailComponent implements OnInit {
 
   onObservationCreated(): void {
     this.showObservationForm = false;
-    this.loadProcedure();
+    // After creating an observation the procedure must transition to OBSERVADO_PENDIENTE_RECOJO
+    if (this.procedure?.currentStatus === ProcedureStatus.EN_REVISION) {
+      this.procedureService.changeStatus(this.procedureId, {
+        toStatus: ProcedureStatus.OBSERVADO_PENDIENTE_RECOJO,
+      }).subscribe({ next: () => this.loadProcedure(), error: () => this.loadProcedure() });
+    } else {
+      this.loadProcedure();
+    }
   }
 
   get procedureTypeCode(): ProcedureTypeCode {
     return (this.procedure?.procedureType?.code as ProcedureTypeCode) || ProcedureTypeCode.RAI;
   }
 
-  get activeCycleId(): string | null {
-    if (!this.procedure?.cycles || this.procedure.cycles.length === 0) return null;
-    const sorted = [...this.procedure.cycles].sort((a, b) => b.cycleNumber - a.cycleNumber);
-    return sorted[0]?.id || null;
-  }
 }

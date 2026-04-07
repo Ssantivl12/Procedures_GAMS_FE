@@ -38,8 +38,6 @@ export interface BulkCreateNonWorkingDaysDto {
 }
 
 export interface UpdateDeadlineConfigDto {
-  procedureType: string;
-  cycleNumber: number;
   deadlineDays: number;
   description?: string | null;
 }

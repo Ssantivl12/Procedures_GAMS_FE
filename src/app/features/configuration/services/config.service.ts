@@ -21,13 +21,13 @@ export class ConfigService {
     return this.api.get<ProcedureType[]>('/config/procedure-types');
   }
 
-  // Deadline Config Corrected Paths
+  // Deadline Config
   getDeadlineConfigs(): Observable<DeadlineConfig[]> {
-    return this.api.get<DeadlineConfig[]>('/config/deadline-config');
+    return this.api.get<DeadlineConfig[]>('/config/deadlines');
   }
 
-  updateDeadlineConfig(dto: UpdateDeadlineConfigDto): Observable<DeadlineConfig> {
-    return this.api.patch<DeadlineConfig>('/config/deadline-config', dto);
+  updateDeadlineConfig(id: number, dto: UpdateDeadlineConfigDto): Observable<DeadlineConfig> {
+    return this.api.patch<DeadlineConfig>(`/config/deadlines/${id}`, dto);
   }
 
   // Non-Working Days

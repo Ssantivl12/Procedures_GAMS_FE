@@ -116,9 +116,7 @@ export class DeadlinesConfigComponent implements OnInit {
 
     this.isUpdating.set(true);
 
-    this.configService.updateDeadlineConfig({ 
-      procedureType: config.procedureType,
-      cycleNumber: Number(config.cycleNumber),
+    this.configService.updateDeadlineConfig(config.id, {
       deadlineDays: Number(newValue),
       description: config.description || undefined
     }).pipe(

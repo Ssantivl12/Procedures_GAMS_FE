@@ -1,7 +1,7 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { ConfigService } from './config.service';
 import { ProcedureType, DeadlineConfig, NonWorkingDay } from '../models/config.model';
-import { forkJoin, finalize } from 'rxjs';
+import { forkJoin, finalize, catchError, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -36,9 +36,9 @@ export class ConfigCacheService {
     this._isLoading.set(true);
 
     forkJoin({
-      procedureTypes: this.configService.getProcedureTypes(),
-      deadlineConfigs: this.configService.getDeadlineConfigs(),
-      nonWorkingDays: this.configService.getNonWorkingDays()
+      procedureTypes: this.configService.getProcedureTypes().pipe(catchError(() => of([] as ProcedureType[]))),
+      deadlineConfigs: this.configService.getDeadlineConfigs().pipe(catchError(() => of([] as DeadlineConfig[]))),
+      nonWorkingDays: this.configService.getNonWorkingDays().pipe(catchError(() => of([] as NonWorkingDay[]))),
     }).pipe(
       finalize(() => this._isLoading.set(false))
     ).subscribe({
@@ -48,10 +48,6 @@ export class ConfigCacheService {
         this._nonWorkingDays.set(res.nonWorkingDays);
         this._isLoaded.set(true);
       },
-      error: (err) => {
-        console.error('Error loading initial configuration:', err);
-        this._isLoaded.set(false);
-      }
     });
   }
 

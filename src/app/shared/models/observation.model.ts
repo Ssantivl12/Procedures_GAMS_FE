@@ -34,7 +34,7 @@ export interface ObservationsGroupedByCycle {
 }
 
 export interface CreateObservationPayload {
-  cycleId: string;
+  cycleId?: string;
   summary: string;
   details?: string;
   category: ObservationCategory;

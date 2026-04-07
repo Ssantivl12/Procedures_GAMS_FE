@@ -95,7 +95,6 @@
   @if (showObservationForm && procedure) {
     <app-observation-form
       [procedureId]="procedure.id"
-      [activeCycleId]="activeCycleId"
       (closeForm)="showObservationForm = false"
       (observationCreated)="onObservationCreated()">
     </app-observation-form>

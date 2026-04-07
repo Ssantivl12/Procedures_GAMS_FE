@@ -10,17 +10,6 @@
     </div>
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-6 space-y-4">
-      <div>
-        <label class="block text-sm font-medium text-foreground mb-1.5">Ciclo *</label>
-        <select formControlName="cycleId"
-                class="w-full px-3 py-2 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/30"
-                [class.border-red-400]="submitted && f['cycleId'].invalid">
-          <option value="" disabled>Seleccionar ciclo</option>
-          @for (cycle of cycles; track cycle.id) {
-            <option [value]="cycle.id">Ciclo {{ cycle.cycleNumber }}{{ !cycle.closedAt ? ' (Activo)' : '' }}</option>
-          }
-        </select>
-      </div>
 
       <div>
         <label class="block text-sm font-medium text-foreground mb-1.5">Resumen *</label>
