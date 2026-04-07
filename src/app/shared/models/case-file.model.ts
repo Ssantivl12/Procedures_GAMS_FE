@@ -14,6 +14,7 @@ export interface CaseFile {
     total: number;
     active: number;
     closed: number;
+    closedProcedureCodes?: string[];
   };
 }
 

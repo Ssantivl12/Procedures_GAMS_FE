@@ -160,8 +160,39 @@ export class ProcedureFormComponent implements OnInit {
     this.submitted = true;
     if (this.form.invalid) return;
 
-    this.isLoading = true;
     const val = this.form.getRawValue();
+    const typeId = Number(val.procedureTypeId);
+    const selectedType = this.procedureTypes.find(t => t.id === typeId);
+    
+    if (!selectedType) return;
+
+    // --- Business Validations ---
+    const category = this.selectedCaseFile?.company?.category;
+    const closedCodes = this.selectedCaseFile?.proceduresSummary?.closedProcedureCodes || [];
+
+    // 1. Category 4: No MAI_PMA or IAA
+    if (category === 'C4' && (selectedType.code === ProcedureTypeCode.MAI_PMA || selectedType.code === ProcedureTypeCode.IAA)) {
+      this.showFeedback('Error: Las empresas de Categoría 4 no pueden tramitar MAI-PMA o IAA.', 'error');
+      return;
+    }
+
+    // 2. MAI_PMA requires closed RAI
+    if (selectedType.code === ProcedureTypeCode.MAI_PMA && !closedCodes.includes(ProcedureTypeCode.RAI)) {
+      this.showFeedback('Error: Se requiere un trámite RAI cerrado (aprobado) previo para este expediente.', 'error');
+      return;
+    }
+
+    // 3. IAA requires closed RAI AND closed MAI_PMA
+    if (selectedType.code === ProcedureTypeCode.IAA) {
+      const hasRai = closedCodes.includes(ProcedureTypeCode.RAI);
+      const hasMai = closedCodes.includes(ProcedureTypeCode.MAI_PMA);
+      if (!hasRai || !hasMai) {
+        this.showFeedback('Error: El trámite IAA requiere que el RAI y el MAI-PMA estén cerrados (aprobados) previamente.', 'error');
+        return;
+      }
+    }
+
+    this.isLoading = true;
     this.procedureService.createProcedure({
       caseFileId: val.caseFileId!,
       procedureTypeId: Number(val.procedureTypeId),
