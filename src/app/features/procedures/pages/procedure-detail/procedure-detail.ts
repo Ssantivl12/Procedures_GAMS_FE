@@ -114,6 +114,12 @@ export class ProcedureDetailComponent implements OnInit {
       case 'assign':
         this.showAssignDialog = true;
         break;
+      case 'mark-observed':
+        this.statusDialogAction = 'observe' as any; // Reusing observe action if we had one for status dialog? Actually we need to change status directly, or open status dialog. If we want to change status directly:
+        this.procedureService.changeStatus(this.procedureId, {
+          toStatus: ProcedureStatus.OBSERVADO_PENDIENTE_RECOJO,
+        }).subscribe({ next: () => this.loadProcedure(), error: () => this.loadProcedure() });
+        break;
     }
   }
 
@@ -134,14 +140,7 @@ export class ProcedureDetailComponent implements OnInit {
 
   onObservationCreated(): void {
     this.showObservationForm = false;
-    // After creating an observation the procedure must transition to OBSERVADO_PENDIENTE_RECOJO
-    if (this.procedure?.currentStatus === ProcedureStatus.EN_REVISION) {
-      this.procedureService.changeStatus(this.procedureId, {
-        toStatus: ProcedureStatus.OBSERVADO_PENDIENTE_RECOJO,
-      }).subscribe({ next: () => this.loadProcedure(), error: () => this.loadProcedure() });
-    } else {
-      this.loadProcedure();
-    }
+    this.loadProcedure();
   }
 
   get procedureTypeCode(): ProcedureTypeCode {

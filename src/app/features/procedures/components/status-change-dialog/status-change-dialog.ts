@@ -4,6 +4,7 @@ import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { ChangeDetectorRef } from '@angular/core';
 import { ProcedureService } from '../../services/procedure.service';
 import { ProcedureStatus, ProcedureTypeCode, ChangeStatusPayload } from '../../../../shared/models';
+import { showToast } from '../../../../shared/utils/toast.utils';
 
 @Component({
   selector: 'app-status-change-dialog',
@@ -51,20 +52,32 @@ import { ProcedureStatus, ProcedureTypeCode, ChangeStatusPayload } from '../../.
 
           @if (action === 'close') {
             <div>
-              <label class="block text-sm font-medium text-foreground mb-1.5">Fecha de Aprobación</label>
+              <label class="block text-sm font-medium text-foreground mb-1.5">Fecha de Aprobación *</label>
               <input formControlName="approvalDate" type="date"
-                     class="w-full px-3 py-2 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                     class="w-full px-3 py-2 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/30"
+                     [class.border-red-400]="submitted && (form.get('approvalDate')?.invalid || !form.get('approvalDate')?.value)" />
+              @if (submitted && !form.get('approvalDate')?.value) {
+                <span class="text-xs text-red-500 mt-1 block">Este campo es requerido.</span>
+              }
             </div>
             <div>
-              <label class="block text-sm font-medium text-foreground mb-1.5">Certificado de Aprobación</label>
+              <label class="block text-sm font-medium text-foreground mb-1.5">Certificado de Aprobación *</label>
               <input formControlName="approvalCertificate" type="text" placeholder="Nro. certificado"
-                     class="w-full px-3 py-2 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                     class="w-full px-3 py-2 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/30"
+                     [class.border-red-400]="submitted && (form.get('approvalCertificate')?.invalid || !form.get('approvalCertificate')?.value)" />
+              @if (submitted && !form.get('approvalCertificate')?.value) {
+                <span class="text-xs text-red-500 mt-1 block">Este campo es requerido.</span>
+              }
             </div>
             @if (procedureTypeCode === 'RAI') {
               <div>
-                <label class="block text-sm font-medium text-foreground mb-1.5">Fecha de Vencimiento RAI</label>
+                <label class="block text-sm font-medium text-foreground mb-1.5">Fecha de Vencimiento RAI *</label>
                 <input formControlName="expirationDate" type="date"
-                       class="w-full px-3 py-2 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                       class="w-full px-3 py-2 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/30"
+                       [class.border-red-400]="submitted && (form.get('expirationDate')?.invalid || !form.get('expirationDate')?.value)" />
+                @if (submitted && !form.get('expirationDate')?.value) {
+                  <span class="text-xs text-red-500 mt-1 block">Este campo es requerido para RAI.</span>
+                }
               </div>
             }
           }
@@ -73,7 +86,11 @@ import { ProcedureStatus, ProcedureTypeCode, ChangeStatusPayload } from '../../.
             <div>
               <label class="block text-sm font-medium text-foreground mb-1.5">Motivo de Abandono *</label>
               <textarea formControlName="abandonReason" rows="3" placeholder="Indique el motivo del abandono..."
-                        class="w-full px-3 py-2 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"></textarea>
+                        class="w-full px-3 py-2 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
+                        [class.border-red-400]="submitted && (form.get('abandonReason')?.invalid || !form.get('abandonReason')?.value)"></textarea>
+              @if (submitted && !form.get('abandonReason')?.value) {
+                <span class="text-xs text-red-500 mt-1 block">El motivo de abandono es requerido.</span>
+              }
             </div>
           }
 
@@ -131,6 +148,7 @@ export class StatusChangeDialogComponent {
   @Output() statusChanged = new EventEmitter<void>();
 
   isLoading = false;
+  submitted = false;
   feedbackMessage = signal<string | null>(null);
 
   form = this.fb.group({
@@ -179,8 +197,19 @@ export class StatusChangeDialogComponent {
   }
 
   onSubmit(): void {
-    this.isLoading = true;
+    this.submitted = true;
     const val = this.form.getRawValue();
+
+    // Manual validations based on action
+    if (this.action === 'close') {
+      if (!val.approvalDate || !val.approvalCertificate) return;
+      if (this.procedureTypeCode === ProcedureTypeCode.RAI && !val.expirationDate) return;
+    }
+    if (this.action === 'abandon' && !val.abandonReason) {
+      return;
+    }
+
+    this.isLoading = true;
     const payload: ChangeStatusPayload = {
       toStatus: this.targetStatus,
       note: val.note || undefined,
@@ -197,12 +226,15 @@ export class StatusChangeDialogComponent {
       next: () => {
         this.isLoading = false;
         this.feedbackMessage.set(null);
+        showToast('success', 'Trámite actualizado correctamente');
         this.statusChanged.emit();
       },
       error: (err) => {
         this.isLoading = false;
+        const msg = err.error?.message || 'Error al actualizar el estado';
+        showToast('error', msg);
         if (err.status === 422) {
-          this.feedbackMessage.set('Error: Transición de estado inválida para este trámite');
+          this.feedbackMessage.set(msg);
         } else {
           this.feedbackMessage.set('Error crítico al cambiar estado. Verifique los requisitos.');
         }

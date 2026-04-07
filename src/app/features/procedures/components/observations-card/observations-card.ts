@@ -47,6 +47,14 @@ export class ObservationsCardComponent implements OnInit {
     }
   }
 
+  ngOnChanges(changes: import('@angular/core').SimpleChanges): void {
+    if (changes['procedure'] && !changes['procedure'].firstChange) {
+      if (this.showObservations) {
+        this.loadObservations();
+      }
+    }
+  }
+
   loadObservations(): void {
     this.isLoading = true;
     this.observationService.getObservations(this.procedureId)

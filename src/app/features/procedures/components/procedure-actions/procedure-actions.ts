@@ -4,7 +4,7 @@ import { AuthService, UserRole } from '../../../../core/auth/auth.service';
 import { ProcedureStatus, ProcedureTypeCode } from '../../../../shared/models';
 
 export interface ActionEvent {
-  action: 'advance' | 'observe' | 'pickup' | 'reentry' | 'close' | 'abandon' | 'reverse-abandon' | 'assign';
+  action: 'advance' | 'observe' | 'mark-observed' | 'pickup' | 'reentry' | 'close' | 'abandon' | 'reverse-abandon' | 'assign';
 }
 
 @Component({
@@ -30,9 +30,19 @@ export interface ActionEvent {
           <button class="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-orange-300 text-orange-700 rounded-xl text-sm font-medium hover:bg-orange-50 transition-colors"
                   (click)="actionClick.emit({ action: 'observe' })">
             <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
-            Emitir Observación
+            Agregar Observación
+          </button>
+        }
+
+        @if (canFinishWithObservations) {
+          <button class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-orange-600 text-white rounded-xl text-sm font-medium hover:bg-orange-700 transition-all shadow-sm"
+                  (click)="actionClick.emit({ action: 'mark-observed' })">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 8.689c0-.864.933-1.405 1.683-.977l7.108 4.062a1.125 1.125 0 010 1.953l-7.108 4.062A1.125 1.125 0 013 16.81V8.69zM12.75 8.689c0-.864.933-1.405 1.683-.977l7.108 4.062a1.125 1.125 0 010 1.953l-7.108 4.062a1.125 1.125 0 01-1.683-.977V8.69z" />
+            </svg>
+            Finalizar Revisión
           </button>
         }
 
@@ -137,6 +147,12 @@ export class ProcedureActionsComponent {
     return this.currentStatus === ProcedureStatus.EN_REVISION
       && this.procedureTypeCode !== ProcedureTypeCode.CIERRE
       && (this.isSuperadminOrEncargado || this.isInspector);
+  }
+
+  get canFinishWithObservations(): boolean {
+    return this.currentStatus === ProcedureStatus.EN_REVISION 
+      && this.pendingObservationsCount > 0
+      && (this.isSuperadminOrEncargado || this.isAssignedInspector);
   }
 
   get canPickup(): boolean {
