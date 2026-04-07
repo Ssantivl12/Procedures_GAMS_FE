@@ -50,6 +50,7 @@ export interface Procedure {
   assignedInspector?: { id: string; firstName: string; lastName: string };
   createdBy?: { id: string; firstName: string; lastName: string };
   cycles?: ProcedureCycle[];
+  observationsSummary?: { total: number; pending: number; resolved: number };
 }
 
 export interface ProcedureAudit {
@@ -76,7 +77,7 @@ export interface ChangeStatusPayload {
 export interface CreateProcedurePayload {
   caseFileId: string;
   procedureTypeId: number;
-  procedureKind: ProcedureKind;
+  procedureKind?: ProcedureKind;
   receptionDate: string;
   routeSheetNumber?: string;
   companyStatus?: CompanyStatus;

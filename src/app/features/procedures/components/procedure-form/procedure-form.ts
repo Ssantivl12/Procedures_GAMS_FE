@@ -193,10 +193,14 @@ export class ProcedureFormComponent implements OnInit {
     }
 
     this.isLoading = true;
+
+    // Only include procedureKind if the field is enabled (RAI / MAI-PMA)
+    const isKindApplicable = this.f['procedureKind'].enabled;
+
     this.procedureService.createProcedure({
       caseFileId: val.caseFileId!,
       procedureTypeId: Number(val.procedureTypeId),
-      procedureKind: (val.procedureKind as ProcedureKind) || undefined,
+      ...(isKindApplicable && val.procedureKind ? { procedureKind: val.procedureKind as ProcedureKind } : {}),
       companyStatus: val.companyStatus as CompanyStatus,
       receptionDate: val.receptionDate!,
       routeSheetNumber: val.routeSheetNumber || undefined,

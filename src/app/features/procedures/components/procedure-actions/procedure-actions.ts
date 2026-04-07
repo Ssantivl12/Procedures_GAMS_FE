@@ -95,6 +95,7 @@ export class ProcedureActionsComponent {
   @Input({ required: true }) currentStatus!: ProcedureStatus;
   @Input() procedureTypeCode: ProcedureTypeCode = ProcedureTypeCode.RAI;
   @Input() assignedInspectorUserId: string | null = null;
+  @Input() pendingObservationsCount = 0;
   @Output() actionClick = new EventEmitter<ActionEvent>();
 
   get isSuperadminOrEncargado(): boolean {
@@ -118,8 +119,10 @@ export class ProcedureActionsComponent {
     if (this.currentStatus === ProcedureStatus.RECIBIDO) {
       return this.isSuperadminOrEncargado || this.isAssignedInspector;
     }
+    // In EN_REVISION: only show 'Cerrar/Aprobar' if there are NO pending observations
     if (this.currentStatus === ProcedureStatus.EN_REVISION) {
-      return this.isSuperadminOrEncargado || this.isAssignedInspector;
+      const hasPendingObs = this.pendingObservationsCount > 0;
+      return !hasPendingObs && (this.isSuperadminOrEncargado || this.isAssignedInspector);
     }
     return false;
   }

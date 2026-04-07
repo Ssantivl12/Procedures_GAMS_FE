@@ -56,6 +56,7 @@
             [currentStatus]="procedure.currentStatus"
             [procedureTypeCode]="procedureTypeCode"
             [assignedInspectorUserId]="procedure.assignedInspectorUserId"
+            [pendingObservationsCount]="procedure.observationsSummary?.pending || 0"
             (actionClick)="onAction($event)">
           </app-procedure-actions>
         </div>

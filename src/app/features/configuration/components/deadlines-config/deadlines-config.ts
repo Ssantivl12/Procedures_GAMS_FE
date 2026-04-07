@@ -30,7 +30,12 @@ import { showToast } from '../../../../shared/utils/toast.utils';
           <thead>
             <tr class="bg-muted/50 text-[10px] uppercase tracking-widest text-muted-foreground font-bold border-b border-border">
               <th class="px-6 py-4">Trámite</th>
-              <th class="px-6 py-4 text-center">Ciclo / Etapa</th>
+              <th class="px-6 py-4 text-center">
+                Ciclo / Etapa
+                <div class="text-[9px] normal-case tracking-normal font-normal text-muted-foreground/70 mt-0.5">
+                  (0 = 1ª Revisión · 1+ = Reingresos)
+                </div>
+              </th>
               <th class="px-6 py-4 text-center">Días Hábiles</th>
               <th class="px-6 py-4 text-right pr-10" *ngIf="!isReadOnly">Edición Directa</th>
             </tr>

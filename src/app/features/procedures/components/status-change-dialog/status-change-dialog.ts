@@ -134,8 +134,8 @@ export class StatusChangeDialogComponent {
   feedbackMessage = signal<string | null>(null);
 
   form = this.fb.group({
-    reviewStartDate: [''],
-    obsPickedDate: [''],
+    reviewStartDate: [new Date().toISOString().split('T')[0]],
+    obsPickedDate: [new Date().toISOString().split('T')[0]],
     approvalDate: [''],
     approvalCertificate: [''],
     expirationDate: [''],
