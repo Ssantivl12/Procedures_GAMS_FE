@@ -1,6 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterModule, Router } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
 import { DashboardHeaderComponent } from '../../../dashboard/components/dashboard-header/dashboard-header';
 import { ProcedureService } from '../../../procedures/services/procedure.service';
@@ -9,13 +9,14 @@ import { StatusBadgeComponent } from '../../../../shared/ui/status-badge/status-
 import { TypeBadgeComponent } from '../../../../shared/ui/type-badge/type-badge';
 import { EmptyStateComponent } from '../../../../shared/ui/empty-state/empty-state';
 import { Procedure, ProcedureStatus, PaginatedResponse } from '../../../../shared/models';
+import { showToast } from '../../../../shared/utils/toast.utils';
 
 @Component({
   selector: 'app-inbox-list',
   standalone: true,
   imports: [
     CommonModule, RouterModule, DashboardHeaderComponent,
-    StatusBadgeComponent, TypeBadgeComponent, EmptyStateComponent,
+    TypeBadgeComponent, EmptyStateComponent,
   ],
   templateUrl: './inbox-list.html',
   styleUrl: './inbox-list.css',
@@ -24,6 +25,7 @@ export class InboxListComponent implements OnInit {
   private readonly procedureService = inject(ProcedureService);
   private readonly auth = inject(AuthService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly router = inject(Router);
 
   procedures: Procedure[] = [];
   filteredProcedures: Procedure[] = [];
@@ -32,24 +34,33 @@ export class InboxListComponent implements OnInit {
   activeFilter: string = 'all';
 
   get pageTitle(): string {
-    if (this.auth.hasRole(UserRole.INSPECTOR)) return 'Mi Cola de Trabajo';
-    if (this.auth.hasRole(UserRole.SECRETARIA)) return 'Trámites Pendientes';
-    return 'Bandeja de Pendientes';
+    return 'Centro de Acciones Urgentes';
   }
 
   get pageSubtitle(): string {
-    if (this.auth.hasRole(UserRole.INSPECTOR)) return 'Trámites asignados que requieren tu revisión';
-    if (this.auth.hasRole(UserRole.SECRETARIA)) return 'Trámites pendientes de recojo u observaciones';
-    return 'Trámites activos que requieren atención';
+    return 'Tablero Kanban de trámites pendientes basados en SLA';
   }
 
-  readonly filterOptions: { value: string; label: string }[] = [
+  readonly filterOptions = [
     { value: 'all', label: 'Todos' },
-    { value: ProcedureStatus.RECIBIDO, label: 'Recibido' },
-    { value: ProcedureStatus.EN_REVISION, label: 'En Revisión' },
-    { value: ProcedureStatus.OBSERVADO_PENDIENTE_RECOJO, label: 'Pendiente Recojo' },
-    { value: ProcedureStatus.SUBSANACION_PENDIENTE_REINGRESO, label: 'Pendiente Reingreso' },
+    { value: 'rojo', label: 'Urgentes (Rojo)' },
+    { value: 'amarillo', label: 'Por vencer (Amarillo)' },
   ];
+
+  get columnRecibidos() {
+    return this.filteredProcedures.filter(p => p.currentStatus === ProcedureStatus.RECIBIDO);
+  }
+
+  get columnRevision() {
+    return this.filteredProcedures.filter(p => p.currentStatus === ProcedureStatus.EN_REVISION);
+  }
+
+  get columnPendientes() {
+    return this.filteredProcedures.filter(p => 
+      p.currentStatus === ProcedureStatus.OBSERVADO_PENDIENTE_RECOJO || 
+      p.currentStatus === ProcedureStatus.SUBSANACION_PENDIENTE_REINGRESO
+    );
+  }
 
   ngOnInit(): void {
     this.loadProcedures();
@@ -59,22 +70,23 @@ export class InboxListComponent implements OnInit {
     this.isLoading = true;
 
     const params: Record<string, string | number | boolean> = {
-      limit: 100,
+      limit: 50,
       isActive: true,
     };
 
-    // Filter by active statuses (exclude CERRADO and ABANDONADO)
     const activeStatuses = [
       ProcedureStatus.RECIBIDO,
       ProcedureStatus.EN_REVISION,
       ProcedureStatus.OBSERVADO_PENDIENTE_RECOJO,
       ProcedureStatus.SUBSANACION_PENDIENTE_REINGRESO,
-    ].join(',');
-    params['status'] = activeStatuses;
+    ];
 
     this.procedureService.getProcedures(params).subscribe({
       next: (res: PaginatedResponse<Procedure>) => {
-        this.procedures = res.data || [];
+        const allProcedures = res.data || [];
+        this.procedures = allProcedures.filter(p => 
+          activeStatuses.includes(p.currentStatus as ProcedureStatus)
+        );
         this.applyFilters();
         this.isLoading = false;
         this.cdr.detectChanges();
@@ -100,7 +112,7 @@ export class InboxListComponent implements OnInit {
     let result = [...this.procedures];
 
     if (this.activeFilter !== 'all') {
-      result = result.filter(p => p.currentStatus === this.activeFilter);
+      result = result.filter(p => this.getSlaStatus(p.deadlineDate) === this.activeFilter);
     }
 
     if (this.searchQuery.trim()) {
@@ -115,14 +127,52 @@ export class InboxListComponent implements OnInit {
     this.filteredProcedures = result;
   }
 
-  formatDate(date: string | null): string {
+  getSlaStatus(deadlineDate: string | null | undefined): 'rojo' | 'amarillo' | 'verde' {
+    if (!deadlineDate) return 'verde';
+    const deadline = new Date(deadlineDate);
+    const now = new Date();
+    deadline.setHours(0,0,0,0);
+    now.setHours(0,0,0,0);
+    const diffTime = deadline.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays <= 1) return 'rojo';
+    if (diffDays <= 5) return 'amarillo';
+    return 'verde';
+  }
+
+  getSlaClasses(deadlineDate: string | null | undefined): string {
+    const sla = this.getSlaStatus(deadlineDate);
+    switch (sla) {
+      case 'rojo': return 'bg-red-50 border-red-300 ring-1 ring-red-500';
+      case 'amarillo': return 'bg-yellow-50 border-yellow-300 ring-1 ring-yellow-400';
+      case 'verde': return 'bg-white border-gray-200';
+    }
+  }
+
+  getSlaLabel(deadlineDate: string | null | undefined): string {
+    const sla = this.getSlaStatus(deadlineDate);
+    if (sla === 'rojo') return 'Vence pronto';
+    if (sla === 'amarillo') return 'Atención requerida';
+    return 'A tiempo';
+  }
+
+  formatDate(date: string | null | undefined): string {
     if (!date) return '—';
     return new Date(date).toLocaleDateString('es-BO', { day: '2-digit', month: '2-digit', year: 'numeric' });
   }
 
-  getDaysElapsed(receptionDate: string): number {
-    const start = new Date(receptionDate);
-    const now = new Date();
-    return Math.floor((now.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+  onAssign(procId: string, event: Event) {
+    event.stopPropagation();
+    event.preventDefault();
+    showToast('info', 'Por ahora asigne desde la pantalla de detalle del trámite.');
+    this.router.navigate(['/procedures', procId]);
+  }
+
+  onObserve(procId: string, event: Event) {
+    event.stopPropagation();
+    event.preventDefault();
+    this.router.navigate(['/procedures', procId]);
   }
 }
+

@@ -1,14 +1,14 @@
-<div class="page-wrapper">
+<div class="page-wrapper min-h-screen bg-slate-50">
   <app-dashboard-header></app-dashboard-header>
 
-  <main class="main-content" style="animation: fadeIn 0.3s ease-out">
-
-    <div class="page-header">
+  <main class="main-content max-w-7xl mx-auto p-6" style="animation: fadeIn 0.3s ease-out">
+    
+    <div class="page-header flex justify-between items-start mb-6">
       <div>
-        <h1 class="page-title">{{ pageTitle }}</h1>
-        <p class="page-subtitle">{{ pageSubtitle }}</p>
+        <h1 class="text-3xl font-bold text-slate-800">{{ pageTitle }}</h1>
+        <p class="text-slate-500 mt-1">{{ pageSubtitle }}</p>
       </div>
-      <button class="btn-refresh" (click)="loadProcedures()">
+      <button class="flex items-center gap-2 px-4 py-2 bg-white text-slate-700 border border-slate-200 rounded-lg font-medium hover:bg-slate-50 transition-colors" (click)="loadProcedures()">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182" />
         </svg>
@@ -17,17 +17,20 @@
     </div>
 
     <!-- Filters -->
-    <div class="filters-bar">
-      <div class="search-box">
-        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="search-icon">
+    <div class="flex flex-wrap gap-4 mb-8 items-center bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
+      <div class="flex-1 min-w-[260px] flex items-center gap-2 px-3">
+        <svg fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-slate-400">
           <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
         </svg>
-        <input type="text" placeholder="Buscar por hoja de ruta, empresa o tipo..."
+        <input type="text" placeholder="Buscar por hoja de ruta o empresa..."
+               class="w-full bg-transparent border-none outline-none text-sm text-slate-700"
                [value]="searchQuery" (input)="onSearch($any($event.target).value)">
       </div>
-      <div class="filter-chips">
+      <div class="w-px h-6 bg-slate-200 hidden sm:block"></div>
+      <div class="flex gap-2">
         @for (opt of filterOptions; track opt.value) {
-          <button class="filter-chip" [class.active]="activeFilter === opt.value"
+          <button class="px-4 py-1.5 rounded-full text-xs font-semibold border transition-all"
+                  [ngClass]="activeFilter === opt.value ? 'bg-indigo-50 border-indigo-200 text-indigo-700' : 'bg-slate-50 border-slate-200 text-slate-600 hover:border-indigo-300'"
                   (click)="onFilterChange(opt.value)">
             {{ opt.label }}
           </button>
@@ -35,80 +38,116 @@
       </div>
     </div>
 
-    <!-- Content -->
     @if (isLoading) {
-      <div class="loading-container">
-        <svg class="animate-spin w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24">
+      <div class="flex flex-col items-center justify-center py-20">
+        <svg class="animate-spin w-8 h-8 text-indigo-500" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
         </svg>
-        <span class="text-muted-foreground text-sm mt-2">Cargando trámites...</span>
+        <span class="text-slate-500 text-sm mt-3">Cargando tablero...</span>
       </div>
     } @else if (filteredProcedures.length === 0) {
-      <div class="empty-card">
+      <div class="bg-white rounded-xl border border-slate-200 p-10 text-center shadow-sm">
         <app-empty-state
-          icon="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
           title="Sin Pendientes"
-          [message]="searchQuery ? 'No se encontraron trámites con los filtros aplicados.' : 'No hay trámites pendientes de atención.'">
+          [message]="searchQuery ? 'No se encontraron trámites.' : 'No hay trámites pendientes.'">
         </app-empty-state>
       </div>
     } @else {
-      <div class="results-count">
-        {{ filteredProcedures.length }} trámite{{ filteredProcedures.length !== 1 ? 's' : '' }} pendiente{{ filteredProcedures.length !== 1 ? 's' : '' }}
-      </div>
-
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Hoja de Ruta</th>
-              <th>Empresa</th>
-              <th>Tipo</th>
-              <th>Estado</th>
-              <th>Fecha Recepción</th>
-              <th>Días</th>
-              <th>Inspector</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (proc of filteredProcedures; track proc.id) {
-              <tr [class.overdue]="proc.isOverdue">
-                <td class="font-medium">{{ proc.routeSheetNumber || '—' }}</td>
-                <td class="cell-name">{{ proc.caseFile?.company?.legalName || '—' }}</td>
-                <td><app-type-badge [type]="proc.procedureType?.code!" /></td>
-                <td><app-status-badge [status]="proc.currentStatus" /></td>
-                <td class="text-sm">{{ formatDate(proc.receptionDate) }}</td>
-                <td>
-                  @if (proc.daysElapsed !== null && proc.daysElapsed !== undefined) {
-                    <span class="days-badge" [class.urgent]="proc.isOverdue">
-                      {{ proc.daysElapsed }}d
-                    </span>
-                  } @else {
-                    <span class="days-badge">{{ getDaysElapsed(proc.receptionDate) }}d</span>
-                  }
-                </td>
-                <td class="text-sm">
-                  @if (proc.assignedInspector) {
-                    {{ proc.assignedInspector.firstName }} {{ proc.assignedInspector.lastName }}
-                  } @else {
-                    <span class="text-muted-foreground">Sin asignar</span>
-                  }
-                </td>
-                <td>
-                  <a [routerLink]="['/procedures', proc.id]" class="btn-view">
-                    Ver detalle
-                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                    </svg>
-                  </a>
-                </td>
-              </tr>
+      <!-- Kanban Layout -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+        
+        <!-- Column: Recibidos -->
+        <div class="kanban-col bg-slate-100 rounded-xl p-4 min-h-[500px]">
+          <h2 class="text-sm font-bold text-slate-700 uppercase tracking-wider mb-4 flex justify-between">
+            Nuevos (Recibidos)
+            <span class="bg-slate-200 text-slate-600 px-2 rounded-full text-xs">{{columnRecibidos.length}}</span>
+          </h2>
+          <div class="space-y-4">
+            @for (proc of columnRecibidos; track proc.id) {
+              <ng-container *ngTemplateOutlet="kanbanCard; context: { $implicit: proc }"></ng-container>
             }
-          </tbody>
-        </table>
+          </div>
+        </div>
+
+        <!-- Column: En Revisión -->
+        <div class="kanban-col bg-indigo-50/50 rounded-xl p-4 min-h-[500px] border border-indigo-100/50">
+          <h2 class="text-sm font-bold text-indigo-800 uppercase tracking-wider mb-4 flex justify-between">
+            En Revisión
+            <span class="bg-indigo-100 text-indigo-700 px-2 rounded-full text-xs">{{columnRevision.length}}</span>
+          </h2>
+          <div class="space-y-4">
+            @for (proc of columnRevision; track proc.id) {
+              <ng-container *ngTemplateOutlet="kanbanCard; context: { $implicit: proc }"></ng-container>
+            }
+          </div>
+        </div>
+
+        <!-- Column: Pendientes -->
+        <div class="kanban-col bg-orange-50/50 rounded-xl p-4 min-h-[500px] border border-orange-100/50">
+          <h2 class="text-sm font-bold text-orange-800 uppercase tracking-wider mb-4 flex justify-between">
+            Re-ingreso/Recojo
+            <span class="bg-orange-100 text-orange-700 px-2 rounded-full text-xs">{{columnPendientes.length}}</span>
+          </h2>
+          <div class="space-y-4">
+            @for (proc of columnPendientes; track proc.id) {
+              <ng-container *ngTemplateOutlet="kanbanCard; context: { $implicit: proc }"></ng-container>
+            }
+          </div>
+        </div>
+
       </div>
     }
 
   </main>
 </div>
+
+<!-- Kanban Card Template -->
+<ng-template #kanbanCard let-proc>
+  <div [class]="'p-4 rounded-xl shadow-sm hover:shadow-md cursor-pointer transition-all ' + getSlaClasses(proc.deadlineDate)"
+       [routerLink]="['/procedures', proc.id]">
+    
+    <div class="flex justify-between items-start mb-2">
+      <span class="text-xs font-bold text-slate-500 uppercase">{{ proc.routeSheetNumber || 'S/N' }}</span>
+      <span class="text-[10px] font-bold px-2 py-0.5 rounded-full"
+            [ngClass]="getSlaStatus(proc.deadlineDate) === 'rojo' ? 'bg-red-100 text-red-700' : (getSlaStatus(proc.deadlineDate) === 'amarillo' ? 'bg-yellow-100 text-yellow-800' : 'bg-emerald-100 text-emerald-700')">
+        {{ getSlaLabel(proc.deadlineDate) }}
+      </span>
+    </div>
+
+    <h3 class="font-bold text-slate-800 text-sm mb-1 line-clamp-2" title="{{ proc.caseFile?.company?.legalName }}">
+      {{ proc.caseFile?.company?.legalName || 'Empresa no asignada' }}
+    </h3>
+    
+    <div class="mb-3">
+      <app-type-badge [type]="proc.procedureType?.code!" />
+    </div>
+
+    <div class="flex items-center text-xs text-slate-500 mb-3">
+      <svg class="w-4 h-4 mr-1 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+      Plazo: <span class="font-medium ml-1" [ngClass]="{'text-red-600': getSlaStatus(proc.deadlineDate) === 'rojo'}">{{ formatDate(proc.deadlineDate) }}</span>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="pt-3 border-t border-slate-100/50 flex gap-2">
+      <button class="flex-1 flex justify-center items-center gap-1 bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 text-xs py-1.5 rounded-lg font-medium transition"
+              (click)="onAssign(proc.id, $event)">
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+        </svg>
+        Asignar
+      </button>
+      <button class="flex-1 flex justify-center items-center gap-1 bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 text-xs py-1.5 rounded-lg font-medium transition"
+              (click)="onObserve(proc.id, $event)">
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+        </svg>
+        Revisar
+      </button>
+    </div>
+
+  </div>
+</ng-template>
