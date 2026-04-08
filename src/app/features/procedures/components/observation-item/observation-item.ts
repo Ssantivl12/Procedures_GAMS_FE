@@ -54,13 +54,13 @@ import { PriorityBadgeComponent } from '../../../../shared/ui/priority-badge/pri
       </div>
       <div class="flex items-center gap-1 flex-shrink-0">
         @if (!observation.isResolved && canResolve) {
-          <button class="px-2.5 py-1 text-xs font-medium text-emerald-700 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors"
+          <button class="cursor-pointer px-2.5 py-1 text-xs font-medium text-emerald-700 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors"
                   (click)="resolve.emit(observation)">
             Resolver
           </button>
         }
         @if (observation.isResolved && canReopen) {
-          <button class="px-2.5 py-1 text-xs font-medium text-amber-700 bg-amber-50 rounded-lg hover:bg-amber-100 transition-colors"
+          <button class="cursor-pointer px-2.5 py-1 text-xs font-medium text-amber-700 bg-amber-50 rounded-lg hover:bg-amber-100 transition-colors"
                   (click)="reopen.emit(observation)">
             Reabrir
           </button>

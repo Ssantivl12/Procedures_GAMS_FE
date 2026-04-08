@@ -15,7 +15,7 @@ import { showToast } from '../../../../shared/utils/toast.utils';
       <div class="bg-card rounded-2xl shadow-xl border border-border w-full max-w-md mx-4 animate-slide-up" (click)="$event.stopPropagation()">
         <div class="flex items-center justify-between p-6 border-b border-border">
           <h2 class="text-lg font-semibold text-foreground">{{ dialogTitle }}</h2>
-          <button class="p-1.5 rounded-lg hover:bg-muted transition-colors" (click)="closeDialog.emit()">
+          <button class="cursor-pointer p-1.5 rounded-lg hover:bg-muted transition-colors" (click)="closeDialog.emit()">
             <svg class="w-5 h-5 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -105,17 +105,17 @@ import { showToast } from '../../../../shared/utils/toast.utils';
 
           <div class="flex justify-end gap-3 pt-4 border-t border-border">
             <button type="button" (click)="closeDialog.emit()"
-                    class="px-4 py-2 text-sm font-medium rounded-xl border border-border text-foreground hover:bg-muted transition-colors">
+                    class="cursor-pointer px-4 py-2 text-sm font-medium rounded-xl border border-border text-foreground hover:bg-muted transition-colors">
               Cancelar
             </button>
             <button type="submit" [disabled]="isLoading"
-                    class="px-5 py-2.5 text-sm font-semibold rounded-xl text-white transition-all shadow-sm hover:shadow-md active:scale-95 disabled:opacity-50 block min-w-[120px]"
+                    class="cursor-pointer px-5 py-2.5 text-sm font-semibold rounded-xl text-white transition-all shadow-sm hover:shadow-md active:scale-95 disabled:opacity-50 block min-w-[120px]"
                     [class.bg-red-600]="action === 'abandon'"
                     [class.hover:bg-red-700]="action === 'abandon'"
                     [class.bg-primary]="action !== 'abandon'"
                     [class.hover:bg-primary/90]="action !== 'abandon'">
               @if (isLoading) {
-                <svg class="animate-spin w-4 h-4 mr-1.5 inline-block" fill="none" viewBox="0 0 24 24">
+                <svg class="cursor-pointer animate-spin w-4 h-4 mr-1.5 inline-block" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                 </svg>

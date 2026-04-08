@@ -15,7 +15,7 @@ import { AuthService, UserRole } from '../../../../core/auth/auth.service';
       <div class="bg-card rounded-2xl shadow-xl border border-border w-full max-w-sm mx-4 animate-slide-up" (click)="$event.stopPropagation()">
         <div class="flex items-center justify-between p-6 border-b border-border">
           <h2 class="text-lg font-semibold text-foreground">Asignar Inspector</h2>
-          <button class="p-1.5 rounded-lg hover:bg-muted transition-colors" (click)="closeDialog.emit()">
+          <button class="cursor-pointer p-1.5 rounded-lg hover:bg-muted transition-colors" (click)="closeDialog.emit()">
             <svg class="w-5 h-5 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -25,7 +25,7 @@ import { AuthService, UserRole } from '../../../../core/auth/auth.service';
         <div class="p-6">
           <label class="block text-sm font-medium text-foreground mb-1.5">Inspector</label>
           <select [(ngModel)]="selectedInspectorId"
-                  class="w-full px-3 py-2 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/30">
+                  class="cursor-pointer w-full px-3 py-2 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/30">
             <option value="">Seleccionar inspector...</option>
             @if (isLoading) {
               <option value="" disabled>Cargando inspectores...</option>
@@ -45,12 +45,12 @@ import { AuthService, UserRole } from '../../../../core/auth/auth.service';
 
           <div class="flex justify-end gap-3 mt-6">
             <button (click)="closeDialog.emit()"
-                    class="px-4 py-2 text-sm font-medium rounded-xl border border-border text-foreground hover:bg-muted transition-colors">
+                    class="cursor-pointer px-4 py-2 text-sm font-medium rounded-xl border border-border text-foreground hover:bg-muted transition-colors">
               Cancelar
             </button>
             <button [disabled]="!selectedInspectorId || isLoading"
                     (click)="onAssign()"
-                    class="px-4 py-2 text-sm font-medium rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50">
+                    class="cursor-pointer px-4 py-2 text-sm font-medium rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-50">
               @if (isLoading) {
                 <svg class="animate-spin w-4 h-4 mr-1.5 inline-block" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
