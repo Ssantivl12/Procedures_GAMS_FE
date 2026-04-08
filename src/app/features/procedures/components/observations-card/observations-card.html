@@ -1,60 +1,59 @@
-@if (showObservations) {
-  <div class="bg-card rounded-xl border border-orange-200 shadow-sm overflow-hidden">
-    <div class="flex items-center justify-between px-6 py-4 border-b border-orange-100 bg-orange-50/50">
-      <div class="flex items-center gap-2">
-        <svg class="w-5 h-5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-        </svg>
-        <h3 class="text-sm font-semibold text-foreground">Observaciones</h3>
-      </div>
-      <div class="flex items-center gap-3 text-xs">
-        <span class="text-muted-foreground">Total: <strong>{{ summary.total || 0 }}</strong></span>
-        <span class="text-orange-600">Pendientes: <strong>{{ summary.pending || 0 }}</strong></span>
-        <span class="text-emerald-600">Resueltas: <strong>{{ summary.resolved || 0 }}</strong></span>
-      </div>
+<div class="bg-card rounded-xl border border-orange-200 shadow-sm overflow-hidden">
+  <div class="flex items-center justify-between px-6 py-4 border-b border-orange-100 bg-orange-50/50">
+    <div class="flex items-center gap-2">
+      <svg class="w-5 h-5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+      </svg>
+      <h3 class="text-sm font-semibold text-foreground">Observaciones</h3>
     </div>
+    <div class="flex items-center gap-3 text-xs">
+      <span class="text-muted-foreground">Total: <strong>{{ summary.total || 0 }}</strong></span>
+      <span class="text-orange-600">Pendientes: <strong>{{ summary.pending || 0 }}</strong></span>
+      <span class="text-emerald-600">Resueltas: <strong>{{ summary.resolved || 0 }}</strong></span>
+    </div>
+  </div>
 
-    @if (isLoading) {
-      <div class="flex items-center justify-center py-8">
-        <svg class="animate-spin w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-        </svg>
-      </div>
-    } @else if (!groupedByCycle || groupedByCycle.length === 0) {
-      <div class="px-6 py-8 text-center">
-        <p class="text-sm text-muted-foreground">No hay observaciones registradas.</p>
-      </div>
-    } @else {
-      <div class="divide-y divide-border">
-        @for (group of groupedByCycle; track group.cycleId) {
-          <div class="group/cycle">
-            <div class="px-6 py-2.5 bg-muted/30 sticky top-0 z-10 border-y border-border/50 backdrop-blur-sm">
-              <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-muted-foreground uppercase tracking-widest">Ciclo {{ group.cycleNumber }}</span>
-                @if (group.cycleId === activeCycleId) {
-                  <span class="text-[10px] font-bold px-2 py-0.5 bg-primary/10 text-primary rounded-full uppercase">Ciclo Activo</span>
-                }
-              </div>
-            </div>
-            <div class="px-3 py-1 space-y-1">
-              @if (group.observations && group.observations.length > 0) {
-                @for (obs of group.observations; track obs.id) {
-                  <app-observation-item
-                    [observation]="obs"
-                    (resolve)="onResolve($event)"
-                    (reopen)="onReopen($event)">
-                  </app-observation-item>
-                }
-              } @else {
-                <div class="py-4 text-center">
-                  <p class="text-xs text-muted-foreground italic">Sin observaciones en este ciclo.</p>
-                </div>
+  @if (isLoading) {
+    <div class="flex items-center justify-center py-8">
+      <svg class="animate-spin w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+      </svg>
+    </div>
+  } @else if (!groupedByCycle || groupedByCycle.length === 0) {
+    <div class="px-6 py-8 text-center">
+      <p class="text-sm text-muted-foreground">No hay observaciones registradas.</p>
+    </div>
+  } @else {
+    <div class="divide-y divide-border">
+      @for (group of groupedByCycle; track group.cycleId) {
+        <div class="group/cycle">
+          <div class="px-6 py-2.5 bg-muted/30 sticky top-0 z-10 border-y border-border/50 backdrop-blur-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-muted-foreground uppercase tracking-widest">Ciclo {{ group.cycleNumber }}</span>
+              @if (group.cycleId === activeCycleId) {
+                <span class="text-[10px] font-bold px-2 py-0.5 bg-primary/10 text-primary rounded-full uppercase">Ciclo Activo</span>
               }
             </div>
           </div>
-        }
-      </div>
-    }
-  </div>
-}
+          <div class="px-3 py-1 space-y-1">
+            @if (group.observations && group.observations.length > 0) {
+              @for (obs of group.observations; track obs.id) {
+                <app-observation-item
+                  [observation]="obs"
+                  (resolve)="onResolve($event)"
+                  (reopen)="onReopen($event)">
+                </app-observation-item>
+              }
+            } @else {
+              <div class="py-4 text-center">
+                <p class="text-xs text-muted-foreground italic">Sin observaciones en este ciclo.</p>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+

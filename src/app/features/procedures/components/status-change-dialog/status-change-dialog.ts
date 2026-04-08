@@ -194,7 +194,7 @@ export class StatusChangeDialogComponent {
       case 'pickup': return ProcedureStatus.SUBSANACION_PENDIENTE_REINGRESO;
       case 'close': return ProcedureStatus.CERRADO;
       case 'abandon': return ProcedureStatus.ABANDONADO;
-      case 'reverse-abandon': return this.currentStatus; // Backend handles previous state
+      case 'reverse-abandon': return ProcedureStatus.RECIBIDO; // Set to RECIBIDO to bypass DTO. Backend ignores and uses last status
       default: return this.currentStatus;
     }
   }

@@ -1,8 +1,9 @@
-import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { ObservationService } from '../../services/observation.service';
 import { ObservationCategory, ObservationPriority } from '../../../../shared/models';
+import { showToast } from '../../../../shared/utils/toast.utils';
 
 @Component({
   selector: 'app-observation-form',
@@ -64,8 +65,10 @@ export class ObservationFormComponent {
         this.isLoading = false;
         this.observationCreated.emit();
       },
-      error: () => {
+      error: (err) => {
         this.isLoading = false;
+        const msg = err?.error?.message;
+        showToast('error', Array.isArray(msg) ? msg[0] : (msg || 'Error al crear la observación'));
       },
     });
   }
