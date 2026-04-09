@@ -115,11 +115,11 @@
                   <td class="px-4 py-3 text-sm font-medium">{{ c.legalName }}</td>
                   <td class="px-4 py-3 font-mono text-xs">{{ c.raiNumber }}</td>
                   <td class="px-4 py-3 text-xs">{{ c.category }}</td>
-                  <td class="px-4 py-3 text-xs">{{ c.currentStatus }}</td>
+                  <td class="px-4 py-3 text-xs">{{ c.raiSemaforo ?? '—' }}</td>
                   <td class="px-4 py-3">
                     <div class="flex flex-col gap-1">
                       <span class="text-[10px]">RAI: {{ c.raiExpirationDate ? formatDate(c.raiExpirationDate) : '—' }}</span>
-                      @if (c.raiStatus === 'VENCIDO') {
+                      @if (c.raiSemaforo === 'VENCIDO') {
                         <span class="w-fit px-1.5 py-0.5 bg-red-100 text-red-700 text-[9px] font-bold rounded uppercase">RAI Vencido</span>
                       }
                     </div>

@@ -21,6 +21,7 @@ export interface ProcedureReportRow {
   procedureId: string;
   caseFileCode: string;
   companyName: string;
+  company: { id: string; legalName: string; raiNumber: string; category: string } | null;
   procedureType: string;
   procedureKind: string;
   currentStatus: ProcedureStatus;
@@ -42,12 +43,15 @@ export interface ProcedureReportRow {
 export interface CompanyReportRow {
   companyId: string;
   legalName: string;
-  raiNumber: string;
+  nit: string | null;
+  raiNumber: string | null;
   category: string;
-  currentStatus: string;
-  lastProcedureDate: string | null;
+  municipality: string | null;
+  caseFileCode: string | null;
   raiExpirationDate: string | null;
-  raiStatus: string;
+  raiSemaforo: 'VIGENTE' | 'POR_VENCER' | 'VENCIDO' | null;
+  currentStatus?: string;
+  lastProcedureDate?: string | null;
 }
 
 export interface ActivityReportRow {
