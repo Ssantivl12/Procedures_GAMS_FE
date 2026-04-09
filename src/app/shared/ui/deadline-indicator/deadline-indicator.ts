@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule],
   template: `
-    @if (deadlineDate) {
+    @if (deadlineDate && daysRemaining !== null) {
       <div class="flex items-center gap-1.5 text-xs" [ngClass]="isOverdue ? 'text-red-600 font-semibold' : 'text-muted-foreground'">
         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
           @if (isOverdue) {
@@ -22,24 +22,26 @@ import { CommonModule } from '@angular/common';
 })
 export class DeadlineIndicatorComponent implements OnChanges {
   @Input() deadlineDate: string | null = null;
+  @Input() daysRemaining: number | null = null;
   @Input() isOverdue = false;
 
   displayText = '';
 
   ngOnChanges(): void {
-    if (!this.deadlineDate) {
+    if (!this.deadlineDate || this.daysRemaining === null) {
       this.displayText = '';
       return;
     }
+
     const deadline = new Date(this.deadlineDate);
     const formatted = deadline.toLocaleDateString('es-BO', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-    if (this.isOverdue) {
-      const diffDays = Math.ceil((new Date().getTime() - deadline.getTime()) / (1000 * 60 * 60 * 24));
-      this.displayText = `Vencido (${diffDays}d) - ${formatted}`;
+    if (this.daysRemaining < 0) {
+      this.displayText = `Vencido hace ${Math.abs(this.daysRemaining)} día${Math.abs(this.daysRemaining) !== 1 ? 's' : ''} hábil${Math.abs(this.daysRemaining) !== 1 ? 'es' : ''} - ${formatted}`;
+    } else if (this.daysRemaining === 0) {
+      this.displayText = `Vence hoy - ${formatted}`;
     } else {
-      const diffDays = Math.ceil((deadline.getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
-      this.displayText = `Vence: ${formatted} (${diffDays}d)`;
+      this.displayText = `Quedan ${this.daysRemaining} día${this.daysRemaining !== 1 ? 's' : ''} hábil${this.daysRemaining !== 1 ? 'es' : ''} - ${formatted}`;
     }
   }
 }

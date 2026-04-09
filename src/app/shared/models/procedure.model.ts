@@ -31,6 +31,7 @@ export interface Procedure {
   obsPickedDate: string | null;
   deadlineDate: string | null;
   daysElapsed: number | null;
+  daysRemaining: number | null;
   isOverdue: boolean;
   routeSheetNumber: string | null;
   companyStatus: CompanyStatus | null;

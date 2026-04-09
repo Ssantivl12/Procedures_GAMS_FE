@@ -65,7 +65,7 @@ import { EmptyStateComponent } from '../../../../shared/ui/empty-state/empty-sta
                     <app-status-badge [status]="proc.currentStatus"></app-status-badge>
                   </td>
                   <td class="px-6 py-4">
-                    <app-deadline-indicator [deadlineDate]="proc.deadlineDate" [isOverdue]="proc.isOverdue"></app-deadline-indicator>
+                    <app-deadline-indicator [deadlineDate]="proc.deadlineDate" [daysRemaining]="proc.daysRemaining" [isOverdue]="proc.isOverdue"></app-deadline-indicator>
                   </td>
                   <td class="px-6 py-4 text-center">
                     <span class="text-sm font-medium text-muted-foreground">

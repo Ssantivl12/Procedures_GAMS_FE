@@ -28,7 +28,8 @@ export interface ProcedureReportRow {
   receptionDate: string;
   reviewStartDate: string | null;
   deadlineDate: string | null;
-  daysElapsed: number;
+  daysElapsed: number | null;
+  daysRemaining: number | null;
   isOverdue: boolean;
   approvalDate: string | null;
   expirationDate: string | null;

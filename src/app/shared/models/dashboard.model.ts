@@ -87,6 +87,7 @@ export interface QueueItem {
   procedureType: string;
   currentStatus: string;
   deadlineDate: string | null;
+  daysRemaining: number | null;
   isOverdue: boolean;
 }
 
