@@ -10,6 +10,7 @@ import { TypeBadgeComponent } from '../../../../shared/ui/type-badge/type-badge'
 import { EmptyStateComponent } from '../../../../shared/ui/empty-state/empty-state';
 import { Procedure, ProcedureStatus, PaginatedResponse } from '../../../../shared/models';
 import { showToast } from '../../../../shared/utils/toast.utils';
+import { parsePureDate, formatPureDate } from '../../../../shared/utils/date.utils';
 
 @Component({
   selector: 'app-inbox-list',
@@ -129,7 +130,7 @@ export class InboxListComponent implements OnInit {
 
   getSlaStatus(deadlineDate: string | null | undefined): 'rojo' | 'amarillo' | 'verde' {
     if (!deadlineDate) return 'verde';
-    const deadline = new Date(deadlineDate);
+    const deadline = parsePureDate(deadlineDate);
     const now = new Date();
     deadline.setHours(0,0,0,0);
     now.setHours(0,0,0,0);
@@ -158,8 +159,7 @@ export class InboxListComponent implements OnInit {
   }
 
   formatDate(date: string | null | undefined): string {
-    if (!date) return '—';
-    return new Date(date).toLocaleDateString('es-BO', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    return formatPureDate(date);
   }
 
   onAssign(procId: string, event: Event) {

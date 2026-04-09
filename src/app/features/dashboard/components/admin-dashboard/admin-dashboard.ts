@@ -10,6 +10,7 @@ import {
   AdminDashboard, OverdueItem, InspectorWorkload,
   AlertsSummary, ProcedureStatus, RaiExpirationAlert,
 } from '../../../../shared/models';
+import { formatPureDate } from '../../../../shared/utils/date.utils';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -91,7 +92,6 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   formatDate(date: string | null): string {
-    if (!date) return '—';
-    return new Date(date).toLocaleDateString('es-BO', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    return formatPureDate(date);
   }
 }

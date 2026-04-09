@@ -6,6 +6,7 @@ import { DashboardService } from '../../services/dashboard.service';
 import { StatCardComponent } from '../stat-card/stat-card';
 import { EmptyStateComponent } from '../../../../shared/ui/empty-state/empty-state';
 import { SecretariaDashboard, PendingItem } from '../../../../shared/models';
+import { formatPureDate } from '../../../../shared/utils/date.utils';
 
 @Component({
   selector: 'app-secretaria-dashboard',
@@ -55,7 +56,6 @@ export class SecretariaDashboardComponent implements OnInit {
   }
 
   formatDate(date: string | null): string {
-    if (!date) return '—';
-    return new Date(date).toLocaleDateString('es-BO', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    return formatPureDate(date);
   }
 }

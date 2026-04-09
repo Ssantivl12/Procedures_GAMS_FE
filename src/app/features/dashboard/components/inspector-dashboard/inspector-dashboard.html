@@ -66,11 +66,7 @@
                 <td class="text-sm text-muted">{{ item.procedureType }}</td>
                 <td><app-status-badge [status]="getStatusEnum(item.currentStatus)" /></td>
                 <td class="text-sm" [class.text-danger]="item.isOverdue">
-                  @if (item.deadlineDate) {
-                    {{ item.deadlineDate | date:'dd/MM/yyyy' }}
-                  } @else {
-                    —
-                  }
+                  {{ formatDate(item.deadlineDate) }}
                 </td>
                 <td>
                   <a [routerLink]="['/procedures', item.procedureId]" class="btn-view">

@@ -7,6 +7,7 @@ import { StatCardComponent } from '../stat-card/stat-card';
 import { StatusBadgeComponent } from '../../../../shared/ui/status-badge/status-badge';
 import { EmptyStateComponent } from '../../../../shared/ui/empty-state/empty-state';
 import { InspectorDashboard, QueueItem, ProcedureStatus } from '../../../../shared/models';
+import { formatPureDate } from '../../../../shared/utils/date.utils';
 
 @Component({
   selector: 'app-inspector-dashboard',
@@ -57,5 +58,9 @@ export class InspectorDashboardComponent implements OnInit {
 
   getStatusEnum(status: string): ProcedureStatus {
     return status as ProcedureStatus;
+  }
+
+  formatDate(date: string | null): string {
+    return formatPureDate(date);
   }
 }

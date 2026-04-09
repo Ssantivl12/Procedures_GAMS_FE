@@ -11,6 +11,7 @@ import {
   ActivityReportRow,
 } from '../../services/reports.service';
 import { ProcedureStatus } from '../../../../shared/models';
+import { formatPureDate } from '../../../../shared/utils/date.utils';
 
 type ReportTab = 'procedures' | 'companies' | 'expired-rai' | 'iaa-status' | 'activity';
 
@@ -121,8 +122,6 @@ export class ReportsPageComponent implements OnInit {
   }
 
   formatDate(date: string): string {
-    return new Date(date).toLocaleDateString('es-BO', {
-      day: '2-digit', month: '2-digit', year: 'numeric',
-    });
+    return formatPureDate(date);
   }
 }
