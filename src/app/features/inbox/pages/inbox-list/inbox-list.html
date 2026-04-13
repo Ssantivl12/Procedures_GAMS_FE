@@ -98,14 +98,14 @@
 
 <!-- Kanban Card Template -->
 <ng-template #kanbanCard let-proc>
-  <div [class]="'p-4 rounded-xl shadow-sm hover:shadow-md cursor-pointer transition-all ' + getSlaClasses(proc.deadlineDate)"
+  <div [class]="'p-4 rounded-xl shadow-sm hover:shadow-md cursor-pointer transition-all ' + getSlaClasses(getEffectiveDeadline(proc))"
        [routerLink]="['/procedures', proc.id]">
-    
+
     <div class="flex justify-between items-start mb-2">
       <span class="text-xs font-bold text-slate-500 uppercase">{{ proc.routeSheetNumber || 'S/N' }}</span>
       <span class="text-[10px] font-bold px-2 py-0.5 rounded-full"
-            [ngClass]="getSlaStatus(proc.deadlineDate) === 'rojo' ? 'bg-red-100 text-red-700' : (getSlaStatus(proc.deadlineDate) === 'amarillo' ? 'bg-yellow-100 text-yellow-800' : 'bg-emerald-100 text-emerald-700')">
-        {{ getSlaLabel(proc.deadlineDate) }}
+            [ngClass]="getSlaStatus(getEffectiveDeadline(proc)) === 'rojo' ? 'bg-red-100 text-red-700' : (getSlaStatus(getEffectiveDeadline(proc)) === 'amarillo' ? 'bg-yellow-100 text-yellow-800' : 'bg-emerald-100 text-emerald-700')">
+        {{ getSlaLabel(getEffectiveDeadline(proc)) }}
       </span>
     </div>
 
@@ -121,7 +121,7 @@
       <svg class="w-4 h-4 mr-1 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
       </svg>
-      Plazo: <span class="font-medium ml-1" [ngClass]="{'text-red-600': getSlaStatus(proc.deadlineDate) === 'rojo'}">{{ formatDate(proc.deadlineDate) }}</span>
+      Plazo: <span class="font-medium ml-1" [ngClass]="{'text-red-600': getSlaStatus(getEffectiveDeadline(proc)) === 'rojo'}">{{ formatDate(getEffectiveDeadline(proc)) }}</span>
     </div>
 
     <!-- Quick Actions -->

@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 import { ChangeDetectorRef } from '@angular/core';
 import { finalize } from 'rxjs';
 import { ProcedureService } from '../../services/procedure.service';
-import { Procedure, ProcedureTypeCode } from '../../../../shared/models';
+import { Procedure, ProcedureStatus, ProcedureTypeCode } from '../../../../shared/models';
 import { StatusBadgeComponent } from '../../../../shared/ui/status-badge/status-badge';
 import { TypeBadgeComponent } from '../../../../shared/ui/type-badge/type-badge';
 import { DeadlineIndicatorComponent } from '../../../../shared/ui/deadline-indicator/deadline-indicator';
@@ -65,7 +65,11 @@ import { EmptyStateComponent } from '../../../../shared/ui/empty-state/empty-sta
                     <app-status-badge [status]="proc.currentStatus"></app-status-badge>
                   </td>
                   <td class="px-6 py-4">
-                    <app-deadline-indicator [deadlineDate]="proc.deadlineDate" [daysRemaining]="proc.daysRemaining" [isOverdue]="proc.isOverdue"></app-deadline-indicator>
+                    <app-deadline-indicator
+                      [deadlineDate]="proc.currentStatus === ProcedureStatus.SUBSANACION_PENDIENTE_REINGRESO ? proc.subsanacionDeadlineDate : proc.deadlineDate"
+                      [daysRemaining]="proc.currentStatus === ProcedureStatus.SUBSANACION_PENDIENTE_REINGRESO ? proc.subsanacionDaysRemaining : proc.daysRemaining"
+                      [isOverdue]="proc.currentStatus === ProcedureStatus.SUBSANACION_PENDIENTE_REINGRESO ? proc.isSubsanacionOverdue : proc.isOverdue">
+                    </app-deadline-indicator>
                   </td>
                   <td class="px-6 py-4 text-center">
                     <span class="text-sm font-medium text-muted-foreground">
@@ -141,6 +145,8 @@ import { EmptyStateComponent } from '../../../../shared/ui/empty-state/empty-sta
   `]
 })
 export class ProcedureTableComponent implements OnInit, OnChanges {
+  ProcedureStatus = ProcedureStatus;
+
   private readonly procedureService = inject(ProcedureService);
   private readonly cdr = inject(ChangeDetectorRef);
 

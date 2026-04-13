@@ -1,11 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Procedure } from '../../../../shared/models';
+import { Procedure, ProcedureStatus } from '../../../../shared/models';
+import { DeadlineIndicatorComponent } from '../../../../shared/ui/deadline-indicator/deadline-indicator';
 
 @Component({
   selector: 'app-procedure-info-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, DeadlineIndicatorComponent],
   template: `
     @if (procedure) {
       <div class="bg-card rounded-xl border border-border shadow-sm p-6">
@@ -70,6 +71,42 @@ import { Procedure } from '../../../../shared/models';
             </div>
           </div>
 
+          @if (procedure.currentStatus === ProcedureStatus.RECIBIDO || procedure.currentStatus === ProcedureStatus.EN_REVISION) {
+            @if (procedure.deadlineDate) {
+              <div class="flex items-start gap-3">
+                <svg class="w-4 h-4 mt-0.5 flex-shrink-0" [class]="procedure.isOverdue ? 'text-red-500' : 'text-muted-foreground'" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                  <p class="text-xs text-muted-foreground">Plazo Técnico</p>
+                  <app-deadline-indicator
+                    [deadlineDate]="procedure.deadlineDate"
+                    [daysRemaining]="procedure.daysRemaining"
+                    [isOverdue]="procedure.isOverdue">
+                  </app-deadline-indicator>
+                </div>
+              </div>
+            }
+          }
+
+          @if (procedure.currentStatus === ProcedureStatus.SUBSANACION_PENDIENTE_REINGRESO) {
+            @if (procedure.subsanacionDeadlineDate) {
+              <div class="flex items-start gap-3">
+                <svg class="w-4 h-4 mt-0.5 flex-shrink-0" [class]="procedure.isSubsanacionOverdue ? 'text-red-500' : 'text-amber-500'" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                  <p class="text-xs text-muted-foreground">Plazo de Subsanación (empresa)</p>
+                  <app-deadline-indicator
+                    [deadlineDate]="procedure.subsanacionDeadlineDate"
+                    [daysRemaining]="procedure.subsanacionDaysRemaining"
+                    [isOverdue]="procedure.isSubsanacionOverdue">
+                  </app-deadline-indicator>
+                </div>
+              </div>
+            }
+          }
+
           @if (procedure.generalNotes) {
             <div class="mt-4 p-3 bg-muted/50 rounded-lg">
               <p class="text-xs text-muted-foreground mb-1">Notas Generales</p>
@@ -82,5 +119,7 @@ import { Procedure } from '../../../../shared/models';
   `,
 })
 export class ProcedureInfoCardComponent {
+  ProcedureStatus = ProcedureStatus;
+
   @Input() procedure: Procedure | null = null;
 }

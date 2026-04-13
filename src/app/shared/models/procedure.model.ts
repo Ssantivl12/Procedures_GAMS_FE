@@ -33,6 +33,9 @@ export interface Procedure {
   daysElapsed: number | null;
   daysRemaining: number | null;
   isOverdue: boolean;
+  subsanacionDeadlineDate: string | null;
+  subsanacionDaysRemaining: number | null;
+  isSubsanacionOverdue: boolean;
   routeSheetNumber: string | null;
   companyStatus: CompanyStatus | null;
   approvalDate: string | null;
@@ -68,6 +71,7 @@ export interface ChangeStatusPayload {
   toStatus: ProcedureStatus;
   reviewStartDate?: string;
   obsPickedDate?: string;
+  subsanacionDays?: number;
   approvalDate?: string;
   approvalCertificate?: string;
   expirationDate?: string;

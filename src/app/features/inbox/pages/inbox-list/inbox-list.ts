@@ -109,11 +109,17 @@ export class InboxListComponent implements OnInit {
     this.applyFilters();
   }
 
+  getEffectiveDeadline(proc: Procedure): string | null | undefined {
+    return proc.currentStatus === ProcedureStatus.SUBSANACION_PENDIENTE_REINGRESO
+      ? proc.subsanacionDeadlineDate
+      : proc.deadlineDate;
+  }
+
   applyFilters(): void {
     let result = [...this.procedures];
 
     if (this.activeFilter !== 'all') {
-      result = result.filter(p => this.getSlaStatus(p.deadlineDate) === this.activeFilter);
+      result = result.filter(p => this.getSlaStatus(this.getEffectiveDeadline(p)) === this.activeFilter);
     }
 
     if (this.searchQuery.trim()) {

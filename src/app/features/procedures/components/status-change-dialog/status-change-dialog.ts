@@ -48,6 +48,15 @@ import { showToast } from '../../../../shared/utils/toast.utils';
               <input formControlName="obsPickedDate" type="date"
                      class="w-full px-3 py-2 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/30" />
             </div>
+            <div>
+              <label class="block text-sm font-medium text-foreground mb-1.5">Días hábiles para subsanación *</label>
+              <input formControlName="subsanacionDays" type="number" min="1" placeholder="Ej: 15"
+                     class="w-full px-3 py-2 text-sm rounded-xl border border-border bg-card focus:outline-none focus:ring-2 focus:ring-primary/30"
+                     [class.border-red-400]="submitted && !form.get('subsanacionDays')?.value" />
+              @if (submitted && !form.get('subsanacionDays')?.value) {
+                <span class="text-xs text-red-500 mt-1 block">Este campo es requerido (mínimo 1 día).</span>
+              }
+            </div>
           }
 
           @if (action === 'close') {
@@ -157,6 +166,7 @@ export class StatusChangeDialogComponent {
   form = this.fb.group({
     reviewStartDate: [new Date().toISOString().split('T')[0]],
     obsPickedDate: [new Date().toISOString().split('T')[0]],
+    subsanacionDays: [null as number | null],
     approvalDate: [''],
     approvalCertificate: [''],
     expirationDate: [''],
@@ -204,6 +214,9 @@ export class StatusChangeDialogComponent {
     const val = this.form.getRawValue();
 
     // Manual validations based on action
+    if (this.action === 'pickup' && !val.subsanacionDays) {
+      return;
+    }
     if (this.action === 'close') {
       if (!val.approvalDate || !val.approvalCertificate) return;
       if (this.procedureTypeCode === ProcedureTypeCode.RAI && !val.expirationDate) return;
@@ -220,6 +233,7 @@ export class StatusChangeDialogComponent {
 
     if (val.reviewStartDate) payload.reviewStartDate = val.reviewStartDate;
     if (val.obsPickedDate) payload.obsPickedDate = val.obsPickedDate;
+    if (this.action === 'pickup' && val.subsanacionDays) payload.subsanacionDays = Number(val.subsanacionDays);
     if (val.approvalDate) payload.approvalDate = val.approvalDate;
     if (val.approvalCertificate) payload.approvalCertificate = val.approvalCertificate;
     if (val.expirationDate) payload.expirationDate = val.expirationDate;
