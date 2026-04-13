@@ -92,7 +92,15 @@ export class AuthService {
   }
 
   logout(): void {
+    const refreshToken = this.getRefreshToken();
     this.clearSession();
+    if (refreshToken) {
+      // Fire-and-forget: revoke the refresh token server-side.
+      // clearSession() runs first so a 401 from this call doesn't re-trigger the interceptor.
+      firstValueFrom(
+        this.api.post('/auth/logout', { refreshToken })
+      ).catch(() => { /* ignore — session is already cleared locally */ });
+    }
   }
 
   async login(email: string, password: string): Promise<LoginResponse> {

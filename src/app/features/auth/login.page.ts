@@ -10,10 +10,6 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { environment } from '../../../environments/environment';
 
-interface LoginResponse {
-  accessToken: string;
-}
-
 @Component({
   standalone: true,
   selector: 'app-login-page',
@@ -449,8 +445,11 @@ export class LoginPage {
         this.loginError = 'Respuesta del servidor inválida.';
       }
     } catch (err: any) {
-      this.loginError = err.message || 'No se pudo conectar con el servidor.';
-      console.error('Login error:', err);
+      if (err.status === 429) {
+        this.loginError = 'Demasiados intentos fallidos. Por favor espere 15 minutos antes de intentar nuevamente.';
+      } else {
+        this.loginError = err.message || 'No se pudo conectar con el servidor.';
+      }
     } finally {
       this.loading = false;
     }

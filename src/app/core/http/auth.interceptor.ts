@@ -1,12 +1,12 @@
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { throwError, BehaviorSubject, Observable } from 'rxjs';
-import { catchError, filter, switchMap, take, finalize } from 'rxjs/operators';
+import { catchError, filter, switchMap, take } from 'rxjs/operators';
 import { AuthService } from '../auth/auth.service';
 import { Router } from '@angular/router';
 
 let isRefreshing = false;
-const refreshTokenSubject = new BehaviorSubject<string | null>(null);
+let refreshTokenSubject = new BehaviorSubject<string | null>(null);
 
 function isAuthEndpoint(url: string): boolean {
   return (
@@ -66,6 +66,9 @@ function handle401Error(req: any, next: any, auth: AuthService, router: Router):
         },
         (err) => {
           isRefreshing = false;
+          // Unblock all queued requests so they reject instead of hanging forever
+          refreshTokenSubject.error(err);
+          refreshTokenSubject = new BehaviorSubject<string | null>(null);
           auth.logout();
           router.navigate(['/login']);
           observer.error(err);
