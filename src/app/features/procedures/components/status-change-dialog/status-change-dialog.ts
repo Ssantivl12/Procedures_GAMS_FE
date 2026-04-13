@@ -71,7 +71,7 @@ import { showToast } from '../../../../shared/utils/toast.utils';
             </div>
             <div>
               <label class="block text-sm font-medium text-foreground mb-1.5">
-                {{ procedureTypeCode === 'RAI' ? 'Nro. de Certificado RAI *' : 'Nro. de Resolución Administrativa *' }}
+                {{ procedureTypeCode === 'RAI' ? 'Nro. de Certificado RAI *' : 'Certificado de Aprobación*' }}
               </label>
               <input formControlName="approvalCertificate" type="text"
                      [placeholder]="procedureTypeCode === 'RAI' ? 'Nro. certificado RAI' : 'Nro. de resolución'"

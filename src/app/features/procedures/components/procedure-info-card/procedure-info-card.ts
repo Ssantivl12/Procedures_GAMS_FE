@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Procedure, ProcedureStatus } from '../../../../shared/models';
 import { DeadlineIndicatorComponent } from '../../../../shared/ui/deadline-indicator/deadline-indicator';
+import { formatPureDate } from '../../../../shared/utils/date.utils';
 
 @Component({
   selector: 'app-procedure-info-card',
@@ -18,7 +19,7 @@ import { DeadlineIndicatorComponent } from '../../../../shared/ui/deadline-indic
             </svg>
             <div>
               <p class="text-xs text-muted-foreground">Fecha de Recepción</p>
-              <p class="text-sm font-medium text-foreground">{{ procedure.receptionDate | date:'dd/MM/yyyy' }}</p>
+              <p class="text-sm font-medium text-foreground">{{ formatPureDate(procedure.receptionDate) }}</p>
             </div>
           </div>
 
@@ -29,7 +30,7 @@ import { DeadlineIndicatorComponent } from '../../../../shared/ui/deadline-indic
               </svg>
               <div>
                 <p class="text-xs text-muted-foreground">Inicio de Revisión</p>
-                <p class="text-sm font-medium text-foreground">{{ procedure.reviewStartDate | date:'dd/MM/yyyy' }}</p>
+                <p class="text-sm font-medium text-foreground">{{ formatPureDate(procedure.reviewStartDate) }}</p>
               </div>
             </div>
           }
@@ -120,6 +121,7 @@ import { DeadlineIndicatorComponent } from '../../../../shared/ui/deadline-indic
 })
 export class ProcedureInfoCardComponent {
   ProcedureStatus = ProcedureStatus;
+  formatPureDate = formatPureDate;
 
   @Input() procedure: Procedure | null = null;
 }
