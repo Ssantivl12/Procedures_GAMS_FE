@@ -35,11 +35,11 @@ export class InboxListComponent implements OnInit {
   activeFilter: string = 'all';
 
   get pageTitle(): string {
-    return 'Centro de Acciones Urgentes';
+    return 'Tablero de Trámites Pendientes';
   }
 
   get pageSubtitle(): string {
-    return 'Tablero Kanban de trámites pendientes basados en SLA';
+    return 'Tablero de trámites pendientes de atención. Haga click en un trámite para ver detalles.';
   }
 
   readonly filterOptions = [

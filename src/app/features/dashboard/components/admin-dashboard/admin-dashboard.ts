@@ -45,10 +45,6 @@ export class AdminDashboardComponent implements OnInit {
     return this.dashboard?.overdueList?.length || 0;
   }
 
-  get inspectors(): InspectorWorkload[] {
-    return this.dashboard?.inspectorWorkload || [];
-  }
-
   get overdueList(): OverdueItem[] {
     return this.dashboard?.overdueList?.slice(0, 8) || [];
   }

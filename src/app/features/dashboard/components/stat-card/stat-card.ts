@@ -8,7 +8,12 @@ import { CommonModule } from '@angular/common';
   template: `
     <div class="stat-card" [ngClass]="'stat-' + color">
       <div class="stat-icon-wrap">
-        <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <svg 
+          [attr.viewBox]="viewBox"
+          [attr.fill]="fill"
+          [attr.stroke]="stroke"
+          [attr.stroke-width]="strokeWidth"
+        >
           <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="icon" />
         </svg>
       </div>
@@ -57,4 +62,8 @@ export class StatCardComponent {
   @Input({ required: true }) value!: string | number;
   @Input() icon = 'M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75z';
   @Input() color: 'primary' | 'warning' | 'danger' | 'success' | 'info' | 'purple' = 'primary';
+  @Input() viewBox: string = '0 0 24 24';
+  @Input() fill: string = 'none';
+  @Input() stroke: string = 'currentColor';
+  @Input() strokeWidth: string = '1.5';
 }

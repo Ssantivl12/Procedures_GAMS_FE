@@ -12,12 +12,15 @@
     <app-stat-card
       label="Trámites Activos"
       [value]="totalActive"
-      icon="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15a2.251 2.251 0 011.152.567"
+      icon="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"
       color="primary" />
     <app-stat-card
       label="Vencidos"
       [value]="overdueCount"
-      icon="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126z"
+      icon="M256 0c14.7 0 28.2 8.1 35.2 21l216 400c6.7 12.4 6.4 27.4-.8 39.5S486.1 480 472 480L40 480c-14.1 0-27.2-7.4-34.4-19.5s-7.5-27.1-.8-39.5l216-400c7-12.9 20.5-21 35.2-21zm0 352a32 32 0 1 0 0 64 32 32 0 1 0 0-64zm0-192c-18.2 0-32.7 15.5-31.4 33.7l7.4 104c.9 12.5 11.4 22.3 23.9 22.3 12.6 0 23-9.7 23.9-22.3l7.4-104c1.3-18.2-13.1-33.7-31.4-33.7z"
+      viewBox="0 0 512 512"
+      fill="currentColor"
+      stroke="none"
       color="danger" />
     <app-stat-card
       label="Cerrados"
@@ -56,105 +59,21 @@
     </div>
   }
 
-  <div class="two-columns">
-    <!-- Inspector Workload -->
-    <div class="section">
-      <div class="section-header">
-        <h2 class="section-title">Carga de Inspectores</h2>
-        <a routerLink="/users" class="section-link">Ver todos</a>
-      </div>
-      @if (inspectors.length === 0) {
-        <div class="empty-card">
-          <app-empty-state
-            icon="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"
-            title="Sin inspectores"
-            message="No hay inspectores con carga asignada.">
-          </app-empty-state>
-        </div>
-      } @else {
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>Inspector</th>
-                <th class="text-center">Activos</th>
-                <th class="text-center">Vencidos</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (ins of inspectors; track ins.inspectorId) {
-                <tr>
-                  <td class="font-medium">{{ ins.inspectorName }}</td>
-                  <td class="text-center">
-                    <span class="count-badge">{{ ins.activeCount }}</span>
-                  </td>
-                  <td class="text-center">
-                    @if (ins.overdueCount > 0) {
-                      <span class="count-badge danger">{{ ins.overdueCount }}</span>
-                    } @else {
-                      <span class="count-badge success">0</span>
-                    }
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      }
+  <!-- Upcoming Expirations (RAI) -->
+  <div class="section">
+    <div class="section-header">
+      <h2 class="section-title pt-6">Trámites Próximos a Vencer (Certificaciones RAI)</h2>
+      <span class="badge-count warning pt-6">{{ raiExpirationAlerts.length }}</span>
     </div>
-
-    <!-- Overdue List -->
-    <div class="section">
-      <div class="section-header">
-        <h2 class="section-title">Trámites Vencidos</h2>
-        <a routerLink="/inbox" class="section-link">Ver bandeja</a>
+    @if (raiExpirationAlerts.length === 0) {
+      <div class="empty-card">
+        <app-empty-state
+          icon="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          title="Sin vencimientos cercanos"
+          message="No hay certificados RAI por vencer.">
+        </app-empty-state>
       </div>
-      @if (overdueList.length === 0) {
-        <div class="empty-card">
-          <app-empty-state
-            icon="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-            title="Sin vencidos"
-            message="No hay trámites con plazo vencido.">
-          </app-empty-state>
-        </div>
-      } @else {
-        <div class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>Empresa</th>
-                <th>Tipo</th>
-                <th class="text-center">Días</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (item of overdueList; track item.procedureId) {
-                <tr>
-                  <td>
-                    <a [routerLink]="['/procedures', item.procedureId]" class="link-name">
-                      {{ item.companyName }}
-                    </a>
-                  </td>
-                  <td class="text-sm text-muted">{{ item.procedureType }}</td>
-                  <td class="text-center">
-                    <span class="count-badge danger">{{ item.daysOverdue }}d</span>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      }
-    </div>
-  </div>
-
-  <!-- RAI Expiration Alerts -->
-  @if (raiExpirationAlerts.length > 0) {
-    <div class="section mt-8">
-      <div class="section-header">
-        <h2 class="section-title">Semáforo RAI (Vencidos o Por Vencer)</h2>
-        <span class="badge-count warning">{{ raiExpirationAlerts.length }}</span>
-      </div>
+    } @else {
       <div class="table-container">
         <table>
           <thead>
@@ -169,7 +88,7 @@
             @for (item of raiExpirationAlerts; track item.companyId) {
               <tr>
                 <td class="font-medium">{{ item.companyName }}</td>
-                <td class="font-mono text-xs">{{ item.raiNumber }}</td>
+                <td class="font-mono text-xs">{{ item.raiNumber || '—' }}</td>
                 <td class="text-sm">{{ formatDate(item.expirationDate) }}</td>
                 <td>
                   <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase"
@@ -182,7 +101,53 @@
           </tbody>
         </table>
       </div>
+    }
+  </div>
+
+  <!-- Overdue List -->
+  <div class="section">
+    <div class="section-header">
+      <h2 class="section-title pt-6">Trámites Vencidos</h2>
+      <a routerLink="/inbox" class="section-link">Ver bandeja</a>
     </div>
-  }
+    @if (overdueList.length === 0) {
+      <div class="empty-card">
+        <app-empty-state
+          icon="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          title="Sin vencidos"
+          message="No hay trámites con plazo vencido.">
+        </app-empty-state>
+      </div>
+    } @else {
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Hoja de Ruta</th>
+              <th>Empresa</th>
+              <th>Tipo</th>
+              <th class="text-center">Días Vencidos</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of overdueList; track item.procedureId) {
+              <tr>
+                <td class="font-medium">{{ item.routeSheetNumber || '—' }}</td>
+                <td>
+                  <a [routerLink]="['/procedures', item.procedureId]" class="link-name">
+                    {{ item.companyName }}
+                  </a>
+                </td>
+                <td class="text-sm text-muted">{{ item.procedureType }}</td>
+                <td class="text-center">
+                  <span class="count-badge danger">{{ item.daysOverdue }}d</span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
 
 }

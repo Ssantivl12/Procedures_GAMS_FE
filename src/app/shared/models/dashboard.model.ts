@@ -36,18 +36,19 @@ export interface OverdueItem {
   routeSheetNumber: string | null;
   companyName: string;
   procedureType: string;
-  deadlineDate: string;
-  daysOverdue: number;
-  inspectorName: string | null;
+  currentStatus: string;
+  deadlineDate: string | null;
+  daysOverdue: number | null;
+  assignedInspector: { id: string; fullName: string } | null;
 }
 
 export interface RaiExpirationAlert {
   companyId: string;
   companyName: string;
-  raiNumber: string;
+  raiNumber: string | null;
   expirationDate: string;
   daysUntilExpiration: number;
-  status: 'POR_VENCER' | 'VENCIDO';
+  status: 'POR_VENCER' | 'VENCIDO' | 'VIGENTE';
 }
 
 export interface IaaDelinquentItem {
@@ -78,6 +79,9 @@ export interface PendingItem {
   currentStatus: string;
   deadlineDate: string | null;
   receptionDate: string;
+  obsIssuedAt?: string | null;
+  daysRemaining?: number | null;
+  isOverdue?: boolean;
 }
 
 export interface QueueItem {
@@ -88,6 +92,7 @@ export interface QueueItem {
   currentStatus: string;
   deadlineDate: string | null;
   daysRemaining: number | null;
+  daysElapsed?: number | null;
   isOverdue: boolean;
 }
 
